@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr4
+ *  NamelessMC version 2.0.0-pr5
  *
  *  License: MIT
  *
@@ -26,50 +26,116 @@ if($form->guest == 0 && !$user->isLoggedIn()){
 
 // Always define page name
 define('PAGE', 'form-' . $form->id);
-?>
-<!DOCTYPE html>
-<html<?php if(defined('HTML_CLASS')) echo ' class="' . HTML_CLASS . '"'; ?> lang="<?php echo (defined('HTML_LANG') ? HTML_LANG : 'en'); ?>" <?php if(defined('HTML_RTL') && HTML_RTL === true) echo ' dir="rtl"'; ?>>
-  <head>
-    <!-- Standard Meta -->
-    <meta charset="<?php echo (defined('LANG_CHARSET') ? LANG_CHARSET : 'utf-8'); ?>">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+$page_title = $forms_language->get('forms', 'forms');
+require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 
-    <!-- Site Properties -->
-	<?php 
-	$title = $forms_language->get('forms', 'forms');
-	require(ROOT_PATH . '/core/templates/header.php');
-	?>
-
-  </head>
-  <body>
-    <?php
-	require(ROOT_PATH . '/core/templates/navbar.php');
-	require(ROOT_PATH . '/core/templates/footer.php');
+// Get fields
+$fields = $queries->getWhere('forms_fields', array('form_id', '=', $form->id));
 	
-	// Get fields
-	$fields = $queries->getWhere('forms_fields', array('form_id', '=', $form->id));
-	$fields_array = array();
-	foreach($fields as $field){
-		$options = explode(',', Output::getClean($field->options));
-		$fields_array[] = array(
-			'id' => Output::getClean($field->id),
-			'name' => Output::getClean($field->name),
-			'type' => Output::getClean($field->type),
-			'options' => $options,
-		);
+// Handle input
+if(Input::exists()){
+	if(Token::check(Input::get('token'))){
+		// Validation
+		$validate = new Validate();
+		$to_validate = array();
+		
+		foreach($fields as $field){
+			if($field->required == 1) {
+				$to_validate[$field->id] = array(
+					'required' => true
+				);
+			}
+		}
+		
+		$validation = $validate->check($_POST, $to_validate);
+		if($validation->passed()){
+			// Validation passed
+			try {
+				// Convert to content
+				$content = array();
+				unset($_POST['token']);
+				foreach($_POST as $key => $item){
+					$content[] = array($key, htmlspecialchars($item));
+				}
+				$content = json_encode($content);
+					
+				// Get user id if logged in
+				if($user->isLoggedIn()){
+					$user_id = $user->data()->id;
+				} else {
+					$user_id = null;
+				}
+					
+				// Save to database
+				$queries->create('forms_replies', array(
+					'form_id' => $form->id,
+					'user_id' => $user_id,
+					'updated_by' => $user_id,
+					'created' => date('U'),
+					'updated' => date('U'),
+					'content' =>  $content,
+					'status_id' => 1
+				));
+				$success = $forms_language->get('forms', 'form_submitted');
+											
+            } catch (Exception $e) {
+                Session::flash('flash_error', $e->getMessage());
+            }
+		} else {
+			// Validation errors
+			$errors = array();
+			foreach($validation->errors() as $item){
+                // Get field name
+                $id = explode(' ', $item);
+                $id = $id[0];
+
+                $fielderror = $queries->getWhere('forms_fields', array('id', '=', $id));
+                if (count($field)) {
+                    $fielderror = $fielderror[0];
+                    $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
+                }
+			}
+		}
+	} else {
+		// Invalid token
+		Session::flash('flash_error', $language->get('general', 'invalid_token'));
 	}
+}
+
+$fields_array = array();
+foreach($fields as $field){
+	$options = explode(',', Output::getClean($field->options));
+	$fields_array[] = array(
+		'id' => Output::getClean($field->id),
+		'name' => Output::getClean($field->name),
+		'type' => Output::getClean($field->type),
+		'required' => Output::getClean($field->required),
+		'options' => $options,
+	);
+}
+
+if(isset($errors)) $smarty->assign('ERRORS', $errors);
+if(isset($success)) $smarty->assign('SUCCESS', $success);
 	
-	$smarty->assign(array(
-		'TITLE' => Output::getClean($form->title),
-		'FIELDS' => $fields_array,
-		'TOKEN' => Token::get(),
-		'SUBMIT' => $language->get('general', 'submit')
-	));
+$smarty->assign(array(
+	'TITLE' => Output::getClean($form->title),
+	'FIELDS' => $fields_array,
+	'TOKEN' => Token::get(),
+	'SUBMIT' => $language->get('general', 'submit')
+));
 	
-	// Display template
-	$smarty->display(ROOT_PATH . '/custom/templates/' . TEMPLATE . '/forms/form.tpl');
-	require(ROOT_PATH . '/core/templates/scripts.php');
-	?>
-  </body>
-</html>
+// Load modules + template
+Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
+
+$page_load = microtime(true) - $start;
+define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
+
+$template->onPageLoad();
+	
+$smarty->assign('WIDGETS', $widgets->getWidgets());
+	
+require(ROOT_PATH . '/core/templates/navbar.php');
+require(ROOT_PATH . '/core/templates/footer.php');
+	
+// Display template
+$template->displayTemplate('forms/form.tpl', $smarty);
