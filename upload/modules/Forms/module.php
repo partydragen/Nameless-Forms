@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -20,7 +20,7 @@ class Forms_Module extends Module {
 		$name = 'Forms';
 		$author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
 		$module_version = '1.0.0';
-		$nameless_version = '2.0.0-pr5';
+		$nameless_version = '2.0.0-pr6';
 
 		parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
@@ -65,7 +65,68 @@ class Forms_Module extends Module {
 	}
 
 	public function onInstall(){
-		// Not necessary for Forms
+		// Queries
+		$queries = new Queries();
+		
+		try {
+			// Create tabels
+			$data = $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, PRIMARY KEY (`id`)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+			$data = $queries->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `content` mediumtext NOT NULL, PRIMARY KEY (`id`)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+			$data = $queries->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `options` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+			$data = $queries->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NOT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+			$data = $queries->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, PRIMARY KEY (`id`)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+			
+			// Insert data
+			$queries->create('forms_statuses', array(
+				'html' => '<span class="badge badge-success">Open</span>',
+				'open' => 1,
+				'fids' => '1',
+				'gids' => '2,3'
+			));
+			$queries->create('forms_statuses', array(
+				'html' => '<span class="badge badge-danger">Closed</span>',
+				'open' => 0,
+				'fids' => '1',
+				'gids' => '2,3'
+			));
+			
+			// create example staff applications
+			$queries->create('forms', array(
+				'url' => '/apply',
+				'title' => 'Staff Applications',
+				'guest' => 0,
+				'link_location' => 1
+				
+			));
+			$queries->create('forms_fields', array(
+				'form_id' => 1,
+				'name' => 'Minecraft Name',
+				'type' => 1,
+				'required' => 1,
+				'order' => 1
+			));
+			$queries->create('forms_fields', array(
+				'form_id' => 1,
+				'name' => 'Why you want to become staff?',
+				'type' => 3,
+				'required' => 1,
+				'order' => 2
+			));
+			
+			// Update main admin group permissions
+			$group = $queries->getWhere('groups', array('id', '=', 2));
+			$group = $group[0];
+			
+			$group_permissions = json_decode($group->permissions, TRUE);
+			$group_permissions['forms.manage'] = 1;
+			$group_permissions['forms.view-submissions'] = 1;
+			$group_permissions['forms.manage-submission'] = 1;
+			
+			$group_permissions = json_encode($group_permissions);
+			$queries->update('groups', 2, array('permissions' => $group_permissions));
+		} catch(Exception $e){
+			// Error
+		}
 	}
 
 	public function onUninstall(){

@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -172,7 +172,7 @@ if(!isset($_GET['view'])){
 						$queries->create('forms_comments', array(
 							'form_id' => $submission->id,
 							'user_id' => $user->data()->id,
-							'date' => date('U'),
+							'created' => date('U'),
 							'content' => Output::getClean(Input::get('content'))
 						));
 					}
@@ -218,8 +218,8 @@ if(!isset($_GET['view'])){
 				'style' => $user->getGroupClass($comment->user_id),
 				'avatar' => $user->getAvatar($comment->user_id),
 				'content' => Output::getPurified(Output::getDecoded($comment->content)),
-				'date' => date('d M Y, H:i', $comment->date),
-				'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->date), $language->getTimeLanguage())
+				'date' => date('d M Y, H:i', $comment->created),
+				'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
 			);
 		}
 		

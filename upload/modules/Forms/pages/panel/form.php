@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -98,7 +98,6 @@ if(!isset($_GET['action'])){
 					// Save to database
 					$queries->update('forms', $form->id, array(
 						'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
-						'type' => 1,
 						'title' => Output::getClean(Input::get('form_name')),
 						'guest' => $guest,
 						'link_location' => $location,
@@ -439,11 +438,9 @@ if(!isset($_GET['action'])){
 				Redirect::to(URL::build('/panel/forms'));
 				die();
 			}
-			try {
-				$queries->delete('forms_fields', array('id', '=', $_GET['id']));
-			} catch(Exception $e){
-				die($e->getMessage());
-			}
+			$queries->update('forms_fields', $_GET['id'], array(
+				'deleted' => 1
+			));
 				
 			Session::flash('staff_forms', $forms_language->get('forms', 'field_deleted_successfully'));
 			Redirect::to(URL::build('/panel/form/', 'form='.$form->id));

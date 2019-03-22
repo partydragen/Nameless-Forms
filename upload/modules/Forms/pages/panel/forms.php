@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -47,7 +47,6 @@ if(!isset($_GET['action'])){
 		foreach($forms as $form){
 			$forms_array[] = array(
 				'name' => Output::getClean($form->title),
-				'type' => Output::getClean($form->type),
 				'edit_link' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
 				'delete_link' => URL::build('/panel/forms/', 'action=delete&id=' . Output::getClean($form->id))
 			);
@@ -138,7 +137,6 @@ if(!isset($_GET['action'])){
 							// Save to database
 							$queries->create('forms', array(
 								'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
-								'type' => 1,
 								'title' => Output::getClean(Input::get('form_name')),
 								'guest' => $guest,
 								'link_location' => $location,
