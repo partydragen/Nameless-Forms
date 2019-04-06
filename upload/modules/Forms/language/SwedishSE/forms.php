@@ -25,6 +25,7 @@ $language = array(
 	'delete_form' => 'Är du säker på att du vill radera det här formuläret?</br>Varning: Varning: Alla uppgifter som hör till detta formulär raderas (frågor och inlägg)',
 	'form_submitted' => 'Formulär skickad',
 	'action' => 'Action',
+	'actions' => 'Actions',
 	'guest' => 'Gäst',
 	
 	// Form
@@ -92,4 +93,6 @@ $language = array(
 	'current_status_x' => 'Nuvarande Status: {x}',
 	'last_updated' => 'Sist uppdaterad:',
 	'your_submission_updated' => 'Your submission has been updated',
+	'user' => 'User',
+	'updated_by' => 'Updated by',
 );

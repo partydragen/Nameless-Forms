@@ -25,6 +25,7 @@ $language = array(
 	'delete_form' => 'Are you sure you want to delete this form?</br>Warning: All data who belongs to this form will be deleted like questions and submissions',
 	'form_submitted' => 'Form submitted successfully',
 	'action' => 'Action',
+	'actions' => 'Actions',
 	'guest' => 'Guest',
 	
 	// Form
@@ -92,4 +93,6 @@ $language = array(
 	'current_status_x' => 'Current status: {x}',
 	'last_updated' => 'Last updated:',
 	'your_submission_updated' => 'Your submission has been updated',
+	'user' => 'User',
+	'updated_by' => 'Updated by',
 );

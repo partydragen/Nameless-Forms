@@ -40,7 +40,7 @@ class Forms_Module extends Module {
 			if(count($forms)){
 				foreach($forms as $form){
 					// Register form page
-					$pages->add('Forms', $form->url, 'pages/form.php', $form->title, true);
+					$pages->add('Forms', $form->url, 'pages/form.php', 'form-' . $form->id, true);
 					
 					// Add link location
 					switch($form->link_location){

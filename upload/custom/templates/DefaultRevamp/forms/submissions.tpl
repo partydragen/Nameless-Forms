@@ -19,9 +19,9 @@
 		    <table class="ui fixed single line selectable unstackable small padded res table">
 			  <thead>
 				<tr>
-				  <th>Form</th>
-				  <th>Updated by</th>
-				  <th>Status</th>
+				  <th>{$FORM}</th>
+				  <th>{$UPDATED_BY}</th>
+				  <th>{$STATUS}</th>
 				  <th></th>
 				</tr>
 			  </thead>

@@ -54,11 +54,11 @@
                             <table class="table table-bordered">
 								<thead>
                                     <tr>
-									  <th>Form</th>
-									  <th>User</th>
-									  <th>Updated by</th>
-									  <th>Status</th>
-									  <th>Actions</th>
+									  <th>{$FORM}</th>
+									  <th>{$USER}</th>
+									  <th>{$UPDATED_BY}</th>
+									  <th>{$STATUS}</th>
+									  <th>{$ACTIONS}</th>
                                     </tr>
 								</thead>
                                 <tbody>

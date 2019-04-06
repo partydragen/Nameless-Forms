@@ -129,6 +129,11 @@ if(!isset($_GET['view'])){
 		'SUBMISSIONS_LIST' => $submissions,
 		'VIEW' => $language->get('general', 'view'),
 		'NO_SUBMISSIONS' => $forms_language->get('forms', 'no_open_submissions'),
+		'FORM' => $forms_language->get('forms', 'form'),
+		'USER' => $forms_language->get('forms', 'user'),
+		'UPDATED_BY' => $forms_language->get('forms', 'updated_by'),
+		'STATUS' => $forms_language->get('forms', 'status'),
+		'ACTIONS' => $forms_language->get('forms', 'actions'),
 	));
 			
 	$template_file = 'forms/submissions.tpl';
