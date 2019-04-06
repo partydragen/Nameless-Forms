@@ -100,6 +100,12 @@ class Forms_Module extends Module {
 				'fids' => '1',
 				'gids' => '2,3'
 			));
+			$queries->create('forms_statuses', array(
+				'html' => '<span class="badge badge-warning">Under Considering</span>',
+				'open' => 1,
+				'fids' => '1',
+				'gids' => '2,3'
+			));
 			
 			// create example staff applications
 			$queries->create('forms', array(
@@ -166,9 +172,8 @@ class Forms_Module extends Module {
 	public function onPageLoad($user, $pages, $cache, $smarty, $navs, $widgets, $template){
 		// Permissions
 		PermissionHandler::registerPermissions('Forms', array(
-			'forms.view-submissions' => $this->_language->get('admin', 'core'),
-			'forms.manage-submission' => $this->_language->get('admin', 'core'),
-			'forms.manage' => $this->_language->get('admin', 'core'),
+			'forms.view-submissions' => $this->_forms_language->get('forms', 'forms_view_submissions'),
+			'forms.manage' => $this->_forms_language->get('forms', 'forms_manage'),
 		));
 		
 		$navs[1]->add('cc_submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/user/submissions'));

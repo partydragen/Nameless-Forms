@@ -28,6 +28,10 @@ $language = array(
 	'actions' => 'Actions',
 	'guest' => 'Guest',
 	
+	// Permissions
+	'forms_view_submissions' => 'StaffCP &raquo; Forms &raquo; Submissions',
+	'forms_manage' => 'StaffCP &raquo; Forms &raquo; Forms',
+	
 	// Form
 	'editing_x' => 'Editing {x}', // Don't replace {x}
 	'form_created_successfully' => 'Form created successfully.',
