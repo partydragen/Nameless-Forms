@@ -130,7 +130,7 @@
 								<div class="col-md-4">
                                     <div class="float-md-right">
                                         <a class="btn btn-warning btn-sm" href="{$status.edit_link}"><i class="fas fa-edit fa-fw"></i></a>
-                                        <button class="btn btn-danger btn-sm" type="button" onclick="showDeleteStatusModal('{$status.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
+                                        {if $status.id != 1 && $status.id != 2}<button class="btn btn-danger btn-sm" type="button" onclick="showDeleteStatusModal('{$status.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>{else}<button class="btn btn-danger btn-sm" type="button"><i class="fa fa-lock fa-fw"></i></button>{/if}
                                     </div>
 								</div>
 							</div>

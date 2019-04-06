@@ -2,6 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
+ *  https://partydragen.com/
  *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
@@ -21,7 +22,7 @@ if($user->isLoggedIn()){
 		Redirect::to(URL::build('/panel/auth'));
 		die();
 	} else {
-		if(!$user->hasPermission('forms.edit')){
+		if(!$user->hasPermission('forms.view-submissions')){
 			require_once(ROOT_PATH . '/404.php');
 			die();
 		}
@@ -141,6 +142,10 @@ if(!isset($_GET['view'])){
 		}
 		$submission = $submission[0];
 		
+		// Get form from id
+		$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
+		$form = $form[0];
+		
 		// Check input
 		if(Input::exists()){
 			$errors = array();
@@ -157,18 +162,25 @@ if(!isset($_GET['view'])){
 				));
 
 				if($validation->passed()){
-					    $status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
-					    if(count($status)){
-                            $groups = explode(',', $status[0]->gids);
-                            if(in_array($user->data()->group_id, $groups)) {
-                                $status = $_POST['status'];
-							} else {
-								$status = $submission->status_id;
+					$any_changes = false;
+					
+					$status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
+					if(count($status)){
+                        $groups = explode(',', $status[0]->gids);
+                        if(in_array($user->data()->group_id, $groups)) {
+                            $status = $_POST['status'];
+								
+							if($submission->status_id != $_POST['status']) {
+								$any_changes = true;
 							}
-                        } else
-                            $status = $submission->status_id;
+						} else {
+							$status = $submission->status_id;
+						}
+                    } else
+                        $status = $submission->status_id;
 					
 					if(!empty(Input::get('content'))) {
+						$any_changes = true;
 						$queries->create('forms_comments', array(
 							'form_id' => $submission->id,
 							'user_id' => $user->data()->id,
@@ -177,17 +189,31 @@ if(!isset($_GET['view'])){
 						));
 					}
 
-					$queries->update('forms_replies', $submission->id, array(
-						'updated_by' => $user->data()->id,
-						'updated' => date('U'),
-						'status_id' => $status
-					));
+					// Was there any changes?
+					if($any_changes == true) {
+						$queries->update('forms_replies', $submission->id, array(
+							'updated_by' => $user->data()->id,
+							'updated' => date('U'),
+							'status_id' => $status
+						));
+						
+						// Alert user?
+						if($form->can_view == 1 && $submission->user_id != null) {
+							Alert::create(
+								$submission->user_id,
+								'submission_update',
+								array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
+								array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
+								URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id))
+							);
+						}
 
-					$success = $language->get('moderator', 'comment_created');
-					
-					Session::flash('submission_success', $forms_language->get('forms', 'submission updated'));
-					Redirect::to(URL::build('/panel/forms/submissions/', 'view=' . Output::getClean($submission->id)));
-					die();
+						$success = $language->get('moderator', 'comment_created');
+						
+						Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
+						Redirect::to(URL::build('/panel/forms/submissions/', 'view=' . Output::getClean($submission->id)));
+						die();
+					}
 				} else {
 					// Display error
 				}
@@ -223,9 +249,6 @@ if(!isset($_GET['view'])){
 			);
 		}
 		
-		$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
-		$form = $form[0];
-		
 		// Get comments
 		$currentstatus = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
 		
@@ -245,7 +268,7 @@ if(!isset($_GET['view'])){
 		// Form statuses
 		$statuses = array();
 
-		$form_statuses = $queries->getWhere('forms_statuses', array('id', '<>', 0));
+		$form_statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
 		if(count($form_statuses)){
 			foreach($form_statuses as $status){
 				$form_ids = explode(',', $status->fids);
@@ -269,7 +292,7 @@ if(!isset($_GET['view'])){
 		}
 
 		$smarty->assign(array(
-			'FORM_X' => str_replace('{x}', $form->title, $forms_language->get('forms', 'form_x')),
+			'FORM_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'form_x')),
 			'CURRENT_STATUS_X' => str_replace('{x}', $currentstatus[0]->html, $forms_language->get('forms', 'current_status_x')),
 			'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
 			'LAST_UPDATED_DATE' => date('d M Y, H:i', $submission->updated),

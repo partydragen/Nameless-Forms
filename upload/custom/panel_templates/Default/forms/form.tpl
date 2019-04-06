@@ -86,7 +86,7 @@
 										<input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}" value="{$FORM_URL_VALUE}">
 									</div>
 									<div class="form-group">
-										<label for="Inputguest">{$ALLOW_GUESTS}</label>
+										<label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
 										<input id="inputguest" name="guest" type="checkbox" class="js-switch"{if $ALLOW_GUESTS_VALUE eq 1} checked{/if} />
 									</div>
 								</div>
@@ -104,11 +104,15 @@
 											<option value="4"{if $LINK_LOCATION_VALUE eq 4} selected{/if}>{$LINK_NONE}</option>
 										</select>
 									</div>
+									<div class="form-group">
+										<label for="Inputguest">{$CAN_USER_VIEW}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$CAN_USER_VIEW_HELP}"></i></span>
+										<input id="inputcan_view" name="can_view" type="checkbox" class="js-switch"{if $CAN_USER_VIEW_VALUE eq 1} checked{/if} />
+									</div>
 								</div>
-								<div class="form-group">
-									<input type="hidden" name="token" value="{$TOKEN}">
-									<input type="submit" class="btn btn-primary" value="{$SUBMIT}">
-								</div>
+							</div>
+							<div class="form-group">
+								<input type="hidden" name="token" value="{$TOKEN}">
+								<input type="submit" class="btn btn-primary" value="{$SUBMIT}">
 							</div>
 						</form>
 						

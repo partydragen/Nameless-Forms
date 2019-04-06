@@ -2,7 +2,8 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  https://partydragen.com/
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -30,7 +31,8 @@ $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 
 // Get fields
-$fields = $queries->getWhere('forms_fields', array('form_id', '=', $form->id));
+//fields = $queries->getWhere('forms_fields', array('form_id', '=', $form->id));
+$fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
 	
 // Handle input
 if(Input::exists()){
@@ -76,10 +78,19 @@ if(Input::exists()){
 					'content' =>  $content,
 					'status_id' => 1
 				));
-				$success = $forms_language->get('forms', 'form_submitted');
+				
+				$submission_id = $queries->getLastId();
+
+				if($form->can_view == 1 && $user->isLoggedIn()) {
+					Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+					Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
+					die();
+				} else {
+					$success = $forms_language->get('forms', 'form_submitted');
+				}
 											
             } catch (Exception $e) {
-                Session::flash('flash_error', $e->getMessage());
+               $errors[] = $e->getMessage();
             }
 		} else {
 			// Validation errors
@@ -98,7 +109,7 @@ if(Input::exists()){
 		}
 	} else {
 		// Invalid token
-		Session::flash('flash_error', $language->get('general', 'invalid_token'));
+		$errors[] = $language->get('general', 'invalid_token');
 	}
 }
 
@@ -126,6 +137,21 @@ $smarty->assign(array(
 	
 // Load modules + template
 Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
+
+if(Session::exists('submission_success'))
+	$success = Session::flash('submission_success');
+
+if(isset($success))
+	$smarty->assign(array(
+		'SUCCESS' => $success,
+		'SUCCESS_TITLE' => $language->get('general', 'success')
+	));
+
+if(isset($errors) && count($errors))
+	$smarty->assign(array(
+		'ERRORS' => $errors,
+		'ERRORS_TITLE' => $language->get('general', 'error')
+	));
 
 $page_load = microtime(true) - $start;
 define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));

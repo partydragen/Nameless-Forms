@@ -2,7 +2,8 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr4
+ *  https://partydragen.com/
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -18,20 +19,23 @@ $language = array(
 	'form_url' => 'Form URL (with preceding /, eg /example)',
 	'form_icon' => 'Form Icon',
 	'link_location' => 'Link Location',
-	'allow_guests' => 'Can guests visit this form?',
 	'creating_new_form' => 'Creating New Form',
 	'form_created_successfully' => 'Form created successfully',
 	'none_forms_defined' => 'There are no forms yet.',
 	'delete_form' => 'Are you sure you want to delete this form?</br>Warning: All data who belongs to this form will be deleted like questions and submissions',
-	'submissions' => 'Submissions',
 	'form_submitted' => 'Form submitted successfully',
 	'action' => 'Action',
+	'guest' => 'Guest',
 	
 	// Form
 	'editing_x' => 'Editing {x}', // Don't replace {x}
 	'form_created_successfully' => 'Form created successfully.',
 	'form_updated_successfully' => 'Form updated successfully.',
 	'form_deleted_successfully' => 'Form deleted successfully.',
+	'allow_guests' => 'Can guests visit this form?',
+	'allow_guests_help' => 'Guests will be able to send in submissions without being logged in, Please note them won\'t be able to view the submission afterwards',
+	'can_user_view' => 'Can user view his own submission?',
+	'can_user_view_help' => 'User will be able to view his own submission and use the comment section, User will also receive update alerts when the status change or when someone comment, Please note this won\'t work for guests.',
 	
 	// Fields
 	'field' => 'Field',
@@ -81,10 +85,11 @@ $language = array(
 	
 	// Submissions
 	'submissions' => 'Submissions',
+	'submission_updated' => 'Submission updated successfully',
 	'no_open_submissions' => 'There are currently no open submissions.',
 	'no_closed_submissions' => 'There are currently no closed submissions.',
 	'form_x' => 'Form: {x}',
 	'current_status_x' => 'Current status: {x}',
 	'last_updated' => 'Last updated:',
-	'guest' => 'Guest',
+	'your_submission_updated' => 'Your submission has been updated',
 );

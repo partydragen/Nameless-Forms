@@ -2,7 +2,8 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr5
+ *  https://partydragen.com/
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -21,7 +22,7 @@ if($user->isLoggedIn()){
 		Redirect::to(URL::build('/panel/auth'));
 		die();
 	} else {
-		if(!$user->hasPermission('forms.edit')){
+		if(!$user->hasPermission('forms.manage')){
 			require_once(ROOT_PATH . '/404.php');
 			die();
 		}
@@ -302,15 +303,17 @@ if(!isset($_GET['action'])){
 				Redirect::to(URL::build('/panel/forms'));
 				die();
 			}
-
-			try {
-				// Delete the status
-				$queries->delete('forms_statuses', array('id', '=', $_GET['id']));
-				Session::flash('staff_forms', $forms_language->get('forms', 'status_deleted_successfully'));
-
-			} catch(Exception $e){
-				// Error, redirect anyway
+			
+			if($_GET['id'] == 1 || $_GET['id'] == 2) {
+				// Check the status ID is valid
+				Redirect::to(URL::build('/panel/forms'));
+				die();
 			}
+
+			$queries->update('forms_statuses', $_GET['id'], array(
+				'deleted' => 1
+			));
+			Session::flash('staff_forms', $forms_language->get('forms', 'status_deleted_successfully'));
 
 			Redirect::to(URL::build('/panel/forms'));
 			die();

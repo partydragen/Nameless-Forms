@@ -81,7 +81,7 @@
 										  {/if}
 										  <br /><span data-toggle="tooltip" data-original-title="{$submission.reported_at_full}">{$submission.updated_at}</span>
 										</td>
-										<td><h4>{$submission.status}</h4></td>
+										<td><h5>{$submission.status}</h5></td>
 										<td><a href="{$submission.link}" class="btn btn-primary">{$VIEW} &raquo;</a></td>
                                     </tr>
 									{/foreach}

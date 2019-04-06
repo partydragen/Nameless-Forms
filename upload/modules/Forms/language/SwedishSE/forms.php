@@ -2,7 +2,8 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr4
+ *  https://partydragen.com/
+ *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
  *
@@ -18,18 +19,23 @@ $language = array(
 	'form_url' => 'Formulärets URL (med föregående /, t.ex /exempel)',
 	'form_icon' => 'Formulärets Ikon',
 	'link_location' => 'Länk Plats',
-	'allow_guests' => 'Kan gäster visa detta formulär?',
 	'creating_new_form' => 'Skapar nytt formulär',
+	'form_created_successfully' => 'Form created successfully',
 	'none_forms_defined' => 'Det finns inga formulär än.',
 	'delete_form' => 'Är du säker på att du vill radera det här formuläret?</br>Varning: Varning: Alla uppgifter som hör till detta formulär raderas (frågor och inlägg)',
 	'form_submitted' => 'Formulär skickad',
 	'action' => 'Action',
+	'guest' => 'Gäst',
 	
 	// Form
 	'editing_x' => 'Redigerar {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formuläret har skapats',
 	'form_updated_successfully' => 'Formuläret har uppdaterats.',
 	'form_deleted_successfully' => 'Formuläret har raderats.',
+	'allow_guests' => 'Kan gäster visa detta formulär?',
+	'allow_guests_help' => 'Guests will be able to send in submissions without being logged in, Please note them won\'t be able to view the submission afterwards',
+	'can_user_view' => 'Can user view his own submission?',
+	'can_user_view_help' => 'User will be able to view his own submission and use the comment section, User will also receive update alerts when the status change or when someone comment, Please note this won\'t work for guests.',
 	
 	// Fields
 	'field' => 'Fält',
@@ -79,10 +85,11 @@ $language = array(
 	
 	// Submissions
 	'submissions' => 'Inskickade',
+	'submission_updated' => 'Submission updated successfully',
 	'no_open_submissions' => 'Det finns inga öppna inskickningar just nu.',
 	'no_closed_submissions' => 'Det finns inga stängda inskickningar just nu.',
 	'form_x' => 'Formulär: {x}',
 	'current_status_x' => 'Nuvarande Status: {x}',
 	'last_updated' => 'Sist uppdaterad:',
-	'guest' => 'Gäst',
+	'your_submission_updated' => 'Your submission has been updated',
 );

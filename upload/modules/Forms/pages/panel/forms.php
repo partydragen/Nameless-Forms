@@ -2,6 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
+ *  https://partydragen.com/
  *  NamelessMC version 2.0.0-pr6
  *
  *  License: MIT
@@ -21,7 +22,7 @@ if($user->isLoggedIn()){
 		Redirect::to(URL::build('/panel/auth'));
 		die();
 	} else {
-		if(!$user->hasPermission('forms.edit')){
+		if(!$user->hasPermission('forms.manage')){
 			require_once(ROOT_PATH . '/404.php');
 			die();
 		}
@@ -54,11 +55,12 @@ if(!isset($_GET['action'])){
 	}
 	
 	// Get statuses from database
-	$statuses = $queries->orderAll('forms_statuses', 'id', 'ASC');
+	$statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
 	$status_array = array();
 	if(count($statuses)){
 		foreach($statuses as $status){
 			$status_array[] = array(
+				'id' => $status->id,
 				'html' => $status->html,
 				'open' => $status->open,
 				'edit_link' => URL::build('/panel/forms/statuses', 'action=edit&id=' . Output::getClean($status->id)),
@@ -133,6 +135,10 @@ if(!isset($_GET['action'])){
 							// Can guest visit?
 							if(isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
 							else $guest = 0;
+							
+							// Can guest visit?
+							if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
+							else $can_view = 0;
 									
 							// Save to database
 							$queries->create('forms', array(
@@ -140,7 +146,8 @@ if(!isset($_GET['action'])){
 								'title' => Output::getClean(Input::get('form_name')),
 								'guest' => $guest,
 								'link_location' => $location,
-								'icon' => Input::get('form_icon')
+								'icon' => Input::get('form_icon'),
+								'can_view' => $can_view,
 							));
 										
 							Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
@@ -204,6 +211,9 @@ if(!isset($_GET['action'])){
 				'LINK_FOOTER' => $language->get('admin', 'page_link_footer'),
 				'LINK_NONE' => $language->get('admin', 'page_link_none'),
 				'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
+				'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
+				'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
+				'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
 			));
 			
 			$template->addCSSFiles(array(
@@ -234,6 +244,8 @@ if(!isset($_GET['action'])){
 			try {
 				$queries->delete('forms', array('id', '=', $_GET['id']));
 				$queries->delete('forms_fields', array('form_id', '=', $_GET['id']));
+				$queries->delete('forms_replies', array('form_id', '=', $_GET['id']));
+				$queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
 			} catch(Exception $e){
 				die($e->getMessage());
 			}
@@ -271,6 +283,7 @@ $smarty->assign(array(
 	'PARENT_PAGE' => PARENT_PAGE,
 	'PAGE' => PANEL_PAGE,
 	'DASHBOARD' => $language->get('admin', 'dashboard'),
+	'INFO' => $language->get('general', 'info'),
 	'FORMS' => $forms_language->get('forms', 'forms'),
 	'TOKEN' => Token::get(),
 	'SUBMIT' => $language->get('general', 'submit')
