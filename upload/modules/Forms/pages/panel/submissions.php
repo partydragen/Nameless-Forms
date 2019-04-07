@@ -43,6 +43,7 @@ $timeago = new Timeago(TIMEZONE);
 
 if(!isset($_GET['view'])){
 	$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies ORDER BY created DESC')->results();
+	$url = URL::build('/panel/forms/submissions/', true);
 	
 	if(count($submissions_query)){
 		// Get page
