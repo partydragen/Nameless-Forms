@@ -74,7 +74,7 @@
 						
 						<div class="row">
 							<div class="col-md-6">
-								<b>Form</b>
+								<b>{$FORM}</b>
 							</div>
 							<div class="col-md-6">
 								<span class="float-md-right"><b>{$ACTION}</b></span>
@@ -103,7 +103,7 @@
 				</br>
                 <div class="card">
                     <div class="card-body">
-						<h3 style="display:inline;">Statuses</h3>
+						<h3 style="display:inline;">{$STATUSES}</h3>
 						<span class="float-md-right"><a href="{$NEW_STATUS_LINK}" class="btn btn-primary">{$NEW_STATUS}</a></span>
 						<hr>
 						

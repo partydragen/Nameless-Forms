@@ -70,12 +70,14 @@ if(!isset($_GET['action'])){
 	}
 	
 	$smarty->assign(array(
+		'FORM' => $forms_language->get('forms', 'form'),
 		'NEW_FORM' => $forms_language->get('forms', 'new_form'),
 		'NEW_FORM_LINK' => URL::build('/panel/forms/', 'action=new'),
 		'FORMS_LIST' => $forms_array,
 		'NEW_STATUS' => $forms_language->get('forms', 'new_status'),
 		'NEW_STATUS_LINK' => URL::build('/panel/forms/statuses/', 'action=new'),
 		'STATUS' => $forms_language->get('forms', 'status'),
+		'STATUSES' => $forms_language->get('forms', 'statuses'),
 		'MARKED_AS_OPEN' => $forms_language->get('forms', 'marked_as_open'),
 		'STATUS_LIST' => $status_array,
 		'NONE_FORMS_DEFINED' => $forms_language->get('forms', 'none_forms_defined'),

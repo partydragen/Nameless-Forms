@@ -46,8 +46,41 @@
                 <div class="card">
                     <div class="card-body">
 						<h3 style="display:inline;">{$SUBMISSIONS}</h3>
-						
 						<hr>
+						
+						<form action="" method="post">
+						  <div class="form-row">
+						    <div class="col-2">
+							  <label for="form_selection">{$FORM}</label>
+							</div>
+							<div class="col-2">
+							  <label for="form_selection">{$STATUS}</label>
+							</div>
+						  </div>
+						  
+						  <div class="form-row">
+						    <div class="col-2">
+							  <select class="form-control" id="form_selection" name="form_selection">
+								{foreach from=$FORM_LIST item=form}
+								  <option value="{$form.id}" {if $FORM_SELECTION_VALUE eq {$form.id}} selected{/if}>{$form.name}</option>
+								{/foreach}
+							  </select>
+							</div>
+						    <div class="col-2">
+							  <select class="form-control" id="status_selection" name="status_selection">
+								{foreach from=$STATUS_LIST item=status}
+								  <option value="{$status.id}" {if $STATUS_SELECTION_VALUE eq {$status.id}} selected{/if}>{$status.html}</option>
+								{/foreach}
+							  </select>
+							</div>
+						    <div class="col-2">
+							  <input type="hidden" name="token" value="{$TOKEN}">
+							  <input type="submit" value="Sort" class="btn btn-primary">
+							</div>
+						  </div>
+						</form>
+						
+						</br>
 						
 						{if count($SUBMISSIONS_LIST)}
 						<div class="table-responsive">

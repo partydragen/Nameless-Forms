@@ -41,9 +41,55 @@ require_once(ROOT_PATH . '/core/templates/backend_init.php');
 
 $timeago = new Timeago(TIMEZONE);
 
+$url_path = '/panel/forms/submissions/?';
 if(!isset($_GET['view'])){
-	$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies ORDER BY created DESC')->results();
-	$url = URL::build('/panel/forms/submissions/', true);
+	// Check input
+	if(Input::exists()){
+		$errors = array();
+		
+		// Check token
+		if(Token::check(Input::get('token'))){
+			// Valid token
+			$form = $_POST['form_selection'];
+			$status = $_POST['status_selection'];
+			
+			if ($form != 0) {
+				$url_path = $url_path . 'form='.$form.'&';
+			}
+			if ($status != 0) {
+				$url_path = $url_path . 'status='.$status.'&';
+			}
+			
+			Redirect::to(URL::build($url_path));
+			die();
+		} else {
+			// Invalid token
+			$errors[] = $language->get('general', 'invalid_token');
+		}
+	}
+	
+	if(!isset($_GET['form']) && !isset($_GET['status'])){
+		// sort by open submissions
+		$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) ORDER BY created DESC')->results();
+		$url = URL::build('/panel/forms/submissions/', true);
+	} else {
+		if(isset($_GET['form']) && isset($_GET['status'])){
+			// Sort by form and status
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
+		} else if(isset($_GET['form'])) {
+			// sort by form
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? ORDER BY created DESC', array($_GET['form']))->results();
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&', true);
+		} else if(isset($_GET['status'])) {
+			// sort by status
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? ORDER BY created DESC', array($_GET['status']))->results();
+
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
+		} else {
+			Redirect::to(URL::build('/panel/forms/submissions/'));
+		}
+	}
 	
 	if(count($submissions_query)){
 		// Get page
@@ -126,6 +172,38 @@ if(!isset($_GET['view'])){
 		
 	}
 	
+	// Get forms from database
+	$forms = $queries->orderAll('forms', 'id', 'ASC');
+	$forms_array = array();
+	if(count($forms)){
+		$forms_array[] = array(
+			'id' => 0,
+			'name' => 'All',
+		);
+		foreach($forms as $form){
+			$forms_array[] = array(
+				'id' => $form->id,
+				'name' => Output::getClean($form->title),
+			);
+		}
+	}
+	
+	// Get statuses from database
+	$statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
+	$status_array = array();
+	if(count($statuses)){
+			$status_array[] = array(
+				'id' => 0,
+				'html' => 'All open'
+			);
+		foreach($statuses as $status){
+			$status_array[] = array(
+				'id' => $status->id,
+				'html' => $status->html
+			);
+		}
+	}
+	
 	$smarty->assign(array(
 		'SUBMISSIONS_LIST' => $submissions,
 		'VIEW' => $language->get('general', 'view'),
@@ -135,6 +213,10 @@ if(!isset($_GET['view'])){
 		'UPDATED_BY' => $forms_language->get('forms', 'updated_by'),
 		'STATUS' => $forms_language->get('forms', 'status'),
 		'ACTIONS' => $forms_language->get('forms', 'actions'),
+		'FORM_LIST' => $forms_array,
+		'STATUS_LIST' => $status_array,
+		'FORM_SELECTION_VALUE' => (isset($_GET['form']) ? $_GET['form'] : '0'),
+		'STATUS_SELECTION_VALUE' => (isset($_GET['status']) ? $_GET['status'] : '0')
 	));
 			
 	$template_file = 'forms/submissions.tpl';

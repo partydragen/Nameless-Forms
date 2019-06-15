@@ -28,10 +28,6 @@ $language = array(
 	'actions' => 'Actions',
 	'guest' => 'Gäst',
 	
-	// Permissions
-	'forms_view_submissions' => 'StaffCP &raquo; Forms &raquo; Submissions',
-	'forms_manage' => 'StaffCP &raquo; Forms &raquo; Forms',
-	
 	// Form
 	'editing_x' => 'Redigerar {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formuläret har skapats',

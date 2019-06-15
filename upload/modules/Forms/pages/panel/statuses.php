@@ -260,7 +260,7 @@ if(!isset($_GET['action'])){
 			}
 
 			// Get a list of all groups
-			$group_list = $queries->getWhere('groups', array('id', '<>', 0));
+			$group_list = $queries->getWhere('groups', array('staff', '=', 1));
 			$template_groups = array();
 
 			// Get a list of groups which have access to the status
