@@ -57,7 +57,7 @@ if(Input::exists()){
 				$content = array();
 				unset($_POST['token']);
 				foreach($_POST as $key => $item){
-					$content[] = array($key, htmlspecialchars($item));
+					$content[] = array($key, Output::getClean(nl2br($item)));
 				}
 				$content = json_encode($content);
 					

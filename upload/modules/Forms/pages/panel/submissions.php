@@ -273,7 +273,7 @@ if(!isset($_GET['view'])){
 							'form_id' => $submission->id,
 							'user_id' => $user->data()->id,
 							'created' => date('U'),
-							'content' => Output::getClean(Input::get('content'))
+							'content' => Output::getClean(nl2br(Input::get('content')))
 						));
 					}
 
@@ -318,7 +318,7 @@ if(!isset($_GET['view'])){
 			$question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
 			$answer_array[] = array(
 				'question' => $question[0]->name,
-				'answer' => $answer[1]
+				'answer' => Output::getPurified(Output::getDecoded($answer[1]))
 			);
 		}
 		

@@ -196,7 +196,7 @@ class Forms_Module extends Module {
 					} else {
 						$icon = $cache->retrieve('forms_icon');
 					}
-					$navs[2]->add('forms', $this->_forms_language->get('forms', 'forms'), URL::build('/panel/forms'), 'top', null, $order, $icon);
+					$navs[2]->add('forms', $this->_forms_language->get('forms', 'forms'), URL::build('/panel/forms'), 'top', null, $order + 0.1, $icon);
 				}
 				
 				if($user->hasPermission('forms.view-submissions')){
@@ -206,7 +206,7 @@ class Forms_Module extends Module {
 					} else {
 						$icon = $cache->retrieve('forms_submissions_icon');
 					}
-					$navs[2]->add('submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/panel/forms/submissions'), 'top', null, $order, $icon);
+					$navs[2]->add('submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/panel/forms/submissions'), 'top', null, $order + 0.2, $icon);
 				}
 			}
 		}
