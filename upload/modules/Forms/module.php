@@ -21,7 +21,7 @@ class Forms_Module extends Module {
 
 		$name = 'Forms';
 		$author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-		$module_version = '1.1.0';
+		$module_version = '1.1.1';
 		$nameless_version = '2.0.0-pr6';
 
 		parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -33,9 +33,7 @@ class Forms_Module extends Module {
 		$pages->add('Forms', '/panel/forms/submissions', 'pages/panel/submissions.php');
 		$pages->add('Forms', '/user/submissions', 'pages/user/submissions.php');
 		
-		// is installed
-		$cache->setCache('forms');
-		if($cache->isCached('forms_installed')){
+		try {
 			$forms = $queries->getWhere('forms', array('id', '<>', 0));
 			if(count($forms)){
 				foreach($forms as $form){
@@ -68,6 +66,8 @@ class Forms_Module extends Module {
 					}
 				}
 			}
+		} catch(Exception $e){
+			// Database tabels don't exist
 		}
 	}
 
@@ -148,12 +148,6 @@ class Forms_Module extends Module {
 			$queries->update('groups', 2, array('permissions' => $group_permissions));
 		} catch(Exception $e){
 			// Error
-		}
-		
-		// Installed
-		$this->_cache->setCache('forms');
-		if(!$this->_cache->isCached('forms_installed')){
-			$this->_cache->store('forms_installed', true);
 		}
 	}
 
