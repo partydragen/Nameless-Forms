@@ -65,7 +65,8 @@
 			  {$NO_COMMENTS}
 			  </br>
             {/if}
-				
+			
+			{if $CAN_COMMENT}
             <form action="" method="post">
               <div class="form-group">
                 <textarea class="form-control" name="content" rows="5" placeholder="{$NEW_COMMENT}"></textarea>
@@ -75,6 +76,7 @@
                 <input type="submit" value="{$SUBMIT}" class="btn btn-primary">
               </div>
             </form>
+			{/if}
 		  
 		</div>
 	  </div>

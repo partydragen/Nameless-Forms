@@ -188,6 +188,7 @@ if(!isset($_GET['view'])){
 		'CREATED_DATE_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
 		'COMMENTS' => $smarty_comments,
 		'COMMENTS_TEXT' => $language->get('moderator', 'comments'),
+		'CAN_COMMENT' => Output::getClean($currentstatus[0]->open),
 		'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
 		'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
 		'ANSWERS' => $answer_array,

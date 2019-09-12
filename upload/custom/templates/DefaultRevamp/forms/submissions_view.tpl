@@ -69,9 +69,9 @@
 		  {else}
 			{$NO_COMMENTS}
 		  {/if}
-				
-		  </br>
 		  
+		  {if $CAN_COMMENT}
+		  </br>
 		  <form class="ui form" action="" method="post">
             <div class="field">
               <textarea name="content" rows="5" placeholder="{$NEW_COMMENT}"></textarea>
@@ -79,10 +79,8 @@
             <input type="hidden" name="token" value="{$TOKEN}">
             <input type="submit" value="{$SUBMIT}" class="ui primary button">
 		  </form>
-		
-		
-		{nocache}
-		{/nocache}
+		  {/if}
+
       </div>
     </div>
   </div>
