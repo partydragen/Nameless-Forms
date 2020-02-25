@@ -98,43 +98,48 @@ if(!isset($_GET['view'])){
 	}
 	$submission = $submission[0];
 	
+	// Get comments
+	$currentstatus = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
+	
 	// Check input
 	if(Input::exists()){
 		$errors = array();
 		
 		// Check token
 		if(Token::check(Input::get('token'))){
-			// Valid token
-			$validate = new Validate();
+			if($currentstatus[0]->open) {
+				// Valid token
+				$validate = new Validate();
 
-			$validation = $validate->check($_POST, array(
-				'content' => array(
-					'required' => true,
-					'min' => 3,
-					'max' => 10000
-				)
-			));
-
-			if($validation->passed()){
-				$queries->create('forms_comments', array(
-					'form_id' => $submission->id,
-					'user_id' => $user->data()->id,
-					'created' => date('U'),
-					'content' => Output::getClean(nl2br(Input::get('content')))
+				$validation = $validate->check($_POST, array(
+					'content' => array(
+						'required' => true,
+						'min' => 3,
+						'max' => 10000
+					)
 				));
 
-				$queries->update('forms_replies', $submission->id, array(
-					'updated_by' => $user->data()->id,
-					'updated' => date('U')
-				));
+				if($validation->passed()){
+					$queries->create('forms_comments', array(
+						'form_id' => $submission->id,
+						'user_id' => $user->data()->id,
+						'created' => date('U'),
+						'content' => Output::getClean(nl2br(Input::get('content')))
+					));
 
-				$success = $language->get('moderator', 'comment_created');
-					
-				Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
-				Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id)));
-				die();
-			} else {
-				// Display error
+					$queries->update('forms_replies', $submission->id, array(
+						'updated_by' => $user->data()->id,
+						'updated' => date('U')
+					));
+
+					$success = $language->get('moderator', 'comment_created');
+						
+					Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
+					Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id)));
+					die();
+				} else {
+					// Display error
+				}
 			}
 		} else {
 			// Invalid token
@@ -170,9 +175,6 @@ if(!isset($_GET['view'])){
 		
 	$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
 	$form = $form[0];
-		
-	// Get comments
-	$currentstatus = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
 
 	$smarty->assign(array(
 		'FORM_X' => str_replace('{x}', $form->title, $forms_language->get('forms', 'form_x')),
