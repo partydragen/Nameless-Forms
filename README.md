@@ -13,6 +13,9 @@ I will love if you add your minecraft server to my Minecraft Community website, 
 There is also monthly 15 USD giveaways so register today :P
 Link: [https://mccommunity.net/](https://mccommunity.net/)
 
+## NamelessHosting:
+Create your own free NamelessMC website at NamelessHosting for free at [https://namelesshosting.com](https://namelesshosting.com/)
+
 ## Contact me:
 - Discord: [https://discord.gg/cY5Yfzd](https://discord.gg/cY5Yfzd)
 - Website: [https://partydragen.com](https://partydragen.com)
