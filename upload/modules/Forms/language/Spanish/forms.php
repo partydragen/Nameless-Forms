@@ -9,6 +9,7 @@
  *
  *  Spanish Language for Forms module
  */
+// Spanish language added.
 
 $language = array(
 	// Forms
@@ -85,8 +86,8 @@ $language = array(
 	'form_url_maximum' => 'La url que ah ingresado tiene mas de 32 letras',
 	'form_icon_maximum' => 'El icono no puede tener mas de 64 letras.',
 	'input_field_name' => 'Por favor introdusca un nombre al campo',
-	'field_name_minimum' => 'The field name must be a minimum of 2 characters.',
-	'field_name_maximum' => 'The field name must be a maximum of 255 characters.',
+	'field_name_minimum' => 'El nombre del campo debe tener un mínimo de 2 caracteres.',
+	'field_name_maximum' => 'El nombre del campo debe tener un máximo de 255 caracteres',
 	
 	// Submissions
 	'submissions' => 'Envios',
