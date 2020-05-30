@@ -9,7 +9,6 @@
  *
  *  Spanish Language for Forms module
  */
-// Spanish language added.
 
 $language = array(
 	// Forms
