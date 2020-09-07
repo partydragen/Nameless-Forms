@@ -91,6 +91,7 @@ if(!isset($_GET['view'])){
 		}
 	}
 	
+	$submissions = array();
 	if(count($submissions_query)){
 		// Get page
 		if(isset($_GET['p'])){
@@ -114,8 +115,6 @@ if(!isset($_GET['view'])){
 		$pagination = $paginator->generate(7, $url);
 		
 		// Get all submissions
-		$submissions = array();
-		
 		foreach($results->data as $submission){
 			$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
 			$form = $form[0];
