@@ -27,7 +27,13 @@
 			<form action="" method="post">
 			  {foreach from=$FIELDS item=field}
 			  <div class="form-group">
-				<label for="{$field.id}">{$field.name} {if $field.required} <span class="text-danger"><strong>*</strong></span>{/if}</label>
+				{if $field.type == 5}
+				  <hr />
+				{elseif $field.type == 4}
+					{', '|implode:$field.options}
+				{else}
+				  <label for="{$field.id}">{$field.name} {if $field.required} <span class="text-danger"><strong>*</strong></span>{/if}</label>
+				{/if}
 				{if $field.type == "1"}
 				<input type="text" class="form-control" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
 				{elseif $field.type == "2"}

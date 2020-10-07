@@ -85,6 +85,8 @@
 									<option value="1">{$TYPES.1}</option>
 									<option value="2">{$TYPES.2}</option>
 									<option value="3">{$TYPES.3}</option>
+									<option value="4">{$TYPES.4}</option>
+									<option value="5">{$TYPES.5}</option>
 								</select>
 							</div>
 							<div class="form-group">

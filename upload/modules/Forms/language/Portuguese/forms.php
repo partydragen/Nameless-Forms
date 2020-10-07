@@ -55,9 +55,13 @@ $language = array(
 	'none_fields_defined' => 'Não há nenhum campo ainda.',
 	'confirm_delete_field' => 'Tem certeza que quer excluir esse campo?',
 	'options' => 'Opções',
-	'options_help' => 'Cada opção em uma nova linha; a linha pode ser deixada em branco (só pra opções)',
+    // TODO: Requires proper translation, as opposed to google translate
+	'options_help' => 'Cada opção em uma nova linha; a linha pode ser deixada em branco (só pra opções). O texto de ajuda também deve ser colocado neste campo',
 	'field_order' => 'Ordem do Campo',
 	'delete_field' => 'Tem certeza que quer excluir esse campo?',
+    // TODO: Requires proper translation, as opposed to google translate
+    'help_box' => 'Texto de ajuda',
+    'barrier' => 'Linha divisória',
 	
 	// Statuses
 	'statuses' => 'Estados',

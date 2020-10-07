@@ -55,9 +55,13 @@ $language = array(
 	'none_fields_defined' => 'Kenttiä ei vielä ole.',
 	'confirm_delete_field' => 'Oletko varma, että haluat poistaa tämän kentän?',
 	'options' => 'Valinnat',
-	'options_help' => 'Jokainen valinta uudelle riville; voi jättää tyhjäksi (vain valinnat)',
+    // TODO: Requires proper translation, as opposed to google translate
+	'options_help' => 'Jokainen valinta uudelle riville; voi jättää tyhjäksi (vain valinnat). Ohjekirja olisi myös lisättävä tähän kenttään',
 	'field_order' => 'Kenttien järjestys',
 	'delete_field' => 'Oletko varma, että haluat poistaa tämän kentän?',
+    // TODO: Requires proper translation, as opposed to google translate
+    'help_box' => 'Ohjeteksti',
+    'barrier' => 'Eroittava viiva',
 	
 	// Statuses
 	'statuses' => 'tilat',

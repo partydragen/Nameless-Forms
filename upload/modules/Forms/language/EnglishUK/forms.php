@@ -55,10 +55,12 @@ $language = array(
 	'none_fields_defined' => 'There are no fields yet.',
 	'confirm_delete_field' => 'Are you sure you want to delete this field?',
 	'options' => 'Options',
-	'options_help' => 'Each option on a new line; can be left empty (options only)',
+	'options_help' => 'Each option on a new line; can be left empty (options only). Help text should also be put inside this box.',
 	'field_order' => 'Field Order',
 	'delete_field' => 'Are you sure you want to delete this field?',
-	
+	'help_box' => 'Help Text',
+	'barrier' => 'Dividing Line',
+
 	// Statuses
 	'statuses' => 'statuses',
 	'status' => 'Status',

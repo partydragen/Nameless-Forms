@@ -51,9 +51,13 @@ $language = array(
 	'none_fields_defined' => 'Det finns inga fält än',
 	'confirm_delete_field' => 'Är du säker på att du vill radera detta fält?',
 	'options' => 'Inställningar',
-	'options_help' => 'Varje alternativ på en ny linje; kan lämnas tomt (endast alternativ)',
+    // TODO: Requires proper translation, as opposed to google translate
+	'options_help' => 'Varje alternativ på en ny linje; kan lämnas tomt (endast alternativ). Hjälptexter bör också sättas i detta fältet',
 	'field_order' => 'Fältorder',
 	'delete_field' => 'Är du säker på att du vill radera detta fält?',
+    // TODO: Requires proper translation, as opposed to google translate
+    'help_box' => 'Hjälp text',
+    'barrier' => 'Skiljelinje',
 	
 	// Statuses
 	'statuses' => 'statusar',
