@@ -167,13 +167,19 @@ if(!isset($_GET['action'])){
 			switch($field->type){
 				case 1:
 					$type = $language->get('admin', 'text');
-				break;
+				    break;
 				case 2:
 					$type = $forms_language->get('forms', 'options');
-				break;
+                    break;
 				case 3:
 					$type = $language->get('admin', 'textarea');
-				break;
+					break;
+                case 4:
+                    $type = $forms_language->get('forms', 'help_box');
+                    break;
+                case 5:
+                    $type = $forms_language->get('forms', 'barrier');
+                    break;
 			}
 			
 			$fields_array[] = array(
@@ -247,6 +253,8 @@ if(!isset($_GET['action'])){
 									case 1:
 									case 2:
 									case 3:
+                                    case 4:
+                                    case 5:
 										$type = $_POST['type'];
 										break;
 									default:
@@ -313,7 +321,7 @@ if(!isset($_GET['action'])){
 				'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
 				'FIELD_NAME' => $language->get('admin', 'field_name'),
 				'TYPE' => $language->get('admin', 'type'),
-				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea')),
+				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea'), 4 => $forms_language->get('forms', 'help_box'), 5 => $forms_language->get('forms', 'barrier')),
 				'OPTIONS' => $forms_language->get('forms', 'options'),
 				'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
 				'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
@@ -358,6 +366,8 @@ if(!isset($_GET['action'])){
 									case 1:
 									case 2:
 									case 3:
+                                    case 4:
+                                    case 5:
 										$type = $_POST['type'];
 										break;
 									default:
@@ -432,7 +442,7 @@ if(!isset($_GET['action'])){
 				'FIELD_NAME_VALUE' => Output::getClean($field->name),
 				'TYPE' => $language->get('admin', 'type'),
 				'TYPE_VALUE' => $field->type,
-				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea')),
+				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea'), 4 => $forms_language->get('forms', 'help_box'), 5 => $forms_language->get('forms', 'barrier')),
 				'OPTIONS' => $forms_language->get('forms', 'options'),
 				'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
 				'OPTIONS_VALUE' => $options,
