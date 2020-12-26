@@ -114,8 +114,8 @@ class Forms_Module extends Module {
 			if($user->hasPermission('forms.manage') || $user->hasPermission('forms.view-submissions')){
 				$cache->setCache('panel_sidebar');
 				if(!$cache->isCached('forms_order')){
-					$order = 12;
-					$cache->store('forms_order', 12);
+					$order = 14;
+					$cache->store('forms_order', 14);
 				} else {
 					$order = $cache->retrieve('forms_order');
 				}
