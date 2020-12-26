@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr6
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -130,10 +130,12 @@ if(!isset($_GET['view'])){
 				$user_style = null;
 				$user_avatar = null;
 			} else {
-				$user_name = Output::getClean($user->idToNickname($submission->user_id));
-				$user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $user->idToName($submission->user_id)));
-				$user_style = $user->getGroupClass($submission->user_id);
-				$user_avatar = $user->getAvatar($submission->user_id, '', 128);
+				$target_user = new User($submission->user_id);
+				
+				$user_name = $target_user->getDisplayname();
+				$user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $target_user->getDisplayname(true)));
+				$user_style = $target_user->getGroupClass();
+				$user_avatar = $target_user->getAvatar();
 			}
 			
 			// Is user a guest or a user
@@ -143,10 +145,12 @@ if(!isset($_GET['view'])){
 				$updated_by_style = null;
 				$updated_by_avatar = null;
 			} else {
-				$updated_by_name = Output::getClean($user->idToNickname($submission->updated_by));
-				$updated_by_profile = URL::build('/panel/user/' . Output::getClean($submission->updated_by . '-' . $user->idToName($submission->updated_by)));
-				$updated_by_style = $user->getGroupClass($submission->updated_by);
-				$updated_by_avatar = $user->getAvatar($submission->updated_by, '', 128);
+				$updated_by_user = new User($submission->updated_by);
+				
+				$updated_by_name = $updated_by_user->getDisplayname();
+				$updated_by_profile = URL::build('/panel/user/' . Output::getClean($submission->updated_by . '-' . $updated_by_user->getDisplayname(true)));
+				$updated_by_style = $updated_by_user->getGroupClass();
+				$updated_by_avatar = $updated_by_user->getAvatar();
 			}
 			
 			$submissions[] = array(
@@ -215,7 +219,8 @@ if(!isset($_GET['view'])){
 		'FORM_LIST' => $forms_array,
 		'STATUS_LIST' => $status_array,
 		'FORM_SELECTION_VALUE' => (isset($_GET['form']) ? $_GET['form'] : '0'),
-		'STATUS_SELECTION_VALUE' => (isset($_GET['status']) ? $_GET['status'] : '0')
+		'STATUS_SELECTION_VALUE' => (isset($_GET['status']) ? $_GET['status'] : '0'),
+		'SORT' => $forms_language->get('forms', 'sort'),
 	));
 			
 	$template_file = 'forms/submissions.tpl';
@@ -232,6 +237,9 @@ if(!isset($_GET['view'])){
 		// Get form from id
 		$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
 		$form = $form[0];
+		
+		// Get user group IDs
+		$user_groups = $user->getAllGroupIds();
 		
 		// Check input
 		if(Input::exists()){
@@ -254,7 +262,15 @@ if(!isset($_GET['view'])){
 					$status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
 					if(count($status)){
                         $groups = explode(',', $status[0]->gids);
-                        if(in_array($user->data()->group_id, $groups)) {
+						$hasperm = false;
+						foreach ($user_groups as $group_id) {
+                            if(in_array($group_id, $groups)) {
+                                $hasperm = true;
+                                break;
+                            }
+                        }
+						
+                        if($hasperm) {
                             $status = $_POST['status'];
 								
 							if($submission->status_id != $_POST['status']) {
@@ -325,11 +341,13 @@ if(!isset($_GET['view'])){
 		$comments = $queries->getWhere('forms_comments', array('form_id', '=', $submission->id));
 		$smarty_comments = array();
 		foreach($comments as $comment){
+			$comment_user = new User($comment->user_id);
+			
 			$smarty_comments[] = array(
-				'username' => Output::getClean($user->idToNickname($comment->user_id)),
-				'profile' => URL::build('/panel/user/' . Output::getClean($comment->user_id . '-' . $user->idToName($comment->user_id))),
-				'style' => $user->getGroupClass($comment->user_id),
-				'avatar' => $user->getAvatar($comment->user_id),
+				'username' => $comment_user->getDisplayname(),
+				'profile' => URL::build('/panel/user/' . Output::getClean($comment->user_id . '-' . $comment_user->getDisplayname(true))),
+				'style' => $comment_user->getGroupClass(),
+				'avatar' => $comment_user->getAvatar(),
 				'content' => Output::getPurified(Output::getDecoded($comment->content)),
 				'date' => date('d M Y, H:i', $comment->created),
 				'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
@@ -346,10 +364,12 @@ if(!isset($_GET['view'])){
 			$user_style = null;
 			$user_avatar = null;
 		} else {
-			$user_name = Output::getClean($user->idToNickname($submission->user_id));
-			$user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $user->idToName($submission->user_id)));
-			$user_style = $user->getGroupClass($submission->user_id);
-			$user_avatar = $user->getAvatar($submission->user_id, '', 128);
+			$target_user = new User($submission->user_id);
+			
+			$user_name = $target_user->getDisplayname();
+			$user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $target_user->getDisplayname(true)));
+			$user_style = $target_user->getGroupClass();
+			$user_avatar = $target_user->getAvatar();
 		}
 		
 		// Form statuses
@@ -364,8 +384,11 @@ if(!isset($_GET['view'])){
 					// Check permissions
 					$groups = explode(',', $status->gids);
 					$perms = false;
-					if(in_array($user->data()->group_id, $groups)){
-						$perms = true;
+					foreach ($user_groups as $group_id) {
+                        if(in_array($group_id, $groups)) {
+							$perms = true;
+						    break;
+                        }
 					}
 				
 					$statuses[] = array(

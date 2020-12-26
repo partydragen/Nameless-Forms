@@ -2,7 +2,7 @@
 /*
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr7
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -21,8 +21,8 @@ class Forms_Module extends Module {
 
 		$name = 'Forms';
 		$author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-		$module_version = '1.1.2';
-		$nameless_version = '2.0.0-pr7';
+		$module_version = '1.2.0';
+		$nameless_version = '2.0.0-pr8';
 
 		parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
@@ -32,6 +32,18 @@ class Forms_Module extends Module {
 		$pages->add('Forms', '/panel/forms/statuses', 'pages/panel/statuses.php');
 		$pages->add('Forms', '/panel/forms/submissions', 'pages/panel/submissions.php');
 		$pages->add('Forms', '/user/submissions', 'pages/user/submissions.php');
+		
+		// Check if module version changed
+		$cache->setCache('forms_module_cache');
+		if(!$cache->isCached('module_version')){
+			$cache->store('module_version', $module_version);
+		} else {
+			if($module_version != $cache->retrieve('module_version')) {
+				// Version have changed, Perform actions
+				$cache->store('module_version', $module_version);
+				$cache->erase('update_check');
+			}
+		}
 		
 		try {
 			$forms = $queries->getWhere('forms', array('id', '<>', 0));
@@ -67,7 +79,7 @@ class Forms_Module extends Module {
 				}
 			}
 		} catch(Exception $e){
-			// Database tabels don't exist
+			// Database tables don't exist yet
 		}
 	}
 
@@ -130,6 +142,33 @@ class Forms_Module extends Module {
 				}
 			}
 		}
+		
+		// Check for module updates
+        if(isset($_GET['route']) && $user->isLoggedIn() && $user->hasPermission('admincp.update')){
+            if(rtrim($_GET['route'], '/') == '/panel/forms/submissions' || rtrim($_GET['route'], '/') == '/panel/forms' || rtrim($_GET['route'], '/') == '/panel/form' || rtrim($_GET['route'], '/') == '/panel/forms/statuses'){
+
+                $cache->setCache('forms_module_cache');
+                if($cache->isCached('update_check')){
+                    $update_check = $cache->retrieve('update_check');
+                } else {
+					require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
+                    $update_check = Forms::updateCheck();
+                    $cache->store('update_check', $update_check, 3600);
+                }
+
+                $update_check = json_decode($update_check);
+				if(!isset($update_check->error) && !isset($update_check->no_update) && isset($update_check->new_version)){	
+                    $smarty->assign(array(
+                        'NEW_UPDATE' => str_replace('{x}', $this->getName(), (isset($update_check->urgent) && $update_check->urgent == 'true') ? $this->_forms_language->get('forms', 'new_urgent_update_available_x') : $this->_forms_language->get('forms', 'new_update_available_x')),
+                        'NEW_UPDATE_URGENT' => (isset($update_check->urgent) && $update_check->urgent == 'true'),
+                        'CURRENT_VERSION' => str_replace('{x}', $this->getVersion(), $this->_forms_language->get('forms', 'current_version_x')),
+                        'NEW_VERSION' => str_replace('{x}', Output::getClean($update_check->new_version), $this->_forms_language->get('forms', 'new_version_x')),
+                        'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
+                        'UPDATE_LINK' => 'https://partydragen.com/resources/resource/1-forms-module/'
+                    ));
+				}
+            }
+        }
 	}
 	
 	private function initialise(){

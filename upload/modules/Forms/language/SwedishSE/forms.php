@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr6
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -51,11 +51,9 @@ $language = array(
 	'none_fields_defined' => 'Det finns inga fält än',
 	'confirm_delete_field' => 'Är du säker på att du vill radera detta fält?',
 	'options' => 'Inställningar',
-    // TODO: Requires proper translation, as opposed to google translate
 	'options_help' => 'Varje alternativ på en ny linje; kan lämnas tomt (endast alternativ). Hjälptexter bör också sättas i detta fältet',
 	'field_order' => 'Fältorder',
 	'delete_field' => 'Är du säker på att du vill radera detta fält?',
-    // TODO: Requires proper translation, as opposed to google translate
     'help_box' => 'Hjälp text',
     'barrier' => 'Skiljelinje',
 	
@@ -99,4 +97,12 @@ $language = array(
 	'your_submission_updated' => 'Your submission has been updated',
 	'user' => 'User',
 	'updated_by' => 'Updated by',
+	'sort' => 'Sortieren',
+	
+	// Update alerts
+	'new_update_available_x' => 'There is a new update available for the module {x}',
+	'new_urgent_update_available_x' => 'There is a new urgent update available for the module {x}. Please update as soon as possible!',
+	'current_version_x' => 'Current module version: {x}',
+	'new_version_x' => 'New module version: {x}',
+	'view_resource' => 'View Resource',
 );

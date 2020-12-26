@@ -75,7 +75,7 @@
 							</div>
 						    <div class="col-2">
 							  <input type="hidden" name="token" value="{$TOKEN}">
-							  <input type="submit" value="Sort" class="btn btn-primary">
+							  <input type="submit" value="{$SORT}" class="btn btn-primary">
 							</div>
 						  </div>
 						</form>

@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr6
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -59,15 +59,17 @@ if(!isset($_GET['view'])){
 			$status = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
 			$status = $status[0];
 			
+			$updated_by_user = new User($submission->updated_by);
+			
 			$submissions[] = array(
 				'id' => $submission->id,
 				'form_name' => $form->title,
 				'status' => $status->html,
 				'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
-				'updated_by_name' => Output::getClean($user->idToNickname($submission->updated_by)),
-				'updated_by_profile' => URL::build('/profile/' . Output::getClean($user->idToName($submission->updated_by))),
-				'updated_by_style' => $user->getGroupClass($submission->updated_by),
-				'updated_by_avatar' => $user->getAvatar($submission->updated_by, '', 128),
+				'updated_by_name' => $updated_by_user->getDisplayname(),
+				'updated_by_profile' => $updated_by_user->getProfileURL(),
+				'updated_by_style' => $updated_by_user->getGroupClass(),
+				'updated_by_avatar' => $updated_by_user->getAvatar(),
 				'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
 				'link' => URL::build('/user/submissions/', 'view=' . $submission->id),
 			);
@@ -84,7 +86,7 @@ if(!isset($_GET['view'])){
 		'FORM' => $forms_language->get('forms', 'form'),
 		'USER' => $forms_language->get('forms', 'user'),
 		'UPDATED_BY' => $forms_language->get('forms', 'updated_by'),
-		'STATUS' => $forms_language->get('forms', 'status'),
+		'STATUS' => $forms_language->get('forms', 'status')
 	));
 	
 	$template_file = 'forms/submissions.tpl';
@@ -162,11 +164,12 @@ if(!isset($_GET['view'])){
 	$comments = $queries->getWhere('forms_comments', array('form_id', '=', $submission->id));
 	$smarty_comments = array();
 	foreach($comments as $comment){
+		$comment_user = new User($comment->user_id);
 		$smarty_comments[] = array(
-			'username' => Output::getClean($user->idToNickname($comment->user_id)),
-			'profile' => URL::build('/profile/' . Output::getClean($user->idToName($comment->user_id))),
-			'style' => $user->getGroupClass($comment->user_id),
-			'avatar' => $user->getAvatar($comment->user_id),
+			'username' => $comment_user->getDisplayname(),
+			'profile' => $comment_user->getProfileURL(),
+			'style' => $comment_user->getGroupClass(),
+			'avatar' => $comment_user->getAvatar(),
 			'content' => Output::getPurified(Output::getDecoded($comment->content)),
 			'date' => date('d M Y, H:i', $comment->created),
 			'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
@@ -176,16 +179,17 @@ if(!isset($_GET['view'])){
 	$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
 	$form = $form[0];
 
+	$target_user = new User($submission->user_id);
 	$smarty->assign(array(
 		'FORM_X' => str_replace('{x}', $form->title, $forms_language->get('forms', 'form_x')),
 		'CURRENT_STATUS_X' => str_replace('{x}', $currentstatus[0]->html, $forms_language->get('forms', 'current_status_x')),
 		'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
 		'LAST_UPDATED_DATE' => date('d M Y, H:i', $submission->updated),
 		'LAST_UPDATED_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
-		'USER' => Output::getClean($user->idToNickname($submission->user_id)),
-		'USER_PROFILE' => URL::build('/profile/' . Output::getClean($user->idToName($submission->user_id))),
-		'USER_STYLE' => $user->getGroupClass($submission->user_id),
-		'USER_AVATAR' => $user->getAvatar($submission->user_id, '', 128),
+		'USER' => $target_user->getDisplayname(),
+		'USER_PROFILE' => $target_user->getProfileURL(),
+		'USER_STYLE' => $target_user->getGroupClass(),
+		'USER_AVATAR' => $target_user->getAvatar(),
 		'CREATED_DATE' => date('d M Y, H:i', $submission->created),
 		'CREATED_DATE_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
 		'COMMENTS' => $smarty_comments,

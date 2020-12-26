@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr6
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -55,11 +55,9 @@ $language = array(
 	'none_fields_defined' => 'Não há nenhum campo ainda.',
 	'confirm_delete_field' => 'Tem certeza que quer excluir esse campo?',
 	'options' => 'Opções',
-    // TODO: Requires proper translation, as opposed to google translate
 	'options_help' => 'Cada opção em uma nova linha; a linha pode ser deixada em branco (só pra opções). O texto de ajuda também deve ser colocado neste campo',
 	'field_order' => 'Ordem do Campo',
 	'delete_field' => 'Tem certeza que quer excluir esse campo?',
-    // TODO: Requires proper translation, as opposed to google translate
     'help_box' => 'Texto de ajuda',
     'barrier' => 'Linha divisória',
 	
@@ -103,4 +101,12 @@ $language = array(
 	'your_submission_updated' => 'Seu envio foi atualizado',
 	'user' => 'Usuário',
 	'updated_by' => 'Modificado por',
+	'sort' => 'Sort',
+	
+	// Update alerts
+	'new_update_available_x' => 'There is a new update available for the module {x}',
+	'new_urgent_update_available_x' => 'There is a new urgent update available for the module {x}. Please update as soon as possible!',
+	'current_version_x' => 'Current module version: {x}',
+	'new_version_x' => 'New module version: {x}',
+	'view_resource' => 'View Resource',
 );

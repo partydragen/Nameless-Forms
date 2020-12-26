@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr6
+ *  NamelessMC version 2.0.0-pr8
  *
  *  License: MIT
  *
@@ -31,7 +31,6 @@ $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 
 // Get fields
-//fields = $queries->getWhere('forms_fields', array('form_id', '=', $form->id));
 $fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
 	
 // Handle input

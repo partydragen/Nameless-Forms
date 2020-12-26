@@ -1,4 +1,4 @@
-# Forms Module for NamelessMC v2.0.0 pr7
+# Forms Module for NamelessMC v2.0.0 pr8
 
 ## Installation:
 - Upload the contents of the **upload** directory straight into your NamelessMC installation's directory
