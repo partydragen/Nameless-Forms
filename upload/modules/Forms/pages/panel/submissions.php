@@ -380,7 +380,7 @@ if(!isset($_GET['view'])){
 			foreach($form_statuses as $status){
 				$form_ids = explode(',', $status->fids);
 				
-				if(in_array($submission->form_id, $form_ids)){
+				if(in_array($submission->form_id, $form_ids) || $status->id == 1){
 					// Check permissions
 					$groups = explode(',', $status->gids);
 					$perms = false;
