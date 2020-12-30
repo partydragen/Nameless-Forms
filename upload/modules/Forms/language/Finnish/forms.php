@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -60,6 +60,7 @@ $language = array(
 	'delete_field' => 'Oletko varma, että haluat poistaa tämän kentän?',
     'help_box' => 'Ohjeteksti',
     'barrier' => 'Eroittava viiva',
+    'number' => 'Number',
 	
 	// Statuses
 	'statuses' => 'tilat',

@@ -51,11 +51,9 @@
 							<div class="form-group">
 								<label for="type">{$TYPE}</label>
 								<select class="form-control" id="type" name="type">
-									<option value="1"{if $TYPE_VALUE eq 1} selected{/if}>{$TYPES.1}</option>
-									<option value="2"{if $TYPE_VALUE eq 2} selected{/if}>{$TYPES.2}</option>
-									<option value="3"{if $TYPE_VALUE eq 3} selected{/if}>{$TYPES.3}</option>
-									<option value="4"{if $TYPE_VALUE eq 4} selected{/if}>{$TYPES.4}</option>
-									<option value="5"{if $TYPE_VALUE eq 5} selected{/if}>{$TYPES.5}</option>
+                                  {foreach from=$TYPES item=type}
+									<option value="{$type.id}"{if $TYPE_VALUE eq {$type.id}} selected{/if}>{$type.name}</option>
+                                  {/foreach}
 								</select>
 							</div>
 							<div class="form-group">

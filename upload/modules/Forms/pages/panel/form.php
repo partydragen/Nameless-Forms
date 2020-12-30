@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -50,6 +50,14 @@ if(!is_numeric($_GET['form'])){
 	}
 }
 $form = $form[0];
+
+$field_types = array();
+$field_types[1] = array('id' => 1, 'name' => $language->get('admin', 'text'));
+$field_types[2] = array('id' => 2, 'name' => $forms_language->get('forms', 'options'));
+$field_types[3] = array('id' => 3, 'name' => $language->get('admin', 'textarea'));
+$field_types[4] = array('id' => 4, 'name' => $forms_language->get('forms', 'help_box'));
+$field_types[5] = array('id' => 5, 'name' => $forms_language->get('forms', 'barrier'));
+$field_types[6] = array('id' => 6, 'name' => $forms_language->get('forms', 'number'));
 
 if(!isset($_GET['action'])){
 	// Editing form
@@ -163,28 +171,9 @@ if(!isset($_GET['action'])){
 	$fields_array = array();
 	if(count($fields)){
 		foreach($fields as $field){
-			// Get field type
-			switch($field->type){
-				case 1:
-					$type = $language->get('admin', 'text');
-				    break;
-				case 2:
-					$type = $forms_language->get('forms', 'options');
-                    break;
-				case 3:
-					$type = $language->get('admin', 'textarea');
-					break;
-                case 4:
-                    $type = $forms_language->get('forms', 'help_box');
-                    break;
-                case 5:
-                    $type = $forms_language->get('forms', 'barrier');
-                    break;
-			}
-			
 			$fields_array[] = array(
 				'name' => Output::getClean($field->name),
-				'type' => $type,
+				'type' => $field_types[$field->type]['name'],
 				'edit_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=edit&id='.$field->id),
 				'delete_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=delete&amp;id=' . $field->id)
 			);
@@ -248,20 +237,10 @@ if(!isset($_GET['action'])){
 						// Create field
 						try {
 							// Get field type
-							if(isset($_POST['type'])){
-								switch($_POST['type']){
-									case 1:
-									case 2:
-									case 3:
-                                    case 4:
-                                    case 5:
-										$type = $_POST['type'];
-										break;
-									default:
-										$type = 1;
-								}
-							} else
-							$type = 1;
+                            $type = 1;
+                            if(array_key_exists($_POST['type'], $field_types)) {
+                                $type = $_POST['type'];
+                            }
 												
 							// Is this field required
 							if(isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
@@ -321,7 +300,7 @@ if(!isset($_GET['action'])){
 				'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
 				'FIELD_NAME' => $language->get('admin', 'field_name'),
 				'TYPE' => $language->get('admin', 'type'),
-				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea'), 4 => $forms_language->get('forms', 'help_box'), 5 => $forms_language->get('forms', 'barrier')),
+				'TYPES' =>  $field_types,
 				'OPTIONS' => $forms_language->get('forms', 'options'),
 				'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
 				'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
@@ -361,20 +340,10 @@ if(!isset($_GET['action'])){
 						// Create field
 						try {
 							// Get field type
-							if(isset($_POST['type'])){
-								switch($_POST['type']){
-									case 1:
-									case 2:
-									case 3:
-                                    case 4:
-                                    case 5:
-										$type = $_POST['type'];
-										break;
-									default:
-										$type = 1;
-								}
-							} else
-							$type = 1;
+                            $type = 1;
+                            if(array_key_exists($_POST['type'], $field_types)) {
+                                $type = $_POST['type'];
+                            }
 												
 							// Is this field required
 							if(isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
@@ -442,7 +411,7 @@ if(!isset($_GET['action'])){
 				'FIELD_NAME_VALUE' => Output::getClean($field->name),
 				'TYPE' => $language->get('admin', 'type'),
 				'TYPE_VALUE' => $field->type,
-				'TYPES' => array(1 => $language->get('admin', 'text'), 2 => $forms_language->get('forms', 'options'), 3 => $language->get('admin', 'textarea'), 4 => $forms_language->get('forms', 'help_box'), 5 => $forms_language->get('forms', 'barrier')),
+				'TYPES' => $field_types,
 				'OPTIONS' => $forms_language->get('forms', 'options'),
 				'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
 				'OPTIONS_VALUE' => $options,

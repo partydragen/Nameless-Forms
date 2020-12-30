@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -60,6 +60,7 @@ $language = array(
 	'delete_field' => 'Tem certeza que quer excluir esse campo?',
     'help_box' => 'Texto de ajuda',
     'barrier' => 'Linha divisória',
+    'number' => 'Number',
 	
 	// Statuses
 	'statuses' => 'Estados',

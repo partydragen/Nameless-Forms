@@ -57,6 +57,8 @@
 			</select>
 			{elseif $field.type == "3"}
 			<textarea name="{$field.id}" id="{$field.id}"></textarea>
+            {elseif $field.type == "6"}
+            <input type="number" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
 			{/if}
 		  </div>
 		{/foreach}
