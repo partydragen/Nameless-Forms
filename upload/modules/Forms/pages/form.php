@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -157,7 +157,8 @@ define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get
 
 $template->onPageLoad();
 	
-$smarty->assign('WIDGETS', $widgets->getWidgets());
+$smarty->assign('WIDGETS_LEFT', $widgets->getWidgets('left'));
+$smarty->assign('WIDGETS_RIGHT', $widgets->getWidgets('right'));
 	
 require(ROOT_PATH . '/core/templates/navbar.php');
 require(ROOT_PATH . '/core/templates/footer.php');
