@@ -71,8 +71,8 @@ $language = array(
 	'marked_as_open' => 'Marked as open',
 	'status_name' => 'Status Name',
 	'status_html' => 'Status HTML',
-	'status_forms' => 'Status Forms',
-	'status_groups' => 'Status Groups',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Status created successfully.',
 	'status_creation_error' => 'Error creating a status. Please ensure the status html is no longer than 1024 characters.',
 	'status_edit_success' => 'Status successfully edited.',
@@ -110,4 +110,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );

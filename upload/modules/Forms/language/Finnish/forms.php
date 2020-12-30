@@ -71,8 +71,8 @@ $language = array(
 	'marked_as_open' => 'Merkitty avoimeksi',
 	'status_name' => 'Tilan nimi',
 	'status_html' => 'Tilan HTML',
-	'status_forms' => 'Tilan lomakkeet',
-	'status_groups' => 'Tilan ryhmät',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Tila luotiin onnistuneesti.',
 	'status_creation_error' => 'Virhe luodessa tilaa. Varmista, että tilan HTML ei ole 1024 merkkiä pidempi.',
 	'status_edit_success' => 'Tila muokattiin onnistuneesti.',
@@ -110,4 +110,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );

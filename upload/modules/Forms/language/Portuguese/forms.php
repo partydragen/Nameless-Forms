@@ -71,8 +71,8 @@ $language = array(
 	'marked_as_open' => 'Significa estado aberto',
 	'status_name' => 'Nome do Estado',
 	'status_html' => 'HTML do Estado',
-	'status_forms' => 'Estado para os Formulários',
-	'status_groups' => 'Estado para os Grupos',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Estado criado com sucesso.',
 	'status_creation_error' => 'Erro ao criar um estado. Por favor certifique-se que o HTML do estado não é maior que 1.024 caracteres.',
 	'status_edit_success' => 'Estado editado com sucesso.',
@@ -110,4 +110,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );

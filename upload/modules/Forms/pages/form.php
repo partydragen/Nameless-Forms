@@ -79,6 +79,16 @@ if(Input::exists()){
 				));
 				
 				$submission_id = $queries->getLastId();
+                
+                HookHandler::executeEvent('newFormSubmission', array(
+					'event' => 'newFormSubmission',
+					'username' => Output::getClean($form->title),
+					'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
+					'content_full' => '',
+					'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(null, 128, true) : null),
+					'title' => Output::getClean($form->title),
+					'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
+				));
 
 				if($form->can_view == 1 && $user->isLoggedIn()) {
 					Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));

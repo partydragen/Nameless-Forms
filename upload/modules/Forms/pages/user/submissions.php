@@ -99,6 +99,9 @@ if(!isset($_GET['view'])){
 		die();
 	}
 	$submission = $submission[0];
+    
+	$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
+	$form = $form[0];
 	
 	// Get comments
 	$currentstatus = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
@@ -133,6 +136,16 @@ if(!isset($_GET['view'])){
 						'updated_by' => $user->data()->id,
 						'updated' => date('U')
 					));
+                    
+                    HookHandler::executeEvent('updatedFormSubmission', array(
+                        'event' => 'updatedFormSubmission',
+                        'username' => Output::getClean($form->title),
+                        'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean($user->data()->nickname)), $forms_language->get('forms', 'updated_submission_text')),
+                        'content_full' => Output::getClean(Input::get('content')),
+                        'avatar_url' => $user->getAvatar(null, 128, true),
+                        'title' => Output::getClean($form->title),
+                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
+                    ));
 
 					$success = $language->get('moderator', 'comment_created');
 						
@@ -175,9 +188,6 @@ if(!isset($_GET['view'])){
 			'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
 		);
 	}
-		
-	$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
-	$form = $form[0];
 
 	$target_user = new User($submission->user_id);
 	$smarty->assign(array(

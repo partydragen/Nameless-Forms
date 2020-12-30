@@ -71,8 +71,8 @@ $language = array(
 	'marked_as_open' => 'Als offen markiert',
 	'status_name' => 'Status Name',
 	'status_html' => 'Status HTML',
-	'status_forms' => 'Status Formular',
-	'status_groups' => 'Status Gruppen',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Status erfolgreich erstellt.',
 	'status_creation_error' => 'Es ist ein Fehler aufgetreten! Bitte überprüfe, dass die HTML nicht mehr als 1024 Zeichen enthält.',
 	'status_edit_success' => 'Status erfolgreich geändert.',
@@ -110,4 +110,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );

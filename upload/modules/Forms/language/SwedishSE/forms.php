@@ -67,8 +67,8 @@ $language = array(
 	'marked_as_open' => 'Markerad som öppen',
 	'status_name' => 'Status Namn',
 	'status_html' => 'Status HTML',
-	'status_forms' => 'Status Formulär',
-	'status_groups' => 'Status Grupper',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Status har skapats.',
 	'status_creation_error' => 'Ett fel uppstod vid att skapa en status. Se till att statusets html inte är längre än 1024 tecken.',
 	'status_edit_success' => 'Status har uppdaterats.',
@@ -106,4 +106,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );

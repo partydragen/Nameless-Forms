@@ -71,8 +71,8 @@ $language = array(
 	'marked_as_open' => 'Marcar como abierto',
 	'status_name' => 'Nombre del estado',
 	'status_html' => 'Estado en HTML',
-	'status_forms' => 'Formularios donde se usara',
-	'status_groups' => 'Grupos que pueden usar el estado',
+	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
+	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
 	'status_creation_success' => 'Estado creado correctamente.',
 	'status_creation_error' => 'Error al crear un estado. Asegúrese de que el estado html no tenga más de 1024 caracteres.',
 	'status_edit_success' => 'Estado actualizado con exito.',
@@ -110,4 +110,11 @@ $language = array(
 	'current_version_x' => 'Current module version: {x}',
 	'new_version_x' => 'New module version: {x}',
 	'view_resource' => 'View Resource',
+    
+    // Hook
+    'new_form_submission' => 'New form submission',
+    'updated_form_submission' => 'New form submission comment',
+    'new_submission_text' => 'New submission created in {x} by {y}',
+    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );
