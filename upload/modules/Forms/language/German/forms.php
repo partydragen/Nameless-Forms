@@ -13,7 +13,7 @@
 $language = array(
 	// Forms
 	'forms' => 'Formulare',
-	'form' => 'Formular',
+	'form' => 'Abgesendet',
 	'new_form' => 'Neues Formular',
 	'form_name' => 'Formularname',
 	'form_url' => 'Formular URL (Bspw. /apply)',
