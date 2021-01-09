@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -144,7 +144,7 @@ if(!isset($_GET['view'])){
                         'content_full' => Output::getClean(Input::get('content')),
                         'avatar_url' => $user->getAvatar(null, 128, true),
                         'title' => Output::getClean($form->title),
-                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
+                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->id)
                     ));
 
 					$success = $language->get('moderator', 'comment_created');
