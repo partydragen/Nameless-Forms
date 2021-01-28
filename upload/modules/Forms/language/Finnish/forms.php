@@ -63,7 +63,7 @@ $language = array(
     'number' => 'Number',
 	
 	// Statuses
-	'statuses' => 'tilat',
+	'statuses' => 'Tilat',
 	'status' => 'Tila',
 	'new_status' => 'Uusi tila',
 	'creating_status' => 'Luodaan uutta statusta',
@@ -73,6 +73,7 @@ $language = array(
 	'status_html' => 'Tilan HTML',
 	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
 	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'groups_view' => 'Select groups who are allowed to view this forms submissions. (Note: Must have form submission permissions)',
 	'status_creation_success' => 'Tila luotiin onnistuneesti.',
 	'status_creation_error' => 'Virhe luodessa tilaa. Varmista, että tilan HTML ei ole 1024 merkkiä pidempi.',
 	'status_edit_success' => 'Tila muokattiin onnistuneesti.',

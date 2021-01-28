@@ -73,6 +73,7 @@ $language = array(
 	'status_html' => 'Estado en HTML',
 	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
 	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'groups_view' => 'Select groups who are allowed to view this forms submissions. (Note: Must have form submission permissions)',
 	'status_creation_success' => 'Estado creado correctamente.',
 	'status_creation_error' => 'Error al crear un estado. Asegúrese de que el estado html no tenga más de 1024 caracteres.',
 	'status_edit_success' => 'Estado actualizado con exito.',

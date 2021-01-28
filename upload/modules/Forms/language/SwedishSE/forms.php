@@ -59,7 +59,7 @@ $language = array(
     'number' => 'Number',
 	
 	// Statuses
-	'statuses' => 'statusar',
+	'statuses' => 'Statusar',
 	'status' => 'Status',
 	'new_status' => 'Ny Status',
 	'creating_status' => 'Skapar ny status',
@@ -69,6 +69,7 @@ $language = array(
 	'status_html' => 'Status HTML',
 	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
 	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'groups_view' => 'Select groups who are allowed to view this forms submissions. (Note: Must have form submission permissions)',
 	'status_creation_success' => 'Status har skapats.',
 	'status_creation_error' => 'Ett fel uppstod vid att skapa en status. Se till att statusets html inte är längre än 1024 tecken.',
 	'status_edit_success' => 'Status har uppdaterats.',

@@ -63,7 +63,7 @@ $language = array(
     'number' => 'Number',
 
 	// Statuses
-	'statuses' => 'statuses',
+	'statuses' => 'Statuses',
 	'status' => 'Status',
 	'new_status' => 'New Status',
 	'creating_status' => 'Creating new status',
@@ -73,6 +73,7 @@ $language = array(
 	'status_html' => 'Status HTML',
 	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
 	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'groups_view' => 'Select groups who are allowed to view this forms submissions. (Note: Must have form submission permissions)',
 	'status_creation_success' => 'Status created successfully.',
 	'status_creation_error' => 'Error creating a status. Please ensure the status html is no longer than 1024 characters.',
 	'status_edit_success' => 'Status successfully edited.',

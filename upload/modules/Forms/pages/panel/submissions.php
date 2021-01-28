@@ -152,23 +152,42 @@ if(!isset($_GET['view'])){
 				$updated_by_style = $updated_by_user->getGroupClass();
 				$updated_by_avatar = $updated_by_user->getAvatar();
 			}
-			
-			$submissions[] = array(
-				'id' => $submission->id,
-				'form_name' => $form->title,
-				'status' => $status->html,
-				'user_name' => $user_name,
-				'user_profile' => $user_profile,
-				'user_style' => $user_style,
-				'user_avatar' => $user_avatar,
-				'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
-				'updated_by_name' => $updated_by_name,
-				'updated_by_profile' => $updated_by_profile,
-				'updated_by_style' => $updated_by_style,
-				'updated_by_avatar' => $updated_by_avatar,
-				'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
-				'link' => URL::build('/panel/forms/submissions/', 'view=' . $submission->id),
-			);
+
+			//Check if current user has access to view specific submission, continue if not. NOTE THIS IS KINDA SHIT, I HAVE NEVER USED PHP BEFORE, OR GITHUB
+			$group_found = false;
+			$groups = explode(',', $form->gids);
+			if(count($groups)){
+				for ($x = 0; $x <= count($groups); $x++) {
+					$group_status = $queries->getWhere('users_groups', array('user_id', '=', $user->data()->id));
+					foreach($group_status as $usergroup){
+						if(intval($groups[$x]) == $usergroup->group_id){
+							$group_found = true;
+							$submissions[] = array(
+								'id' => $submission->id,
+								'form_name' => $form->title,
+								'status' => $status->html,
+								'user_name' => $user_name,
+								'user_profile' => $user_profile,
+								'user_style' => $user_style,
+								'user_avatar' => $user_avatar,
+								'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
+								'updated_by_name' => $updated_by_name,
+								'updated_by_profile' => $updated_by_profile,
+								'updated_by_style' => $updated_by_style,
+								'updated_by_avatar' => $updated_by_avatar,
+								'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
+								'link' => URL::build('/panel/forms/submissions/', 'view=' . $submission->id),
+							);
+							break;
+						}else{
+							//not right group, dont show
+						}
+					}
+					if($group_found){
+						break;
+					}
+				}
+			}
 		}
 		
 		$smarty->assign('PAGINATION', $pagination);

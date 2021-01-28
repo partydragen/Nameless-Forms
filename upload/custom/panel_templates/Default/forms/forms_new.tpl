@@ -58,6 +58,16 @@
 									  <label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
 									  <input id="inputguest" name="guest" type="checkbox" class="js-switch" />
 								    </div>
+									<div class="form-group">
+										<label for="groups_view">{$GROUPS_VIEW}</label>
+										<select name="groups_view[]" id="groups_view" size="5" class="form-control" multiple style="overflow:auto;">
+										{if count($ALL_GROUPS)}
+											{foreach from=$ALL_GROUPS item=item}
+											<option value="{$item.id}"{if $item.selected} selected{/if}>{$item.name}</option>
+											{/foreach}
+										{/if}
+										</select>
+									</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">

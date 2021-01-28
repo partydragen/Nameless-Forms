@@ -107,6 +107,16 @@ if(!isset($_GET['action'])){
 					// Can user views his own submission?
 					if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
 					else $can_view = 0;
+
+					// Which groups can view this type of form
+					$group_string = '';
+					if(isset($_POST['groups_view']) && count($_POST['groups_view'])){
+						foreach($_POST['groups_view'] as $item){
+							$group_string .= $item . ',';
+						}
+					}
+
+					$group_string = rtrim($group_string, ',');
 									
 					// Save to database
 					$queries->update('forms', $form->id, array(
@@ -115,6 +125,7 @@ if(!isset($_GET['action'])){
 						'guest' => $guest,
 						'link_location' => $location,
 						'icon' => Input::get('form_icon'),
+						'gids' => $group_string,
 						'can_view'  => $can_view
 					));
 										
@@ -179,6 +190,29 @@ if(!isset($_GET['action'])){
 			);
 		}
 	}
+	// Get a list of all groups
+	$group_list_full = $queries->getWhere('groups', array('deleted', '=', 0));
+	$group_list = array();
+	foreach($group_list_full as $item){
+		$manage = json_decode($item->permissions, true);
+		if($manage['forms.view-submissions']){
+			$group_list[] = $item;
+		}
+	}
+	$template_groups = array();
+
+	// Get a list of groups which have access to the status
+	$groups = explode(',', $form->gids);
+
+	if(count($group_list)){
+		foreach($group_list as $item){
+			$template_groups[] = array(
+				'id' => Output::getClean($item->id),
+				'name' => Output::getClean(Output::getDecoded($item->name)),
+				'selected' => (in_array($item->id, $groups))
+			);
+		}
+	}
 
 	$smarty->assign(array(
 		'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
@@ -212,6 +246,8 @@ if(!isset($_GET['action'])){
 		'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
 		'CONFIRM_DELETE_FIELD' => $forms_language->get('forms', 'delete_field'),
 		'YES' => $language->get('general', 'yes'),
+		'GROUPS_VIEW' => $forms_language->get('forms', 'groups_view'),
+		'ALL_GROUPS' => $template_groups,
 		'NO' => $language->get('general', 'no')
 	));
 	
@@ -248,7 +284,7 @@ if(!isset($_GET['action'])){
 												
 							// Get options into a string
 							$options = str_replace("\n", ',', Input::get('options'));
-											
+
 							// Save to database
 							$queries->create('forms_fields', array(
 								'form_id' => $_GET['form'],
@@ -293,7 +329,6 @@ if(!isset($_GET['action'])){
 					$errors[] = $language->get('general', 'invalid_token');
 				}
 			}
-		
 			$smarty->assign(array(
 				'NEW_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'new_field_for_x')),
 				'BACK' => $language->get('general', 'back'),
@@ -402,7 +437,7 @@ if(!isset($_GET['action'])){
 			} else {
 				$options = str_replace(',', "\n", htmlspecialchars($field->options));
 			}
-		
+
 			$smarty->assign(array(
 				'EDITING_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_field_for_x')),
 				'BACK' => $language->get('general', 'back'),

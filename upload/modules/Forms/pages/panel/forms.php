@@ -141,6 +141,16 @@ if(!isset($_GET['action'])){
 							// Can guest visit?
 							if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
 							else $can_view = 0;
+
+							// Which groups can view this type of form
+							$group_string = '';
+							if(isset($_POST['groups_view']) && count($_POST['groups_view'])){
+								foreach($_POST['groups_view'] as $item){
+									$group_string .= $item . ',';
+								}
+							}
+
+							$group_string = rtrim($group_string, ',');
 									
 							// Save to database
 							$queries->create('forms', array(
@@ -149,6 +159,7 @@ if(!isset($_GET['action'])){
 								'guest' => $guest,
 								'link_location' => $location,
 								'icon' => Input::get('form_icon'),
+								'gids' => $group_string,
 								'can_view' => $can_view,
 							));
 										
@@ -199,7 +210,29 @@ if(!isset($_GET['action'])){
 					$errors[] = $language->get('general', 'invalid_token');
 				}
 			}
-						
+			// Get a list of all groups
+			$group_list_full = $queries->getWhere('groups', array('deleted', '=', 0));
+			$group_list = array();
+			foreach($group_list_full as $item){
+				$manage = json_decode($item->permissions, true);
+				if($manage['forms.view-submissions']){
+					$group_list[] = $item;
+				}
+			}
+			$template_groups = array();
+
+			// Get a list of groups which have access to the status
+			$groups = explode(',', $form->gids);
+
+			if(count($group_list)){
+				foreach($group_list as $item){
+					$template_groups[] = array(
+						'id' => Output::getClean($item->id),
+						'name' => Output::getClean(Output::getDecoded($item->name))
+					);
+				}
+			}
+
 			$smarty->assign(array(
 				'CREATING_NEW_FORM' => $forms_language->get('forms', 'creating_new_form'),
 				'BACK' => $language->get('general', 'back'),
@@ -215,6 +248,8 @@ if(!isset($_GET['action'])){
 				'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
 				'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
 				'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
+				'GROUPS_VIEW' => $forms_language->get('forms', 'groups_view'),
+				'ALL_GROUPS' => $template_groups,
 				'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
 			));
 			
