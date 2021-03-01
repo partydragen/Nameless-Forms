@@ -129,7 +129,9 @@ if(Input::exists()){
                         Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
                         die();
                     } else {
-                        $success = $forms_language->get('forms', 'form_submitted');
+                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                        Redirect::to(URL::build($form->url));
+                        die();
                     }
                                                 
                 } catch (Exception $e) {
@@ -165,6 +167,7 @@ foreach($fields as $field){
 	$fields_array[] = array(
 		'id' => Output::getClean($field->id),
 		'name' => Output::getClean($field->name),
+        'value' => (isset($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
 		'type' => Output::getClean($field->type),
 		'required' => Output::getClean($field->required),
 		'options' => $options,
