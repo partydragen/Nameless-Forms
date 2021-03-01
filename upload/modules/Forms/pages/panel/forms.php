@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -154,7 +154,8 @@ if(!isset($_GET['action'])){
 								'link_location' => $location,
 								'icon' => Input::get('form_icon'),
 								'can_view' => $can_view,
-                                'captcha' => $captcha
+                                'captcha' => $captcha,
+                                'content' => Output::getClean(Input::get('content'))
 							));
 										
 							Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
@@ -217,6 +218,8 @@ if(!isset($_GET['action'])){
 				'LINK_MORE' => $language->get('admin', 'page_link_more'),
 				'LINK_FOOTER' => $language->get('admin', 'page_link_footer'),
 				'LINK_NONE' => $language->get('admin', 'page_link_none'),
+                'CONTENT' => $language->get('admin', 'description'),
+                'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : ''),
 				'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
 				'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
 				'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
@@ -225,13 +228,17 @@ if(!isset($_GET['action'])){
 			));
 			
 			$template->addCSSFiles(array(
-				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => array()
+				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => array(),
+                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => array()
 			));
 
 			$template->addJSFiles(array(
-				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => array()
+				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => array(),
+				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => array(),
+				(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => array()
 			));
 
+            $template->addJSScript(Input::createEditor('inputContent', true));
 			$template->addJSScript('
 				var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));
 

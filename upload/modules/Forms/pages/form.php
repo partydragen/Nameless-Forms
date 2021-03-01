@@ -191,6 +191,10 @@ if ($captcha_enabled) {
         );
     }
 }
+
+if(!empty($form->content)) {
+	$smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->content)));
+}
 	
 $smarty->assign(array(
 	'TITLE' => Output::getClean($form->title),

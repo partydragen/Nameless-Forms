@@ -121,7 +121,8 @@ if(!isset($_GET['action'])){
 						'link_location' => $location,
 						'icon' => Input::get('form_icon'),
 						'can_view'  => $can_view,
-                        'captcha' => $captcha
+                        'captcha' => $captcha,
+                        'content' => Output::getClean(Input::get('content'))
 					));
 										
 					Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
@@ -202,6 +203,8 @@ if(!isset($_GET['action'])){
 		'LINK_MORE' => $language->get('admin', 'page_link_more'),
 		'LINK_FOOTER' => $language->get('admin', 'page_link_footer'),
 		'LINK_NONE' => $language->get('admin', 'page_link_none'),
+        'CONTENT' => $language->get('admin', 'description'),
+        'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : Output::getClean(Output::getDecoded($form->content))),
 		'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
 		'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
 		'ALLOW_GUESTS_VALUE' => $form->guest,
@@ -220,6 +223,17 @@ if(!isset($_GET['action'])){
 		'YES' => $language->get('general', 'yes'),
 		'NO' => $language->get('general', 'no')
 	));
+    
+	$template->addCSSFiles(array(
+		(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => array()
+	));
+
+	$template->addJSFiles(array(
+		(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => array(),
+		(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => array()
+	));
+
+	$template->addJSScript(Input::createEditor('inputContent', true));
 	
 	$template_file = 'forms/form.tpl';
 } else {

@@ -54,14 +54,6 @@
 										<label for="InputUrl">{$FORM_URL}</label>
 										<input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}" value="{$FORM_URL_VALUE}">
 									</div>
-									<div class="form-group">
-										<label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
-										<input id="inputguest" name="guest" type="checkbox" class="js-switch"{if $ALLOW_GUESTS_VALUE eq 1} checked{/if} />
-									</div>
-                                    <div class="form-group">
-										<label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
-										<input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
-									</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
@@ -77,11 +69,29 @@
 											<option value="4"{if $LINK_LOCATION_VALUE eq 4} selected{/if}>{$LINK_NONE}</option>
 										</select>
 									</div>
+								</div>
+								<div class="col-md-12">
+                                  <div class="form-group">
+                                      <label for="inputContent">{$CONTENT}</label>
+                                      <textarea name="content" id="inputContent">{$CONTENT_VALUE}</textarea>
+                                  </div>
+								</div>
+                                <div class="col-md-6">
+									<div class="form-group">
+										<label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
+										<input id="inputguest" name="guest" type="checkbox" class="js-switch"{if $ALLOW_GUESTS_VALUE eq 1} checked{/if} />
+									</div>
+                                    <div class="form-group">
+										<label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
+										<input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
+									</div>
+                                </div>
+                                <div class="col-md-6">
 									<div class="form-group">
 										<label for="Inputguest">{$CAN_USER_VIEW}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$CAN_USER_VIEW_HELP}"></i></span>
 										<input id="inputcan_view" name="can_view" type="checkbox" class="js-switch"{if $CAN_USER_VIEW_VALUE eq 1} checked{/if} />
 									</div>
-								</div>
+                                </div>
 							</div>
 							<div class="form-group">
 								<input type="hidden" name="token" value="{$TOKEN}">

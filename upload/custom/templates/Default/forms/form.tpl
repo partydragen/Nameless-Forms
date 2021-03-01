@@ -31,6 +31,11 @@
 			  {/foreach}
 			  </div>
 			{/if}
+            
+            {if isset($CONTENT)}
+              {$CONTENT}
+              </br></br>
+            {/if}
 			
 			<form action="" method="post">
 			  {foreach from=$FIELDS item=field}
