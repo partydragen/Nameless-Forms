@@ -21,7 +21,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.3.0';
+        $module_version = '1.4.0';
         $nameless_version = '2.0.0-pr9';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -44,6 +44,8 @@ class Forms_Module extends Module {
         } else {
             if($module_version != $cache->retrieve('module_version')) {
                 // Version have changed, Perform actions
+                $this->initialiseUpdate($cache->retrieve('module_version'));
+        
                 $cache->store('module_version', $module_version);
                 
                 if($cache->isCached('update_check')){
@@ -178,6 +180,20 @@ class Forms_Module extends Module {
         }
     }
     
+    private function initialiseUpdate($old_version){
+        $old_version = str_replace(array(".", "-"), "", $old_version);
+        $queries = new Queries();
+        
+        if($old_version < 134) {
+            try {
+                $queries->alterTable('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $queries->alterTable('forms', '`content`', "mediumtext NULL DEFAULT NULL");
+            } catch(Exception $e){
+                // Error
+            }
+        }
+    }
+    
     private function initialise(){
         // Generate tables
         try {
@@ -195,7 +211,7 @@ class Forms_Module extends Module {
         $queries = new Queries();
         if(!$queries->tableExists('forms')){
             try {
-                $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
                 
                 $queries->create('forms', array(
                     'url' => '/apply',

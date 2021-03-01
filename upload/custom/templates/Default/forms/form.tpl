@@ -53,10 +53,19 @@
 				{elseif $field.type == "3"}
 				<textarea class="form-control" name="{$field.id}" id="{$field.id}"></textarea>
                 {elseif $field.type == "6"}
-                <input type="text" class="form-control" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
+                <input type="number" class="form-control" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
+                {elseif $field.type == "7"}
+                <input type="email" class="form-control" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
 				{/if}
 			  </div>
 			  {/foreach}
+              
+              {if isset($RECAPTCHA)}
+                <div class="form-group">
+                  <div class="{$CAPTCHA_CLASS}" data-sitekey="{$RECAPTCHA}"></div>
+                </div>
+              {/if}
+              
 			  <input type="hidden" name="token" value="{$TOKEN}">
 			  <input type="submit" class="btn btn-primary" value="{$SUBMIT}">
 			</form>

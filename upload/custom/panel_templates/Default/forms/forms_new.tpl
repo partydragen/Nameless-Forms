@@ -58,6 +58,10 @@
 									  <label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
 									  <input id="inputguest" name="guest" type="checkbox" class="js-switch" />
 								    </div>
+                                    <div class="form-group">
+									  <label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
+									  <input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch" />
+								    </div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
@@ -85,6 +89,7 @@
 							  </div>
 						</form>
                         
+                        <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
                     </div>
                 </div>
 

@@ -141,6 +141,10 @@ if(!isset($_GET['action'])){
 							// Can guest visit?
 							if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
 							else $can_view = 0;
+                            
+                            // Enable captcha?
+							if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
+							else $captcha = 0;
 									
 							// Save to database
 							$queries->create('forms', array(
@@ -150,6 +154,7 @@ if(!isset($_GET['action'])){
 								'link_location' => $location,
 								'icon' => Input::get('form_icon'),
 								'can_view' => $can_view,
+                                'captcha' => $captcha
 							));
 										
 							Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
@@ -216,6 +221,7 @@ if(!isset($_GET['action'])){
 				'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
 				'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
 				'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
+                'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha')
 			));
 			
 			$template->addCSSFiles(array(

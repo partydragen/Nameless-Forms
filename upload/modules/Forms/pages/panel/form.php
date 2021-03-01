@@ -58,6 +58,7 @@ $field_types[3] = array('id' => 3, 'name' => $language->get('admin', 'textarea')
 $field_types[4] = array('id' => 4, 'name' => $forms_language->get('forms', 'help_box'));
 $field_types[5] = array('id' => 5, 'name' => $forms_language->get('forms', 'barrier'));
 $field_types[6] = array('id' => 6, 'name' => $forms_language->get('forms', 'number'));
+$field_types[7] = array('id' => 7, 'name' => $language->get('general', 'email_address'));
 
 if(!isset($_GET['action'])){
 	// Editing form
@@ -107,6 +108,10 @@ if(!isset($_GET['action'])){
 					// Can user views his own submission?
 					if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
 					else $can_view = 0;
+                    
+                    // Enable captcha?
+					if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
+					else $captcha = 0;
 									
 					// Save to database
 					$queries->update('forms', $form->id, array(
@@ -115,7 +120,8 @@ if(!isset($_GET['action'])){
 						'guest' => $guest,
 						'link_location' => $location,
 						'icon' => Input::get('form_icon'),
-						'can_view'  => $can_view
+						'can_view'  => $can_view,
+                        'captcha' => $captcha
 					));
 										
 					Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
@@ -202,8 +208,8 @@ if(!isset($_GET['action'])){
 		'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
 		'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
 		'CAN_USER_VIEW_VALUE' => $form->can_view,
-		'ALERT_USER' => $forms_language->get('forms', 'alert_user_for_updates'),
-		'ALERT_USER_VALUE' => $form->alert_user,
+		'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha'),
+		'ENABLE_CAPTCHA_VALUE' => $form->captcha,
 		'FIELDS' => $forms_language->get('forms', 'fields'),
 		'NEW_FIELD' => $forms_language->get('forms', 'new_field'),
 		'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=new'),

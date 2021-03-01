@@ -59,9 +59,18 @@
 			<textarea name="{$field.id}" id="{$field.id}"></textarea>
             {elseif $field.type == "6"}
             <input type="number" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
+            {elseif $field.type == "7"}
+            <input type="email" name="{$field.id}" id="{$field.id}" placeholder="{$field.name}">
 			{/if}
 		  </div>
 		{/foreach}
+        
+        {if isset($RECAPTCHA)}
+          <div class="field">
+            <div class="{$CAPTCHA_CLASS}" data-sitekey="{$RECAPTCHA}"></div>
+          </div>
+        {/if}
+        
 		<input type="hidden" name="token" value="{$TOKEN}">
 		<input type="submit" class="ui primary button" value="{$SUBMIT}">
 	  </form>

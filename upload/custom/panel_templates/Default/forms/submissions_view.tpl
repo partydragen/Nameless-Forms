@@ -103,6 +103,7 @@
                           </div>
                         </form>
 
+                        <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
                     </div>
                 </div>
 

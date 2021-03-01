@@ -41,6 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Guests will be able to send in submissions without being logged in, Please note them won\'t be able to view the submission afterwards',
 	'can_user_view' => 'Can user view his own submission?',
 	'can_user_view_help' => 'User will be able to view his own submission and use the comment section, User will also receive update alerts when the status change or when someone comment, Please note this won\'t work for guests.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Field',

@@ -41,6 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Los invitados podrán enviar envíos sin haber iniciado sesión. Tenga en cuenta que no podrán ver el envío después.',
 	'can_user_view' => '¿Puede el usuario ver su propia presentación?',
 	'can_user_view_help' => 'El usuario podrá ver su propio envío y usar la sección de comentarios, también recibirá alertas de actualización cuando el estado cambie o cuando alguien comente, tenga en cuenta que esto no funcionará para los invitados.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Campo',

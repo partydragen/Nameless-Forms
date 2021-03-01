@@ -41,6 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Vieraat voivat lähettää hakemuksia kirjautumatta sisään. Ota huomioon, että he eivät voi tarkastella hakemusta jälkeenpäin.',
 	'can_user_view' => 'Voiko käyttäjä tarkastella omaa hakemusta?',
 	'can_user_view_help' => 'Käyttäjä voi tarkastella hakemusta ja nähdä kommenttiosion. Käyttäjä saa myös ilmoituksen, kun tila vaihtuu tai joku kommentoi hakemusta. Huomaa, että tämä ei toimi vieraille.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Kenttä',

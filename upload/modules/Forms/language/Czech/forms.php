@@ -41,6 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Hosti budou moct odesílat odpovědi bez přihlášení. Po odeslání si ale nebudou moci své odpovědi zobrazit',
 	'can_user_view' => 'Může si uživatel zobrazit své vlastní odpovědi?',
 	'can_user_view_help' => 'Uživatel si bude moct zobrazit jeho vlastní odpovědi a použít sekci komentářů. Bude také dostávat upozornění o aktualizacích při změně stavu nebo když jeho odpovědi někdo okomentuje. Toto nebude fungovat pro hosty.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Pole',

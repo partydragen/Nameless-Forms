@@ -42,6 +42,7 @@ $language = array(
 	'allow_guests_help' => 'Gäste können Beiträge einreichen, ohne eingeloggt zu sein. Bitte beachten Sie, dass sie die Beiträge anschließend nicht mehr sehen können.',
 	'can_user_view' => 'Kann ein Mitglied seinen Formular sehen?',
 	'can_user_view_help' => 'Der Benutzer kann seine eigenen Beiträge anzeigen und den Kommentarbereich verwenden. Außerdem erhält er Aktualisierungsbenachrichtigungen, wenn sich der Status ändert oder wenn jemand einen Kommentar abgibt, Bitte beachten Sie, dass dies nicht für Gäste funktioniert.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Feld',

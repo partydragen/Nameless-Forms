@@ -41,6 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Visitantes poderão enviar sem estar logado. Note que eles não poderão ver o envio depois',
 	'can_user_view' => 'O usuário pode ver seu próprio envio?',
 	'can_user_view_help' => 'O usuário poderá ver seu próprio envio e usar a seção de comentários. O usuário também vai receber alertas quando a página de status mudar ou quando alguém comentar. Note que isso não funcionará para visitantes.',
+    'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields
 	'field' => 'Campo',
