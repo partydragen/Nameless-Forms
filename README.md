@@ -8,8 +8,8 @@
 - If you are using a custom template, make sure you add the template file (in the **custom/templates/Default/forms/** or **custom/templates/DefaultRevamp/forms/** directory) to your custom template!
 - Submission list don't have a search fuction yet, Currently all even closed submisssions being displayed
 
-## Subscribe:
-If you like to help out with the development of my modules there is a link where you can subscribe a monthly amount [https://partydragen.com/subscribe/](https://partydragen.com/subscribe/)
+## Patreon
+If you like to help out with the development and get early access updates and new modules check out [https://www.patreon.com/partydragen/](https://www.patreon.com/partydragen)
 
 ## Minecraft Community website:
 I will love if you add your minecraft server to my Minecraft Community website, and adding your voting link to your website :)
