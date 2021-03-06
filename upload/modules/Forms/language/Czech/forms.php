@@ -104,6 +104,9 @@ $language = array(
 	'user' => 'Uživatel',
 	'updated_by' => 'Upravil',
 	'sort' => 'Pořadí',
+    'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
+    'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
+    'delete_submissions_or_comments' => 'Delete submissions or comments',
 	
 	// Update alerts
 	'new_update_available_x' => 'Je dostupná nová aktualizace doplňku {x}',

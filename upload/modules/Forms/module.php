@@ -21,7 +21,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.4.0';
+        $module_version = '1.5.0';
         $nameless_version = '2.0.0-pr9';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -115,6 +115,7 @@ class Forms_Module extends Module {
         PermissionHandler::registerPermissions('Forms', array(
             'forms.view-submissions' => $this->_forms_language->get('forms', 'forms_view_submissions'),
             'forms.manage' => $this->_forms_language->get('forms', 'forms_manage'),
+            'forms.delete-submissions' => $this->_forms_language->get('forms', 'delete_submissions_or_comments')
         ));
         
         $navs[1]->add('cc_submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/user/submissions'));
@@ -173,7 +174,7 @@ class Forms_Module extends Module {
                         'CURRENT_VERSION' => str_replace('{x}', $this->getVersion(), $this->_forms_language->get('forms', 'current_version_x')),
                         'NEW_VERSION' => str_replace('{x}', Output::getClean($update_check->new_version), $this->_forms_language->get('forms', 'new_version_x')),
                         'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
-                        'UPDATE_LINK' => 'https://partydragen.com/resources/resource/1-forms-module/'
+                        'UPDATE_LINK' => 'https://namelessmc.com/resources/resource/43-forms-module/'
                     ));
                 }
             }
@@ -183,6 +184,22 @@ class Forms_Module extends Module {
     private function initialiseUpdate($old_version){
         $old_version = str_replace(array(".", "-"), "", $old_version);
         $queries = new Queries();
+
+        if($old_version < 150) {
+            try {
+                // Update main admin group permissions
+                $group = $queries->getWhere('groups', array('id', '=', 2));
+                $group = $group[0];
+                
+                $group_permissions = json_decode($group->permissions, TRUE);
+                $group_permissions['forms.delete-submissions'] = 1;
+                
+                $group_permissions = json_encode($group_permissions);
+                $queries->update('groups', 2, array('permissions' => $group_permissions));
+            } catch(Exception $e){
+                // Error
+            }
+        }
         
         if($old_version < 134) {
             try {
@@ -300,6 +317,7 @@ class Forms_Module extends Module {
             $group_permissions['forms.manage'] = 1;
             $group_permissions['forms.view-submissions'] = 1;
             $group_permissions['forms.manage-submission'] = 1;
+            $group_permissions['forms.delete-submissions'] = 1;
             
             $group_permissions = json_encode($group_permissions);
             $queries->update('groups', 2, array('permissions' => $group_permissions));

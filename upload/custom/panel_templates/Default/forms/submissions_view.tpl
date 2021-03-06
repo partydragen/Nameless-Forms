@@ -54,6 +54,9 @@
                               <i class="fa fa-user"></i> {$USER}:
                             {/if}
                             <span class="pull-right" data-toggle="tooltip" data-original-title="{$CREATED_DATE}">{$CREATED_DATE_FRIENDLY}</span>
+                            {if $DELETE_LINK}
+                                <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteSubmissionModal('{$DELETE_LINK}')"><i class="fas fa-trash fa-fw"></i></button>
+                            {/if}
                           </div>
                           <div class="card-body">
                             {foreach from=$ANSWERS item=answer}
@@ -70,6 +73,9 @@
                               <div class="card-header">
                                 <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}</a>:
                                 <span class="pull-right" data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
+                                {if $comment.delete_link}
+                                    <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteCommentModal('{$comment.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
+                                {/if}
                               </div>
                                 <div class="card-body">
                                     {$comment.content}
@@ -124,7 +130,58 @@
     <!-- End Wrapper -->
 </div>
 
+<div class="modal fade" id="deleteSubmissionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{$ARE_YOU_SURE}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {$CONFIRM_DELETE_SUBMISSION}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{$NO}</button>
+                <a href="#" id="deleteSubmissionLink" class="btn btn-primary">{$YES}</a>
+            </div>
+        </div>
+    </div>
+</div>
+	
+<div class="modal fade" id="deleteCommentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{$ARE_YOU_SURE}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {$CONFIRM_DELETE_COMMENT}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{$NO}</button>
+                <a href="#" id="deleteCommentLink" class="btn btn-primary">{$YES}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {include file='scripts.tpl'}
+
+<script type="text/javascript">
+    function showDeleteSubmissionModal(id){
+        $('#deleteSubmissionLink').attr('href', id);
+        $('#deleteSubmissionModal').modal().show();
+    }
+    function showDeleteCommentModal(id){
+        $('#deleteCommentLink').attr('href', id);
+        $('#deleteCommentModal').modal().show();
+    }
+</script>
 
 </body>
 </html>

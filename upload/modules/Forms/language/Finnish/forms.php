@@ -104,6 +104,9 @@ $language = array(
 	'user' => 'Käyttäjä',
 	'updated_by' => 'Päivittänyt',
 	'sort' => 'Sort',
+    'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
+    'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
+    'delete_submissions_or_comments' => 'Delete submissions or comments',
 	
 	// Update alerts
 	'new_update_available_x' => 'There is a new update available for the module {x}',

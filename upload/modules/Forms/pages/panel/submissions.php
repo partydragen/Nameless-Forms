@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr8
+ *  NamelessMC version 2.0.0-pr9
  *
  *  License: MIT
  *
@@ -350,7 +350,8 @@ if(!isset($_GET['view'])){
 				'avatar' => $comment_user->getAvatar(),
 				'content' => Output::getPurified(Output::getDecoded($comment->content)),
 				'date' => date('d M Y, H:i', $comment->created),
-				'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
+				'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage()),
+                'delete_link' => ($user->hasPermission('forms.delete-submissions') ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_comment&id=' . Output::getClean($comment->id)) : null)
 			);
 		}
 		
@@ -418,12 +419,62 @@ if(!isset($_GET['view'])){
 			'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
 			'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
 			'ANSWERS' => $answer_array,
+            'DELETE_LINK' => ($user->hasPermission('forms.delete-submissions') ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_submission&id=' . Output::getClean($submission->id)) : null),
+            'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
+            'CONFIRM_DELETE_SUBMISSION' => $forms_language->get('forms', 'confirm_delete_submisssion'),
+            'CONFIRM_DELETE_COMMENT' => $forms_language->get('forms', 'confirm_delete_comment'),
+            'YES' => $language->get('general', 'yes'),
+            'NO' => $language->get('general', 'no'),
 			'STATUSES' => $statuses,
 			'TOKEN' => Token::get()
 		));
 		
 		$template_file = 'forms/submissions_view.tpl';
-	}
+	} else {
+        switch($_GET['action']) {
+            case 'delete_submission':
+                // Delete Submission
+                if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
+                    Redirect::to(URL::build('/panel/forms/submissions'));
+                    die();
+                }
+                
+                if($user->hasPermission('forms.delete-submissions')){
+                    try {
+                        $queries->delete('forms_replies', array('id', '=', $_GET['id']));
+                        $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
+                    } catch(Exception $e){
+                        die($e->getMessage());
+                    }
+                }
+                
+                Redirect::to(URL::build('/panel/forms/submissions'));
+                die();
+            break;
+            case 'delete_comment':
+                // Delete comment
+                if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
+                    Redirect::to(URL::build('/panel/forms/submissions'));
+                    die();
+                }
+                
+                if($user->hasPermission('forms.delete-submissions')){
+                    try {
+                        $queries->delete('forms_comments', array('id', '=', $_GET['id']));
+                    } catch(Exception $e){
+                        die($e->getMessage());
+                    }
+                }
+                
+				Redirect::to(URL::build('/panel/forms/submissions/', 'view=' . Output::getClean($_GET['view'])));
+				die();
+            break;
+            default:
+                Redirect::to(URL::build('/panel/forms/submissions'));
+                die();
+            break;
+        }
+    }
 }
 
 // Load modules + template
