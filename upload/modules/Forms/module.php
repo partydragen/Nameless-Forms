@@ -173,7 +173,7 @@ class Forms_Module extends Module {
                         'CURRENT_VERSION' => str_replace('{x}', $this->getVersion(), $this->_forms_language->get('forms', 'current_version_x')),
                         'NEW_VERSION' => str_replace('{x}', Output::getClean($update_check->new_version), $this->_forms_language->get('forms', 'new_version_x')),
                         'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
-                        'UPDATE_LINK' => 'https://partydragen.com/resources/resource/1-forms-module/'
+                        'UPDATE_LINK' => 'https://namelessmc.com/resources/resource/43-forms-module/'
                     ));
                 }
             }
