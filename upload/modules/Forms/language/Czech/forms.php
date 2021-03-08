@@ -22,7 +22,7 @@ $language = array(
 	'creating_new_form' => 'Vytváření nového formuláře',
 	'form_created_successfully' => 'Formulář úspěšně vytvořen',
 	'none_forms_defined' => 'Zatím jste nevytvořili žádné formuláře.',
-	'delete_form' => 'Opravdu chcete odstranit tento formulář?</br>Varování: Všechna data související s tímto formulářem, jako otázky a odpovědi, budou smazány',
+	'delete_form' => 'Opravdu chcete odstranit tento formulář?</br>Varování: Všechna data související s tímto formulářem, jako otázky a odpovědi, budou smazána',
 	'form_submitted' => 'Formulář úspěšně odeslán',
 	'action' => 'Akce',
 	'actions' => 'Akce',
@@ -41,7 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Hosti budou moct odesílat odpovědi bez přihlášení. Po odeslání si ale nebudou moci své odpovědi zobrazit',
 	'can_user_view' => 'Může si uživatel zobrazit své vlastní odpovědi?',
 	'can_user_view_help' => 'Uživatel si bude moct zobrazit jeho vlastní odpovědi a použít sekci komentářů. Bude také dostávat upozornění o aktualizacích při změně stavu nebo když jeho odpovědi někdo okomentuje. Toto nebude fungovat pro hosty.',
-    'enable_captcha' => 'Enable Captcha on this form?',
+    'enable_captcha' => 'Povolit CAPTCHA u tohoto formuláře?',
 	
 	// Fields
 	'field' => 'Pole',
@@ -98,7 +98,7 @@ $language = array(
 	'no_open_submissions' => 'Momentálně zde nejsou žádné otevřené odpovědi.',
 	'no_closed_submissions' => 'Momentálně zde nejsou žádné uzavřené odpovědi.',
 	'form_x' => 'Formulář: {x}',
-	'current_status_x' => 'Status: {x}',
+	'current_status_x' => 'Stav: {x}',
 	'last_updated' => 'Naposledy aktualizováno:',
 	'your_submission_updated' => 'Vaše odpověď byla upravena',
 	'user' => 'Uživatel',
