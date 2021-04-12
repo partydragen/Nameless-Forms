@@ -39,6 +39,13 @@ define('PANEL_PAGE', 'submissions');
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/backend_init.php');
 
+require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
+$forms = new Forms();
+
+// Get user groups
+$user_groups = $user->getAllGroupIds();
+$group_ids = implode(',', $user_groups);
+
 $timeago = new Timeago(TIMEZONE);
 
 $url_path = '/panel/forms/submissions/?';
@@ -70,20 +77,20 @@ if(!isset($_GET['view'])){
 	
 	if(!isset($_GET['form']) && !isset($_GET['status'])){
 		// sort by open submissions
-		$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) ORDER BY created DESC')->results();
+		$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC')->results();
 		$url = URL::build('/panel/forms/submissions/', true);
 	} else {
 		if(isset($_GET['form']) && isset($_GET['status'])){
 			// Sort by form and status
-			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
 			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
 		} else if(isset($_GET['form'])) {
 			// sort by form
-			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? ORDER BY created DESC', array($_GET['form']))->results();
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form']))->results();
 			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&', true);
 		} else if(isset($_GET['status'])) {
 			// sort by status
-			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? ORDER BY created DESC', array($_GET['status']))->results();
+			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['status']))->results();
 
 			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
 		} else {
@@ -176,14 +183,14 @@ if(!isset($_GET['view'])){
 	}
 	
 	// Get forms from database
-	$forms = $queries->orderAll('forms', 'id', 'ASC');
+	$forms_query = $queries->orderAll('forms', 'id', 'ASC');
 	$forms_array = array();
-	if(count($forms)){
+	if(count($forms_query)){
 		$forms_array[] = array(
 			'id' => 0,
 			'name' => 'All',
 		);
-		foreach($forms as $form){
+		foreach($forms_query as $form){
 			$forms_array[] = array(
 				'id' => $form->id,
 				'name' => Output::getClean($form->title),
@@ -233,13 +240,16 @@ if(!isset($_GET['view'])){
 			die();
 		}
 		$submission = $submission[0];
+        
+        // Does user have permission to view this submission
+		if(!$forms->canViewSubmission($group_ids, $submission->form_id)){
+			Redirect::to(URL::build('/panel/forms/submissions'));
+			die();
+		}
 		
 		// Get form from id
 		$form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
 		$form = $form[0];
-		
-		// Get user group IDs
-		$user_groups = $user->getAllGroupIds();
 		
 		// Check input
 		if(Input::exists()){
@@ -301,18 +311,19 @@ if(!isset($_GET['view'])){
 						));
 						
 						// Alert user?
-						if($form->can_view == 1 && $submission->user_id != null) {
-							Alert::create(
-								$submission->user_id,
-								'submission_update',
-								array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
-								array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
-								URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id))
-							);
+						if($submission->user_id != null) {
+                            $target_user = new User($submission->user_id);
+                            if($target_user && $forms->canViewOwnSubmission(implode(',', $user->getAllGroupIds()), $submission->form_id)) {
+                                Alert::create(
+                                    $submission->user_id,
+                                    'submission_update',
+                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
+                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
+                                    URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id))
+                                );
+                            }
 						}
 
-						$success = $language->get('moderator', 'comment_created');
-						
 						Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
 						Redirect::to(URL::build('/panel/forms/submissions/', 'view=' . Output::getClean($submission->id)));
 						die();
@@ -419,7 +430,7 @@ if(!isset($_GET['view'])){
 			'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
 			'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
 			'ANSWERS' => $answer_array,
-            'DELETE_LINK' => ($user->hasPermission('forms.delete-submissions') ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_submission&id=' . Output::getClean($submission->id)) : null),
+            'DELETE_LINK' => ($forms->canDeleteSubmission($group_ids, $submission->form_id) ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_submission&id=' . Output::getClean($submission->id)) : null),
             'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
             'CONFIRM_DELETE_SUBMISSION' => $forms_language->get('forms', 'confirm_delete_submisssion'),
             'CONFIRM_DELETE_COMMENT' => $forms_language->get('forms', 'confirm_delete_comment'),
@@ -439,7 +450,7 @@ if(!isset($_GET['view'])){
                     die();
                 }
                 
-                if($user->hasPermission('forms.delete-submissions')){
+                if($forms->canDeleteSubmission($group_ids, $submission->form_id)){
                     try {
                         $queries->delete('forms_replies', array('id', '=', $_GET['id']));
                         $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));

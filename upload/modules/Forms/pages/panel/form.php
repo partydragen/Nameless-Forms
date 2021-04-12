@@ -100,14 +100,6 @@ if(!isset($_GET['action'])){
 						}
 					} else
 					$location = 1;
-										
-					// Can guest visit?
-					if(isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
-					else $guest = 0;
-					
-					// Can user views his own submission?
-					if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
-					else $can_view = 0;
                     
                     // Enable captcha?
 					if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
@@ -117,15 +109,13 @@ if(!isset($_GET['action'])){
 					$queries->update('forms', $form->id, array(
 						'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
 						'title' => Output::getClean(Input::get('form_name')),
-						'guest' => $guest,
 						'link_location' => $location,
 						'icon' => Input::get('form_icon'),
-						'can_view'  => $can_view,
                         'captcha' => $captcha,
                         'content' => Output::getClean(Input::get('content'))
 					));
 										
-					Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
+					Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
 					Redirect::to(URL::build('/panel/form/', 'form=' . Output::getClean($form->id)));
 					die();
 				} catch(Exception $e){
@@ -205,12 +195,6 @@ if(!isset($_GET['action'])){
 		'LINK_NONE' => $language->get('admin', 'page_link_none'),
         'CONTENT' => $language->get('admin', 'description'),
         'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : Output::getClean(Output::getDecoded($form->content))),
-		'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
-		'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
-		'ALLOW_GUESTS_VALUE' => $form->guest,
-		'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
-		'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
-		'CAN_USER_VIEW_VALUE' => $form->can_view,
 		'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha'),
 		'ENABLE_CAPTCHA_VALUE' => $form->captcha,
 		'FIELDS' => $forms_language->get('forms', 'fields'),
@@ -457,6 +441,141 @@ if(!isset($_GET['action'])){
 			Redirect::to(URL::build('/panel/form/', 'form='.$form->id));
 			die();
 		break;
+        case 'permissions':
+            // Form permissions
+            if(Input::exists()){
+				$errors = array();
+                
+                if(Token::check(Input::get('token'))){
+                    // Display navigation link for guest?
+					if(isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
+					else $guest = 0;
+                    
+                    // Save to database
+					$queries->update('forms', $form->id, array(
+                        'guest' => $guest
+					));
+                    
+                    // Update form permissions
+					$post = Input::get('perm-post-0');
+					$view_own = Input::get('perm-view_own-0');
+					$view_submissions = 0;
+					$delete_submissions = 0;
+                    
+                    $groups = DB::getInstance()->query('SELECT id FROM nl2_groups')->results();
+                    $form_perm_query = $queries->getWhere('forms_permissions', array('form_id', '=', $form->id));
+                    
+                    $cat_perm_exists = 0;
+                    if(count($form_perm_query)){
+						foreach($form_perm_query as $query){
+							if($query->group_id == 0){
+								$cat_perm_exists = 1;
+								$update_id = $query->id;
+								break;
+							}
+						}
+					}
+                    
+                    try {
+                        if($cat_perm_exists != 0){ // Permission already exists, update
+							// Update the category
+                            $queries->update('forms_permissions', $update_id, array(
+								'post' => $post,
+								'view_own' => $view_own,
+								'view' => $view_submissions,
+								'can_delete' => $delete_submissions
+							));
+                        } else {
+                            // Permission doesn't exist, create
+                            $queries->create('forms_permissions', array(
+								'group_id' => 0,
+								'form_id' => $form->id,
+								'post' => $post,
+								'view_own' => $view_own,
+								'view' => $view_submissions,
+								'can_delete' => $delete_submissions
+							));
+                        }
+                    } catch(Exception $e) {
+                        $errors[] = $e->getMessage();
+					}
+                    
+                    foreach($groups as $group){
+                        $post = Input::get('perm-post-' . $group->id);
+						$view_own = Input::get('perm-view_own-' . $group->id);
+						$view_submissions = Input::get('perm-view_submissions-' . $group->id);
+						$delete_submissions = Input::get('perm-delete_submissions-' . $group->id);
+                        
+                        if(!($post)) $post = 0;
+						if(!($view_own)) $view_own = 0;
+						if(!($view_submissions)) $view_submissions = 0;
+						if(!($delete_submissions)) $delete_submissions = 0;
+                        
+                        $cat_perm_exists = 0;
+                        if(count($form_perm_query)){
+							foreach($form_perm_query as $query){
+								if($query->group_id == $group->id){
+									$cat_perm_exists = 1;
+									$update_id = $query->id;
+									break;
+								}
+							}
+						}
+                        
+                        try {
+							if($cat_perm_exists != 0){
+                                // Permission already exists, update
+								$queries->update('forms_permissions', $update_id, array(
+                                    'post' => $post,
+                                    'view_own' => $view_own,
+                                    'view' => $view_submissions,
+                                    'can_delete' => $delete_submissions
+								));
+							} else {
+                                // Permission doesn't exist, create
+								$queries->create('forms_permissions', array(
+									'group_id' => $group->id,
+                                    'form_id' => $form->id,
+                                    'post' => $post,
+                                    'view_own' => $view_own,
+                                    'view' => $view_submissions,
+                                    'can_delete' => $delete_submissions
+								));
+							}
+						} catch(Exception $e) {
+							die($e->getMessage());
+						}
+                    }
+                    
+                    Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
+                    Redirect::to(URL::build('/panel/form/', 'form='.$form->id.'&action=permissions'));
+                    die();
+                } else
+					$errors[] = $language->get('general', 'invalid_token');
+            }
+            
+            $guest_query = DB::getInstance()->query('SELECT 0 AS id, post AS can_post, view_own AS can_view_own FROM nl2_forms_permissions WHERE group_id = 0 AND form_id = ?', array($form->id))->results();
+			$group_query = DB::getInstance()->query('SELECT id, name, can_post, can_view_own, can_view, can_delete FROM nl2_groups A LEFT JOIN (SELECT group_id, post AS can_post, `view_own` AS can_view_own, `view` AS can_view, can_delete FROM nl2_forms_permissions WHERE form_id = ?) B ON A.id = B.group_id ORDER BY `order` ASC', array($form->id))->results();
+        
+            $smarty->assign(array(
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+                'BACK' => $language->get('general', 'back'),
+                'BACK_LINK' => URL::build('/panel/forms'),
+                'USER' => $language->get('admin', 'user'),
+                'STAFFCP' => $language->get('moderator', 'staff_cp'),
+                'GROUP' => $language->get('admin', 'group'),
+                'GUESTS' => $language->get('user', 'guests'),
+                'GUEST_PERMISSIONS' => $guest_query,
+                'GROUP_PERMISSIONS' => $group_query,
+                'CAN_POST_SUBMISSION' => $forms_language->get('forms', 'can_post_submission'),
+                'CAN_VIEW_OWN_SUBMISSION' => $forms_language->get('forms', 'can_view_own_submission'),
+                'CAN_VIEW_SUBMISSIONS' => $forms_language->get('forms', 'can_view_submissions'),
+                'CAN_DELETE_SUBMISSIONS' => $forms_language->get('forms', 'can_delete_submissions'),
+                'SHOW_NAVIGATION_LINK_FOR_GUEST' => $forms_language->get('forms', 'show_navigation_link_for_guest'),
+            ));
+            
+            $template_file = 'forms/form_permissions.tpl';
+        break;
 		default:
 			Redirect::to(URL::build('/panel/forms'));
 			die();
@@ -489,7 +608,12 @@ $smarty->assign(array(
 	'INFO' => $language->get('general', 'info'),
 	'FORMS' => $forms_language->get('forms', 'forms'),
 	'TOKEN' => Token::get(),
-	'SUBMIT' => $language->get('general', 'submit')
+	'SUBMIT' => $language->get('general', 'submit'),
+    'GENERAL_SETTINGS' => $language->get('admin', 'general_settings'),
+    'GENERAL_SETTINGS_LINK' => URL::build('/panel/form/', 'form='.$form->id),
+    'PERMISSIONS' => $language->get('admin', 'permissions'),
+    'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=permissions'),
+    'GUEST_VALUE' => $form->guest
 ));
 
 $template->addCSSFiles(array(

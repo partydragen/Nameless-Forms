@@ -14,4 +14,4 @@ $forms_language = new Language(ROOT_PATH . '/modules/Forms/language', LANGUAGE);
 
 // Initialise module
 require_once(ROOT_PATH . '/modules/Forms/module.php');
-$module = new Forms_Module($language, $forms_language, $pages, $queries, $navigation, $cache);
+$module = new Forms_Module($language, $forms_language, $pages, $user, $queries, $navigation, $cache);

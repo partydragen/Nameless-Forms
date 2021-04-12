@@ -32,16 +32,17 @@ $language = array(
 	// Permissions
 	'forms_view_submissions' => 'AdminCP &raquo; Formulare &raquo; Formulare',
 	'forms_manage' => 'AdminCP &raquo; Formulare &raquo; Abgesendet',
+    'can_post_submission' => 'Can post submission',
+    'can_view_own_submission' => 'Can view own submission',
+    'can_view_submissions' => 'Can view submissions',
+    'can_delete_submissions' => 'Can delete submissions',
+    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
 	
 	// Form
 	'editing_x' => 'Ändere {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formular erfolgreich erstellt.',
 	'form_updated_successfully' => 'Formular erfolgreich geändert.',
 	'form_deleted_successfully' => 'Formular erfolgreich gelöscht.',
-	'allow_guests' => 'Können Gäste hier einen Formular erstellen?',
-	'allow_guests_help' => 'Gäste können Beiträge einreichen, ohne eingeloggt zu sein. Bitte beachten Sie, dass sie die Beiträge anschließend nicht mehr sehen können.',
-	'can_user_view' => 'Kann ein Mitglied seinen Formular sehen?',
-	'can_user_view_help' => 'Der Benutzer kann seine eigenen Beiträge anzeigen und den Kommentarbereich verwenden. Außerdem erhält er Aktualisierungsbenachrichtigungen, wenn sich der Status ändert oder wenn jemand einen Kommentar abgibt, Bitte beachten Sie, dass dies nicht für Gäste funktioniert.',
     'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields

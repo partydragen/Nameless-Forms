@@ -39,6 +39,17 @@
 							<a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
 						<hr>
+
+                        <ul class="nav nav-tabs">
+                          <li class="nav-item">
+                            <a class="nav-link active">{$GENERAL_SETTINGS}</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{$PERMISSIONS_LINK}">{$PERMISSIONS}</a>
+                          </li>
+                        </ul>
+                        
+                        </br>
 						
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
@@ -77,19 +88,9 @@
                                   </div>
 								</div>
                                 <div class="col-md-6">
-									<div class="form-group">
-										<label for="Inputguest">{$ALLOW_GUESTS}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$ALLOW_GUESTS_HELP}"></i></span>
-										<input id="inputguest" name="guest" type="checkbox" class="js-switch"{if $ALLOW_GUESTS_VALUE eq 1} checked{/if} />
-									</div>
                                     <div class="form-group">
 										<label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
 										<input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
-									</div>
-                                </div>
-                                <div class="col-md-6">
-									<div class="form-group">
-										<label for="Inputguest">{$CAN_USER_VIEW}</label> <span class="badge badge-info"><i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" title="{$INFO}" data-content="{$CAN_USER_VIEW_HELP}"></i></span>
-										<input id="inputcan_view" name="can_view" type="checkbox" class="js-switch"{if $CAN_USER_VIEW_VALUE eq 1} checked{/if} />
 									</div>
                                 </div>
 							</div>

@@ -133,15 +133,7 @@ if(!isset($_GET['action'])){
 								}
 							} else
 							$location = 1;
-										
-							// Can guest visit?
-							if(isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
-							else $guest = 0;
-							
-							// Can guest visit?
-							if(isset($_POST['can_view']) && $_POST['can_view'] == 'on') $can_view = 1;
-							else $can_view = 0;
-                            
+
                             // Enable captcha?
 							if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
 							else $captcha = 0;
@@ -150,10 +142,8 @@ if(!isset($_GET['action'])){
 							$queries->create('forms', array(
 								'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
 								'title' => Output::getClean(Input::get('form_name')),
-								'guest' => $guest,
 								'link_location' => $location,
 								'icon' => Input::get('form_icon'),
-								'can_view' => $can_view,
                                 'captcha' => $captcha,
                                 'content' => Output::getClean(Input::get('content'))
 							));
@@ -220,10 +210,6 @@ if(!isset($_GET['action'])){
 				'LINK_NONE' => $language->get('admin', 'page_link_none'),
                 'CONTENT' => $language->get('admin', 'description'),
                 'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : ''),
-				'ALLOW_GUESTS' => $forms_language->get('forms', 'allow_guests'),
-				'ALLOW_GUESTS_HELP' => $forms_language->get('forms', 'allow_guests_help'),
-				'CAN_USER_VIEW' => $forms_language->get('forms', 'can_user_view'),
-				'CAN_USER_VIEW_HELP' => $forms_language->get('forms', 'can_user_view_help'),
                 'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha')
 			));
 			
@@ -258,6 +244,7 @@ if(!isset($_GET['action'])){
 			
 			try {
 				$queries->delete('forms', array('id', '=', $_GET['id']));
+                $queries->delete('forms_permissions', array('form_id', '=', $_GET['id']));
 				$queries->delete('forms_fields', array('form_id', '=', $_GET['id']));
 				$queries->delete('forms_replies', array('form_id', '=', $_GET['id']));
 				$queries->delete('forms_comments', array('form_id', '=', $_GET['id']));

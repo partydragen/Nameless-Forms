@@ -31,16 +31,17 @@ $language = array(
 	// Permissions
 	'forms_view_submissions' => 'StaffCP &raquo; Formulários &raquo; Envios',
 	'forms_manage' => 'StaffCP &raquo; Formulários &raquo; Formulários',
+    'can_post_submission' => 'Can post submission',
+    'can_view_own_submission' => 'Can view own submission',
+    'can_view_submissions' => 'Can view submissions',
+    'can_delete_submissions' => 'Can delete submissions',
+    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
 	
 	// Form
 	'editing_x' => 'Editando {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formulário criado com sucesso.',
 	'form_updated_successfully' => 'Formulário atualizado com sucesso.',
 	'form_deleted_successfully' => 'Formulário excluído com sucesso.',
-	'allow_guests' => 'Visitantes podem acessar esse formulário?',
-	'allow_guests_help' => 'Visitantes poderão enviar sem estar logado. Note que eles não poderão ver o envio depois',
-	'can_user_view' => 'O usuário pode ver seu próprio envio?',
-	'can_user_view_help' => 'O usuário poderá ver seu próprio envio e usar a seção de comentários. O usuário também vai receber alertas quando a página de status mudar ou quando alguém comentar. Note que isso não funcionará para visitantes.',
     'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields

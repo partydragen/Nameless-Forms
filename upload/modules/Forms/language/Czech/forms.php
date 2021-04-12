@@ -31,16 +31,17 @@ $language = array(
 	// Permissions
 	'forms_view_submissions' => 'StaffCP &raquo; Formuláře &raquo; Odpovědi',
 	'forms_manage' => 'StaffCP &raquo; Formuláře &raquo; Formuláře',
+    'can_post_submission' => 'Can post submission',
+    'can_view_own_submission' => 'Can view own submission',
+    'can_view_submissions' => 'Can view submissions',
+    'can_delete_submissions' => 'Can delete submissions',
+    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
 	
 	// Form
 	'editing_x' => 'Úprava formuláře {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formulář úspěšně vytvořen.',
 	'form_updated_successfully' => 'Formulář úspěšně upraven.',
 	'form_deleted_successfully' => 'Formulář úspěšně odstraněn.',
-	'allow_guests' => 'Mohou si hosti zobrazit tento formulář?',
-	'allow_guests_help' => 'Hosti budou moct odesílat odpovědi bez přihlášení. Po odeslání si ale nebudou moci své odpovědi zobrazit',
-	'can_user_view' => 'Může si uživatel zobrazit své vlastní odpovědi?',
-	'can_user_view_help' => 'Uživatel si bude moct zobrazit jeho vlastní odpovědi a použít sekci komentářů. Bude také dostávat upozornění o aktualizacích při změně stavu nebo když jeho odpovědi někdo okomentuje. Toto nebude fungovat pro hosty.',
     'enable_captcha' => 'Povolit CAPTCHA u tohoto formuláře?',
 	
 	// Fields

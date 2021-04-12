@@ -31,16 +31,17 @@ $language = array(
 	// Permissions
 	'forms_view_submissions' => 'AdminCP &raquo; Lomakkeet &raquo; Hakemukset',
 	'forms_manage' => 'AdminCP &raquo; Lomakkeet &raquo; Lomakkeet',
+    'can_post_submission' => 'Can post submission',
+    'can_view_own_submission' => 'Can view own submission',
+    'can_view_submissions' => 'Can view submissions',
+    'can_delete_submissions' => 'Can delete submissions',
+    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
 	
 	// Lomake
 	'editing_x' => 'Muokataan {x}', // Don't replace {x}
 	'form_created_successfully' => 'Lomake luotiin onnistuneesti.',
 	'form_updated_successfully' => 'Lomake päivitettiin onnistuneesti.',
 	'form_deleted_successfully' => 'Lomake poistettiin onnistuneesti.',
-	'allow_guests' => 'Voiko vieraat tarkastella lomaketta?',
-	'allow_guests_help' => 'Vieraat voivat lähettää hakemuksia kirjautumatta sisään. Ota huomioon, että he eivät voi tarkastella hakemusta jälkeenpäin.',
-	'can_user_view' => 'Voiko käyttäjä tarkastella omaa hakemusta?',
-	'can_user_view_help' => 'Käyttäjä voi tarkastella hakemusta ja nähdä kommenttiosion. Käyttäjä saa myös ilmoituksen, kun tila vaihtuu tai joku kommentoi hakemusta. Huomaa, että tämä ei toimi vieraille.',
     'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields

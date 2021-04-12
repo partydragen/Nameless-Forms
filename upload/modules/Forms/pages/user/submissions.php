@@ -21,10 +21,17 @@ define('PAGE', 'cc_submissions');
 $page_title = $language->get('user', 'user_cp');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 
+require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
+$forms = new Forms();
+
+// Get user groups
+$user_groups = $user->getAllGroupIds();
+$group_ids = implode(',', $user_groups);
+
 $timeago = new Timeago(TIMEZONE);
 
 if(!isset($_GET['view'])){
-	$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT id FROM nl2_forms WHERE can_view = 1) ORDER BY created DESC', array($user->data()->id))->results();
+	$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($user->data()->id))->results();
 	
 	if(count($submissions_query)){
 		// Get page
@@ -92,7 +99,7 @@ if(!isset($_GET['view'])){
 	$template_file = 'forms/submissions.tpl';
 } else {
 	// Get submission by id
-	$submission = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE id = ? AND user_id = ? AND form_id IN (SELECT id FROM nl2_forms WHERE can_view = 1) ORDER BY created DESC', array($_GET['view'], $user->data()->id))->results();
+	$submission = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE id = ? AND user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['view'], $user->data()->id))->results();
 	
 	if(!count($submission)){
 		Redirect::to(URL::build('/user/submissions'));

@@ -14,14 +14,14 @@ class Forms_Module extends Module {
     private $_forms_language;
     private $_cache;
 
-    public function __construct($language, $forms_language, $pages, $queries, $navigation, $cache){
+    public function __construct($language, $forms_language, $pages, $user, $queries, $navigation, $cache){
         $this->_language = $language;
         $this->_forms_language = $forms_language;
         $this->_cache = $cache;
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.5.0';
+        $module_version = '1.6.0';
         $nameless_version = '2.0.0-pr9';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -55,35 +55,55 @@ class Forms_Module extends Module {
         }
         
         try {
-            $forms = $queries->getWhere('forms', array('id', '<>', 0));
+            $forms = DB::getInstance()->query('SELECT id, link_location, url, icon, title, guest FROM nl2_forms')->results();
             if(count($forms)){
+                if ($user->isLoggedIn()) {
+                    $group_ids = implode(',', $user->getAllGroupIds());
+                } else {
+                    $group_ids = implode(',', array(0));
+                }
+                
                 foreach($forms as $form){
                     // Register form page
                     $pages->add('Forms', $form->url, 'pages/form.php', 'form-' . $form->id, true);
+
+                    $perm = false;
+                    if(!$user->isLoggedIn() && $form->guest == 1) {
+                        $perm = true;
+                    }
                     
-                    // Add link location
-                    switch($form->link_location){
-                        case 1:
-                            // Navbar
-                            // Check cache first
-                            $cache->setCache('navbar_order');
-                            if(!$cache->isCached('form-' . $form->id . '_order')){
-                                // Create cache entry now
-                                $form_order = 5;
-                                $cache->store('form-' . $form->id . '_order', 5);
-                            } else {
-                                $form_order = $cache->retrieve('form-' . $form->id . '_order');
-                            }
-                            $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form_order, $form->icon);
-                        break;
-                        case 2:
-                            // "More" dropdown
-                            $navigation->addItemToDropdown('more_dropdown', 'form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form->icon);
-                        break;
-                        case 3:
-                            // Footer
-                            $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'footer', null, 2000, $form->icon);
-                        break;
+                    if(!$perm) {
+                        $hasperm = DB::getInstance()->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN('.$group_ids.')', array($form->id));
+                        if($hasperm->count()) {
+                            $perm = true;
+                        }
+                    }
+                    
+                    // Add link location to navigation if user have permission
+                    if($perm) {
+                        switch($form->link_location){
+                            case 1:
+                                // Navbar
+                                // Check cache first
+                                $cache->setCache('navbar_order');
+                                if(!$cache->isCached('form-' . $form->id . '_order')){
+                                    // Create cache entry now
+                                    $form_order = 5;
+                                    $cache->store('form-' . $form->id . '_order', 5);
+                                } else {
+                                    $form_order = $cache->retrieve('form-' . $form->id . '_order');
+                                }
+                                $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form_order, $form->icon);
+                            break;
+                            case 2:
+                                // "More" dropdown
+                                $navigation->addItemToDropdown('more_dropdown', 'form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form->icon);
+                            break;
+                            case 3:
+                                // Footer
+                                $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'footer', null, 2000, $form->icon);
+                            break;
+                        }
                     }
                 }
             }
@@ -114,8 +134,7 @@ class Forms_Module extends Module {
         // Permissions
         PermissionHandler::registerPermissions('Forms', array(
             'forms.view-submissions' => $this->_forms_language->get('forms', 'forms_view_submissions'),
-            'forms.manage' => $this->_forms_language->get('forms', 'forms_manage'),
-            'forms.delete-submissions' => $this->_forms_language->get('forms', 'delete_submissions_or_comments')
+            'forms.manage' => $this->_forms_language->get('forms', 'forms_manage')
         ));
         
         $navs[1]->add('cc_submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/user/submissions'));
@@ -184,6 +203,57 @@ class Forms_Module extends Module {
     private function initialiseUpdate($old_version){
         $old_version = str_replace(array(".", "-"), "", $old_version);
         $queries = new Queries();
+        
+        if($old_version < 160) {
+            try {
+                if(!$queries->tableExists('forms_permissions')){
+                    try {
+                        // Generate table
+                        try {
+                            $engine = Config::get('mysql/engine');
+                            $charset = Config::get('mysql/charset');
+                        } catch(Exception $e){
+                            $engine = 'InnoDB';
+                            $charset = 'utf8mb4';
+                        }
+                        if(!$engine || is_array($engine))
+                            $engine = 'InnoDB';
+                        if(!$charset || is_array($charset))
+                            $charset = 'latin1';
+                        
+                        $queries->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                    } catch(Exception $e){
+                        // Error
+                    }
+                    
+                    $groups = DB::getInstance()->query('SELECT id, staff FROM nl2_groups')->results();
+                    $forms = DB::getInstance()->query('SELECT * FROM nl2_forms')->results();
+                    foreach($forms as $form) {
+                        $queries->create('forms_permissions', array(
+                            'group_id' => 0,
+                            'form_id' => $form->id,
+                            'post' => $form->guest,
+                            'view_own' => 0,
+                            'view' => 0,
+                            'can_delete' => 0
+                        ));
+                            
+                        foreach($groups as $group) {
+                            $queries->create('forms_permissions', array(
+                                'group_id' => $group->id,
+                                'form_id' => $form->id,
+                                'post' => 1,
+                                'view_own' => $form->can_view,
+                                'view' => ($group->staff == 1 ? 1 : 0),
+                                'can_delete' => ($group->staff == 1 ? 1 : 0)
+                            ));
+                        }
+                    }
+                } 
+            } catch(Exception $e){
+                // Error
+            }
+        }
 
         if($old_version < 150) {
             try {
@@ -241,6 +311,35 @@ class Forms_Module extends Module {
                 // Error
             }
         }
+        
+        if(!$queries->tableExists('forms_permissions')){
+            try {
+                $queries->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                
+                $groups = DB::getInstance()->query('SELECT id, staff FROM nl2_groups')->results();
+                $queries->create('forms_permissions', array(
+                    'group_id' => 0,
+                    'form_id' => 1,
+                    'post' => 0,
+                    'view_own' => 0,
+                    'view' => 0,
+                    'can_delete' => 0
+                ));
+                    
+                foreach($groups as $group) {
+                    $queries->create('forms_permissions', array(
+                        'group_id' => $group->id,
+                        'form_id' => 1,
+                        'post' => 1,
+                        'view_own' => 1,
+                        'view' => ($group->staff == 1 ? 1 : 0),
+                        'can_delete' => ($group->staff == 1 ? 1 : 0)
+                    ));
+                }
+            } catch(Exception $e){
+                // Error
+            }
+        }  
         
         if(!$queries->tableExists('forms_comments')){
             try {

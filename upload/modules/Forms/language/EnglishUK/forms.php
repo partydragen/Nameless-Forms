@@ -31,16 +31,17 @@ $language = array(
 	// Permissions
 	'forms_view_submissions' => 'StaffCP &raquo; Forms &raquo; Submissions',
 	'forms_manage' => 'StaffCP &raquo; Forms &raquo; Forms',
+    'can_post_submission' => 'Can post submission',
+    'can_view_own_submission' => 'Can view own submission',
+    'can_view_submissions' => 'Can view submissions',
+    'can_delete_submissions' => 'Can delete submissions',
+    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
 	
 	// Form
 	'editing_x' => 'Editing {x}', // Don't replace {x}
 	'form_created_successfully' => 'Form created successfully.',
 	'form_updated_successfully' => 'Form updated successfully.',
 	'form_deleted_successfully' => 'Form deleted successfully.',
-	'allow_guests' => 'Can guests visit this form?',
-	'allow_guests_help' => 'Guests will be able to send in submissions without being logged in, Please note them won\'t be able to view the submission afterwards',
-	'can_user_view' => 'Can user view his own submission?',
-	'can_user_view_help' => 'User will be able to view his own submission and use the comment section, User will also receive update alerts when the status change or when someone comment, Please note this won\'t work for guests.',
     'enable_captcha' => 'Enable Captcha on this form?',
 	
 	// Fields

@@ -19,10 +19,28 @@ if(!count($form)){
     $form = $form[0];
 }
 
+require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
+$forms = new Forms();
+
+if ($user->isLoggedIn()) {
+    $group_ids = array();
+    foreach ($user->getGroups() as $group) {
+        $group_ids[] = $group->id;
+    }
+} else {
+    $group_ids = array(0);
+}
+$group_ids = implode(',', $group_ids);
+
 // Can guests view?
-if($form->guest == 0 && !$user->isLoggedIn()){
-	Redirect::to(URL::build('/login/'));
-	die();
+if(!$forms->canPostSubmission($group_ids, $form->id)){
+    if (!$user->isLoggedIn()) {
+        Redirect::to(URL::build('/login/'));
+        die();
+    } else {
+        require(ROOT_PATH . '/403.php');
+        die();
+    }
 }
 
 // Always define page name
@@ -124,7 +142,7 @@ if(Input::exists()){
                         'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
                     ));
 
-                    if($form->can_view == 1 && $user->isLoggedIn()) {
+                    if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
                         Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
                         Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
                         die();
