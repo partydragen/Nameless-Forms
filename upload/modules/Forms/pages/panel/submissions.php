@@ -48,7 +48,7 @@ $group_ids = implode(',', $user_groups);
 
 $timeago = new Timeago(TIMEZONE);
 
-$url_path = '/panel/forms/submissions/?';
+$url_path = '';
 if(!isset($_GET['view'])){
 	// Check input
 	if(Input::exists()){
@@ -59,56 +59,97 @@ if(!isset($_GET['view'])){
 			// Valid token
 			$form = $_POST['form_selection'];
 			$status = $_POST['status_selection'];
+            $target_user = $_POST['user'];
 			
 			if ($form != 0) {
-				$url_path = $url_path . 'form='.$form.'&';
+				$url_path .= 'form='.$form.'&';
 			}
 			if ($status != 0) {
-				$url_path = $url_path . 'status='.$status.'&';
+				$url_path .= 'status='.$status.'&';
+			}
+            if (!empty($target_user)) {
+                if(is_numeric($target_user)) {
+                    $url_path .= 'user='.$target_user.'&';
+                } else {
+                    $user_query = DB::getInstance()->query('SELECT id FROM nl2_users WHERE username = ?', array(Output::getClean($target_user)));
+                    if($user_query->count()) {
+                        $url_path .= 'user='.$user_query->first()->id . '&';
+                    }
+                }
 			}
 			
-			Redirect::to(URL::build($url_path));
+			Redirect::to(URL::build('/panel/forms/submissions/', $url_path));
 			die();
 		} else {
 			// Invalid token
 			$errors[] = $language->get('general', 'invalid_token');
 		}
 	}
+    
+    $query = 'SELECT * FROM nl2_forms_replies';
+    $where = ' WHERE form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.'))';
+    $order = ' ORDER BY created DESC';
+    $limit = '';
+    $params = array();
+    $url_parameters = '';
 	
-	if(!isset($_GET['form']) && !isset($_GET['status'])){
+	if(!isset($_GET['form']) && !isset($_GET['status']) && !isset($_GET['user'])){
 		// sort by open submissions
-		$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC')->results();
-		$url = URL::build('/panel/forms/submissions/', true);
+		/*$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC')->results();
+		$url = URL::build('/panel/forms/submissions/', '');*/
+        
+        $url_parameters = true;
+        $where .= ' AND status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1)';
 	} else {
-		if(isset($_GET['form']) && isset($_GET['status'])){
+		/*if(isset($_GET['form']) && isset($_GET['status'])){
 			// Sort by form and status
 			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
-			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
 		} else if(isset($_GET['form'])) {
 			// sort by form
 			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form']))->results();
-			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&', true);
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&');
 		} else if(isset($_GET['status'])) {
 			// sort by status
 			$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['status']))->results();
 
-			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&', true);
+			$url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
 		} else {
 			Redirect::to(URL::build('/panel/forms/submissions/'));
-		}
+		}*/
+        
+        if(isset($_GET['form'])) {
+            $url_parameters .= 'form=' . $_GET['form'] . '&';
+            $where .= ' AND form_id = ?';
+            array_push($params, $_GET['form']);
+        }
+        
+        if(isset($_GET['status'])) {
+            $url_parameters .= 'status=' . $_GET['status'] . '&';
+            $where .= ' AND status_id = ?';
+            array_push($params, $_GET['status']);
+        }
+        
+        if(isset($_GET['user'])) {
+            $url_parameters .= 'user=' . $_GET['user'] . '&';
+            $where .= ' AND user_id = ?';
+            array_push($params, $_GET['user']);
+        }
 	}
+    
+    $submissions_query = DB::getInstance()->query($query . $where . $order . $limit, $params)->results();
 	
 	$submissions = array();
 	if(count($submissions_query)){
 		// Get page
 		if(isset($_GET['p'])){
 			if(!is_numeric($_GET['p'])){
-				Redirect::to($url);
+				Redirect::to(URL::build('/panel/forms/submissions/', $url_parameters));
 				die();
 			} else {
 				if($_GET['p'] == 1){
 					// Avoid bug in pagination class
-					Redirect::to($url);
+					Redirect::to(URL::build('/panel/forms/submissions/', $url_parameters));
 					die();
 				}
 				$p = $_GET['p'];
@@ -119,7 +160,7 @@ if(!isset($_GET['view'])){
 		
 		$paginator = new Paginator((isset($template_pagination) ? $template_pagination : array()));
 		$results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
-		$pagination = $paginator->generate(7, $url);
+		$pagination = $paginator->generate(7, URL::build('/panel/forms/submissions/', $url_parameters));
 		
 		// Get all submissions
 		foreach($results->data as $submission){
@@ -227,6 +268,9 @@ if(!isset($_GET['view'])){
 		'STATUS_LIST' => $status_array,
 		'FORM_SELECTION_VALUE' => (isset($_GET['form']) ? $_GET['form'] : '0'),
 		'STATUS_SELECTION_VALUE' => (isset($_GET['status']) ? $_GET['status'] : '0'),
+        'USER' => $forms_language->get('forms', 'user'),
+        'ID_OR_USERNAME' => $forms_language->get('forms', 'id_or_username'),
+        'USER_VALUE' => (isset($_GET['user']) ? $_GET['user'] : ''),
 		'SORT' => $forms_language->get('forms', 'sort'),
 	));
 			

@@ -46,6 +46,9 @@
 							<div class="col-2">
 							  <label for="form_selection">{$STATUS}</label>
 							</div>
+                            <div class="col-2">
+							  <label for="form_selection">{$USER}</label>
+							</div>
 						  </div>
 						  
 						  <div class="form-row">
@@ -63,6 +66,9 @@
 								{/foreach}
 							  </select>
 							</div>
+                            <div class="col-2">
+                                <input type="text" name="user" class="form-control" id="InputUser" value="{$USER_VALUE}" placeholder="{$ID_OR_USERNAME}">
+                            </div>
 						    <div class="col-2">
 							  <input type="hidden" name="token" value="{$TOKEN}">
 							  <input type="submit" value="{$SORT}" class="btn btn-primary">
