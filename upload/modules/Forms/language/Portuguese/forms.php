@@ -41,7 +41,7 @@ $language = array(
 	'allow_guests_help' => 'Visitantes poderão enviar sem estar logado. Note que eles não poderão ver o envio depois',
 	'can_user_view' => 'O usuário pode ver seu próprio envio?',
 	'can_user_view_help' => 'O usuário poderá ver seu próprio envio e usar a seção de comentários. O usuário também vai receber alertas quando a página de status mudar ou quando alguém comentar. Note que isso não funcionará para visitantes.',
-    'enable_captcha' => 'Enable Captcha on this form?',
+    'enable_captcha' => 'Habilitar o Captcha nesse formulário?',
 	
 	// Fields
 	'field' => 'Campo',
@@ -61,7 +61,7 @@ $language = array(
 	'delete_field' => 'Tem certeza que quer excluir esse campo?',
     'help_box' => 'Texto de ajuda',
     'barrier' => 'Linha divisória',
-    'number' => 'Number',
+    'number' => 'Número',
 	
 	// Statuses
 	'statuses' => 'Estados',
@@ -72,8 +72,8 @@ $language = array(
 	'marked_as_open' => 'Significa estado aberto',
 	'status_name' => 'Nome do Estado',
 	'status_html' => 'HTML do Estado',
-	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
-	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'status_forms' => 'Selecione os formulários nos quais esse estado será exibido. (Ctrl+clique para selecionar/desmarcar vários)',
+	'status_groups' => 'Selecione os grupos que têm permissão para selecionar este estado. (Ctrl+clique para selecionar/desmarcar vários)',
 	'status_creation_success' => 'Estado criado com sucesso.',
 	'status_creation_error' => 'Erro ao criar um estado. Por favor certifique-se que o HTML do estado não é maior que 1.024 caracteres.',
 	'status_edit_success' => 'Estado editado com sucesso.',
@@ -103,22 +103,22 @@ $language = array(
 	'your_submission_updated' => 'Seu envio foi atualizado',
 	'user' => 'Usuário',
 	'updated_by' => 'Modificado por',
-	'sort' => 'Sort',
-    'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
-    'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
-    'delete_submissions_or_comments' => 'Delete submissions or comments',
+	'sort' => 'Ordenar',
+    'confirm_delete_comment' => 'Tem certeza que deseja deletar este comentário?',
+    'confirm_delete_submisssion' => 'Tem certeza de que deseja excluir este envio?',
+    'delete_submissions_or_comments' => 'Excluir envios ou comentários',
 	
 	// Update alerts
-	'new_update_available_x' => 'There is a new update available for the module {x}',
-	'new_urgent_update_available_x' => 'There is a new urgent update available for the module {x}. Please update as soon as possible!',
-	'current_version_x' => 'Current module version: {x}',
-	'new_version_x' => 'New module version: {x}',
-	'view_resource' => 'View Resource',
+	'new_update_available_x' => 'Há uma nova atualização disponível para o módulo {x}',
+	'new_urgent_update_available_x' => 'Há uma nova atualização urgente disponível para o módulo {x}. Por favor, atualize o mais rápido possível!',
+	'current_version_x' => 'Versão atual do módulo: {x}',
+	'new_version_x' => 'Nova versão do módulo: {x}',
+	'view_resource' => 'Ver Recurso',
     
     // Hook
-    'new_form_submission' => 'New form submission',
-    'updated_form_submission' => 'New form submission comment',
-    'new_submission_text' => 'New submission created in {x} by {y}',
-    'updated_submission_text' => 'New submission comment in {x} by {y}'
+    'new_form_submission' => 'Envio de novo formulário',
+    'updated_form_submission' => 'Novo comentário de envio do formulário',
+    'new_submission_text' => 'Novo envio criado em {x} por {y}',
+    'updated_submission_text' => 'Novo comentário de envio em {x} por {y}'
     //'updated_submission_text' => 'Submission updated in {x} by {y}'
 );
