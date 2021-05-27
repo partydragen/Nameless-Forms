@@ -54,19 +54,19 @@
                       <label for="{$field.id}">{$field.name} {if $field.required} <span class="text-danger"><strong>*</strong></span>{/if}</label>
                   {/if}
                 {if $field.type == "1"}
-                <input type="text" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}">
+                <input type="text" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required="This field is required."{/if}>
                 {elseif $field.type == "2"}
-                <select name="{$field.id}" id="{$field.id}">
+                <select name="{$field.id}" id="{$field.id}" {if $field.required}required="This field is required."{/if}>
                   {foreach from=$field.options item=option}
                   <option value="{$option}" {if $option eq $field.value} selected{/if}>{$option}</option>
                   {/foreach}
                 </select>
                 {elseif $field.type == "3"}
-                <textarea name="{$field.id}" id="{$field.id}">{$field.value}</textarea>
+                <textarea name="{$field.id}" id="{$field.id}" {if $field.required}required="This field is required."{/if}>{$field.value}</textarea>
                 {elseif $field.type == "6"}
-                <input type="number" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}">
+                <input type="number" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required="This field is required."{/if}>
                 {elseif $field.type == "7"}
-                <input type="email" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}">
+                <input type="email" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required="This field is required."{/if}>
                 {/if}
               </div>
             {/foreach}
