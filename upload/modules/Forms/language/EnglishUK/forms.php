@@ -65,7 +65,7 @@ $language = array(
     'number' => 'Number',
 
 	// Statuses
-	'statuses' => 'statuses',
+	'statuses' => 'Statuses',
 	'status' => 'Status',
 	'new_status' => 'New Status',
 	'creating_status' => 'Creating new status',
