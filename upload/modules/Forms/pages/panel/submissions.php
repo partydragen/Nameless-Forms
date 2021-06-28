@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr10
  *
  *  License: MIT
  *
@@ -11,25 +11,8 @@
  */
 
 // Can the user view the panel?
-if($user->isLoggedIn()){
-    if(!$user->canViewACP()){
-        // No
-        Redirect::to(URL::build('/'));
-        die();
-    }
-    if(!$user->isAdmLoggedIn()){
-        // Needs to authenticate
-        Redirect::to(URL::build('/panel/auth'));
-        die();
-    } else {
-        if(!$user->hasPermission('forms.view-submissions')){
-            require_once(ROOT_PATH . '/404.php');
-            die();
-        }
-    }
-} else {
-    // Not logged in
-    Redirect::to(URL::build('/login'));
+if(!$user->handlePanelPageLoad('forms.view-submissions')) {
+    require_once(ROOT_PATH . '/403.php');
     die();
 }
 

@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr10
  *
  *  License: MIT
  *
@@ -51,14 +51,10 @@ require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 // Get fields
 $fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
 
-// Use recaptcha?
-$captcha_enabled = $form->captcha ? true : false;
-if ($captcha_enabled) {
-    $captcha_type = $queries->getWhere('settings', array('name', '=', 'recaptcha_type'));
-    $captcha_type = $captcha_type[0]->value;
-
-    $recaptcha_key = $queries->getWhere("settings", array("name", "=", "recaptcha_key"));
-    $recaptcha_secret = $queries->getWhere('settings', array('name', '=', 'recaptcha_secret'));
+// Check if captcha is enabled
+$captcha = $form->captcha ? true : false;
+if ($captcha) {
+    $captcha = CaptchaBase::isCaptchaEnabled();
 }
 
 // Handle input
@@ -66,30 +62,14 @@ if(Input::exists()){
     if(Token::check(Input::get('token'))){
         $errors = array();
         
-        if ($captcha_enabled) {
-            // Check reCAPCTHA
-            $url = $captcha_type === 'hCaptcha' ? 'https://hcaptcha.com/siteverify' : 'https://www.google.com/recaptcha/api/siteverify';
-
-            $post_data = 'secret=' . $recaptcha_secret[0]->value . '&response=' . ($captcha_type === 'hCaptcha' ? Input::get('h-captcha-response') : Input::get('g-recaptcha-response'));
-
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-            $result = curl_exec($ch);
-
-            $result = json_decode($result, true);
+        if ($captcha) {
+            $captcha_passed = CaptchaBase::getActiveProvider()->validateToken($_POST);
         } else {
-            // reCAPTCHA is disabled
-            $result = array(
-                'success' => 'true'
-            );
+            $captcha_passed = true;
         }
         
-        // Check if reCAPCTHA was success
-        if (isset($result['success']) && $result['success'] == 'true') {
+        // Check if CAPCTHA was success
+        if ($captcha_passed) {
             // Validation
             $validate = new Validate();
             $to_validate = array();
@@ -192,24 +172,18 @@ foreach($fields as $field){
     );
 }
 
-if ($captcha_enabled) {
-    $smarty->assign(array(
-        'RECAPTCHA' => Output::getClean($recaptcha_key[0]->value),
-        'CAPTCHA_CLASS' => $captcha_type === 'hCaptcha' ? 'h-captcha' : 'g-recaptcha'
-    ));
+if ($captcha) {
+    $smarty->assign('CAPTCHA', CaptchaBase::getActiveProvider()->getHtml());
+    $template->addJSFiles(array(CaptchaBase::getActiveProvider()->getJavascriptSource() => array()));
 
-    if ($captcha_type === 'hCaptcha') {
-        $template->addJSFiles(
-            array(
-                'https://hcaptcha.com/1/api.js' => array()
-            )
-        );
-    } else {
-        $template->addJSFiles(
-            array(
-                'https://www.google.com/recaptcha/api.js' => array()
-            )
-        );
+    $submitScript = CaptchaBase::getActiveProvider()->getJavascriptSubmit('forms');
+    if ($submitScript) {
+        $template->addJSScript('
+            $("#forms").submit(function(e) {
+                e.preventDefault();
+                ' . $submitScript . '
+            });
+        ');
     }
 }
 

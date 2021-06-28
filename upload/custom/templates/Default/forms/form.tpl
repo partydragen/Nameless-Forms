@@ -37,7 +37,7 @@
               </br></br>
             {/if}
 			
-			<form action="" method="post">
+			<form action="" method="post" id="forms">
 			  {foreach from=$FIELDS item=field}
 			  <div class="form-group">
 				{if $field.type == 5}
@@ -65,9 +65,9 @@
 			  </div>
 			  {/foreach}
               
-              {if isset($RECAPTCHA)}
+              {if $CAPTCHA}
                 <div class="form-group">
-                  <div class="{$CAPTCHA_CLASS}" data-sitekey="{$RECAPTCHA}"></div>
+                  {$CAPTCHA}
                 </div>
               {/if}
               
