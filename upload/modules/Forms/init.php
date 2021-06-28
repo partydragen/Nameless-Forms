@@ -1,6 +1,6 @@
 <?php 
 /*
- *	Made by Partydragen
+ *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  NamelessMC version 2.0.0-pr6
  *

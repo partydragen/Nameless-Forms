@@ -1,6 +1,6 @@
 <?php
 /*
- *	Made by Partydragen
+ *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
  *  NamelessMC version 2.0.0-pr9
@@ -63,7 +63,7 @@ if ($captcha_enabled) {
 
 // Handle input
 if(Input::exists()){
-	if(Token::check(Input::get('token'))){
+    if(Token::check(Input::get('token'))){
         $errors = array();
         
         if ($captcha_enabled) {
@@ -173,23 +173,23 @@ if(Input::exists()){
             // reCAPTCHA failed
             $errors[] = $language->get('user', 'invalid_recaptcha');
         }
-	} else {
-		// Invalid token
-		$errors[] = $language->get('general', 'invalid_token');
-	}
+    } else {
+        // Invalid token
+        $errors[] = $language->get('general', 'invalid_token');
+    }
 }
 
 $fields_array = array();
 foreach($fields as $field){
-	$options = explode(',', Output::getClean($field->options));
-	$fields_array[] = array(
-		'id' => Output::getClean($field->id),
-		'name' => Output::getClean($field->name),
+    $options = explode(',', Output::getClean($field->options));
+    $fields_array[] = array(
+        'id' => Output::getClean($field->id),
+        'name' => Output::getClean($field->name),
         'value' => (isset($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
-		'type' => Output::getClean($field->type),
-		'required' => Output::getClean($field->required),
-		'options' => $options,
-	);
+        'type' => Output::getClean($field->type),
+        'required' => Output::getClean($field->required),
+        'options' => $options,
+    );
 }
 
 if ($captcha_enabled) {
@@ -214,44 +214,44 @@ if ($captcha_enabled) {
 }
 
 if(!empty($form->content)) {
-	$smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->content)));
+    $smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->content)));
 }
-	
+    
 $smarty->assign(array(
-	'TITLE' => Output::getClean($form->title),
-	'FIELDS' => $fields_array,
-	'TOKEN' => Token::get(),
-	'SUBMIT' => $language->get('general', 'submit')
+    'TITLE' => Output::getClean($form->title),
+    'FIELDS' => $fields_array,
+    'TOKEN' => Token::get(),
+    'SUBMIT' => $language->get('general', 'submit')
 ));
-	
+    
 // Load modules + template
 Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
 
 if(Session::exists('submission_success'))
-	$success = Session::flash('submission_success');
+    $success = Session::flash('submission_success');
 
 if(isset($success))
-	$smarty->assign(array(
-		'SUCCESS' => $success,
-		'SUCCESS_TITLE' => $language->get('general', 'success')
-	));
+    $smarty->assign(array(
+        'SUCCESS' => $success,
+        'SUCCESS_TITLE' => $language->get('general', 'success')
+    ));
 
 if(isset($errors) && count($errors))
-	$smarty->assign(array(
-		'ERRORS' => $errors,
-		'ERRORS_TITLE' => $language->get('general', 'error')
-	));
+    $smarty->assign(array(
+        'ERRORS' => $errors,
+        'ERRORS_TITLE' => $language->get('general', 'error')
+    ));
 
 $page_load = microtime(true) - $start;
 define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
-	
+    
 $smarty->assign('WIDGETS_LEFT', $widgets->getWidgets('left'));
 $smarty->assign('WIDGETS_RIGHT', $widgets->getWidgets('right'));
-	
+    
 require(ROOT_PATH . '/core/templates/navbar.php');
 require(ROOT_PATH . '/core/templates/footer.php');
-	
+    
 // Display template
 $template->displayTemplate('forms/form.tpl', $smarty);

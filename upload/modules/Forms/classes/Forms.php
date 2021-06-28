@@ -1,6 +1,6 @@
 <?php
 /*
- *	Made by Partydragen
+ *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
  *  NamelessMC version 2.0.0-pr9
@@ -67,15 +67,15 @@ class Forms {
 
         $uid = $queries->getWhere('settings', array('name', '=', 'unique_id'));
         $uid = $uid[0]->value;
-		
-		$enabled_modules = Module::getModules();
-		foreach($enabled_modules as $enabled_item){
-			if($enabled_item->getName() == 'Forms'){
-				$module = $enabled_item;
-				break;
-			}
-		}
-		
+        
+        $enabled_modules = Module::getModules();
+        foreach($enabled_modules as $enabled_item){
+            if($enabled_item->getName() == 'Forms'){
+                $module = $enabled_item;
+                break;
+            }
+        }
+        
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -85,11 +85,11 @@ class Forms {
         $update_check = curl_exec($ch);
         curl_close($ch);
 
-		$info = json_decode($update_check);
-		if (isset($info->message)) {
-			die($info->message);
-		}
-		
+        $info = json_decode($update_check);
+        if (isset($info->message)) {
+            die($info->message);
+        }
+        
         return $update_check;
     }
 }
