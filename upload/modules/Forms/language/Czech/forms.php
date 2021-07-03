@@ -1,6 +1,6 @@
 <?php 
 /*
- *	Made by Partydragen
+ *  Made by Partydragen, translated by Fjuro
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
  *  NamelessMC version 2.0.0-pr8
@@ -29,20 +29,20 @@ $language = array(
 	'guest' => 'Host',
 	
 	// Permissions
-	'forms_view_submissions' => 'StaffCP &raquo; Formuláře &raquo; Odpovědi',
-	'forms_manage' => 'StaffCP &raquo; Formuláře &raquo; Formuláře',
-    'can_post_submission' => 'Can post submission',
-    'can_view_own_submission' => 'Can view own submission',
-    'can_view_submissions' => 'Can view submissions',
-    'can_delete_submissions' => 'Can delete submissions',
-    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
+	'forms_view_submissions' => 'Panel &raquo; Formuláře &raquo; Odpovědi',
+	'forms_manage' => 'Panel &raquo; Formuláře &raquo; Formuláře',
+	'can_post_submission' => 'Může odesílat odpovědi',
+	'can_view_own_submission' => 'Může zobrazit vlastní odpověď',
+	'can_view_submissions' => 'Může zobrazovat odpovědi',
+	'can_delete_submissions' => 'Může mazat odpovědi',
+	'show_navigation_link_for_guest' => 'Zobrazit odkaz v navigaci hostům a zobrazit přihlašovací formulář, pokud nemají oprávnění na odpovědi',
 	
 	// Form
 	'editing_x' => 'Úprava formuláře {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formulář úspěšně vytvořen.',
 	'form_updated_successfully' => 'Formulář úspěšně upraven.',
 	'form_deleted_successfully' => 'Formulář úspěšně odstraněn.',
-    'enable_captcha' => 'Povolit CAPTCHA u tohoto formuláře?',
+	'enable_captcha' => 'Povolit CAPTCHA u tohoto formuláře?',
 	
 	// Fields
 	'field' => 'Pole',
@@ -105,10 +105,10 @@ $language = array(
 	'user' => 'Uživatel',
 	'updated_by' => 'Upravil',
 	'sort' => 'Pořadí',
-    'id_or_username' => 'ID or Username',
-    'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
-    'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
-    'delete_submissions_or_comments' => 'Delete submissions or comments',
+	'id_or_username' => 'ID nebo jméno',
+	'confirm_delete_comment' => 'Opravdu chcete odstranit tento komentář?',
+	'confirm_delete_submisssion' => 'Opravdu chcete odstranit tuto odpověď?',
+	'delete_submissions_or_comments' => 'Mazat odpovědi nebo komentáře',
 	
 	// Update alerts
 	'new_update_available_x' => 'Je dostupná nová aktualizace doplňku {x}',
@@ -118,9 +118,9 @@ $language = array(
 	'view_resource' => 'Zobrazit stránku doplňku',
 	
 	// Hook
-    'new_form_submission' => 'Nová odpověď ve formuláři',
-    'updated_form_submission' => 'Nový komentář u odpovědi formuláře',
-    'new_submission_text' => 'Nová odpověď vytvořena u formuláře {x} uživatelem {y}',
-    'updated_submission_text' => 'Komentář nové odpovědi u formuláře {x} od uživatele {y}'
+	'new_form_submission' => 'Nová odpověď ve formuláři',
+	'updated_form_submission' => 'Nový komentář u odpovědi formuláře',
+	'new_submission_text' => 'Nová odpověď vytvořena u formuláře {x} uživatelem {y}',
+	'updated_submission_text' => 'Komentář nové odpovědi u formuláře {x} od uživatele {y}'
     //'updated_submission_text' => 'Odpověď u formuláře {x} aktualizována uživatelem {y}'
 );
