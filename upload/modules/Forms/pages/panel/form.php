@@ -243,7 +243,9 @@ if(!isset($_GET['action'])){
                                 'type' => $type,
                                 'required' => $required,
                                 'options' => htmlspecialchars($options),
-                                'order' => Input::get('order')
+                                'order' => Input::get('order'),
+                                'min' => Input::get('minimum'),
+                                'max' => Input::get('maximum')
                             ));
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_created_successfully'));
@@ -291,6 +293,8 @@ if(!isset($_GET['action'])){
                 'OPTIONS' => $forms_language->get('forms', 'options'),
                 'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
                 'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
+                'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),
+                'MAXIMUM_CHARACTERS' => $forms_language->get('forms', 'maximum_characters'),
                 'REQUIRED' => $language->get('admin', 'required'),
             ));
         
@@ -345,6 +349,8 @@ if(!isset($_GET['action'])){
                                 'type' => $type,
                                 'required' => $required,
                                 'options' => htmlspecialchars($options),
+                                'min' => Input::get('minimum'),
+                                'max' => Input::get('maximum'),
                                 '`order`' => Input::get('order')
                             ));
                                     
@@ -404,6 +410,10 @@ if(!isset($_GET['action'])){
                 'OPTIONS_VALUE' => $options,
                 'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
                 'ORDER_VALUE' => $field->order,
+                'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),
+                'MINIMUM_CHARACTERS_VALUE' => $field->min,
+                'MAXIMUM_CHARACTERS' => $forms_language->get('forms', 'maximum_characters'),
+                'MAXIMUM_CHARACTERS_VALUE' => $field->max,
                 'REQUIRED' => $language->get('admin', 'required'),
                 'REQUIRED_VALUE' => $field->required,
             ));

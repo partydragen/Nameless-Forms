@@ -60,9 +60,25 @@
 								<label for="InputOptions">{$OPTIONS} - {$OPTIONS_HELP}</label>
 								<textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS}">{$OPTIONS_VALUE}</textarea>
 							</div>
-                            <div class="form-group">
-                                <label for="InputOrder">{$FIELD_ORDER}</label>
-                                <input type="number" min="1" class="form-control" id="InputOrder" name="order" value="{$ORDER_VALUE}">
+                            <div class="row">
+							  <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="InputOrder">{$FIELD_ORDER}</label>
+                                    <input type="number" min="1" class="form-control" id="InputOrder" name="order" value="{$ORDER_VALUE}">
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="InputMinimum">{$MINIMUM_CHARACTERS}</label>
+                                    <input type="number" min="0" class="form-control" id="InputMinimum" name="minimum" value="{$MINIMUM_CHARACTERS_VALUE}">
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="InputMaximum">{$MAXIMUM_CHARACTERS}</label>
+                                    <input type="number" min="0" class="form-control" id="InputMaximum" name="maximum" value="{$MAXIMUM_CHARACTERS_VALUE}">
+                                </div>
+                              </div>
                             </div>
 							<div class="form-group">
 								<label for="inputrequired">{$REQUIRED}</label>

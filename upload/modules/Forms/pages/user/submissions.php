@@ -66,17 +66,30 @@ if(!isset($_GET['view'])){
             $status = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
             $status = $status[0];
             
-            $updated_by_user = new User($submission->updated_by);
+            // Check if last updater is anonymous
+            if($submission->updated_by != 0) {
+                $updated_by_user = new User($submission->updated_by);
+                
+                $updated_by_name = $updated_by_user->getDisplayname();
+                $updated_by_profile = $updated_by_user->getProfileURL();
+                $updated_by_style = $updated_by_user->getGroupClass();
+                $updated_by_avatar = $updated_by_user->getAvatar();
+            } else {
+                $updated_by_name = $forms_language->get('forms', 'anonymous');
+                $updated_by_profile = null;
+                $updated_by_style = null;
+                $updated_by_avatar = null;
+            }
             
             $submissions[] = array(
                 'id' => $submission->id,
                 'form_name' => $form->title,
                 'status' => $status->html,
                 'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
-                'updated_by_name' => $updated_by_user->getDisplayname(),
-                'updated_by_profile' => $updated_by_user->getProfileURL(),
-                'updated_by_style' => $updated_by_user->getGroupClass(),
-                'updated_by_avatar' => $updated_by_user->getAvatar(),
+                'updated_by_name' => $updated_by_name,
+                'updated_by_profile' => $updated_by_profile,
+                'updated_by_style' => $updated_by_style,
+                'updated_by_avatar' => $updated_by_avatar,
                 'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
                 'link' => URL::build('/user/submissions/', 'view=' . $submission->id),
             );
@@ -184,12 +197,27 @@ if(!isset($_GET['view'])){
     $comments = $queries->getWhere('forms_comments', array('form_id', '=', $submission->id));
     $smarty_comments = array();
     foreach($comments as $comment){
-        $comment_user = new User($comment->user_id);
+
+        // Check if comment user is 
+        if($comment->anonymous != 1) {
+            $comment_user = new User($comment->user_id);
+                
+            $user_name = $comment_user->getDisplayname();
+            $user_profile = $comment_user->getProfileURL();
+            $user_style = $comment_user->getGroupClass();
+            $user_avatar = $comment_user->getAvatar();
+        } else {
+            $user_name = $forms_language->get('forms', 'anonymous');
+            $user_profile = null;
+            $user_style = null;
+            $user_avatar = null;
+        }
+        
         $smarty_comments[] = array(
-            'username' => $comment_user->getDisplayname(),
-            'profile' => $comment_user->getProfileURL(),
-            'style' => $comment_user->getGroupClass(),
-            'avatar' => $comment_user->getAvatar(),
+            'username' => $user_name,
+            'profile' => $user_profile,
+            'style' => $user_style,
+            'avatar' => $user_avatar,
             'content' => Output::getPurified(Output::getDecoded($comment->content)),
             'date' => date('d M Y, H:i', $comment->created),
             'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())

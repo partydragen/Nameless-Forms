@@ -75,13 +75,25 @@ if(Input::exists()){
             $to_validate = array();
             
             foreach($fields as $field){
+                $field_validation = array();
+                
                 if($field->required == 1) {
-                    $to_validate[$field->id] = array(
-                        'required' => true
-                    );
+                    $field_validation['required'] = true;
+                }
+                
+                if($field->min != 0) {
+                    $field_validation['min'] = $field->min;
+                }
+                
+                if($field->max != 0) {
+                    $field_validation['max'] = $field->max;
+                }
+                
+                if(count($field_validation)) {
+                    $to_validate[$field->id] = $field_validation;
                 }
             }
-            
+
             $validation = $validate->check($_POST, $to_validate);
             if($validation->passed()){
                 // Validation passed
@@ -145,7 +157,14 @@ if(Input::exists()){
                     $fielderror = $queries->getWhere('forms_fields', array('id', '=', $id));
                     if (count($field)) {
                         $fielderror = $fielderror[0];
-                        $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
+
+                        if(strpos($item, 'is required') !== false){
+                            $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
+                        } else if(strpos($item, 'minimum') !== false){
+                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->min), $forms_language->get('forms', 'x_field_minimum_y'));
+                        } else if(strpos($item, 'maximum') !== false){
+                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->max), $forms_language->get('forms', 'x_field_maximum_y'));
+                        }
                     }
                 }
             }

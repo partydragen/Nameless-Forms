@@ -21,7 +21,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.6.1';
+        $module_version = '1.7.0';
         $nameless_version = '2.0.0-pr10';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -134,7 +134,8 @@ class Forms_Module extends Module {
         // Permissions
         PermissionHandler::registerPermissions('Forms', array(
             'forms.view-submissions' => $this->_forms_language->get('forms', 'forms_view_submissions'),
-            'forms.manage' => $this->_forms_language->get('forms', 'forms_manage')
+            'forms.manage' => $this->_forms_language->get('forms', 'forms_manage'),
+            'forms.anonymous' => $this->_language->get('moderator', 'staff_cp')  . ' &raquo; ' .  $this->_forms_language->get('forms', 'forms')  . ' &raquo; ' . $this->_forms_language->get('forms', 'submit_as_anonymous')
         ));
         
         $navs[1]->add('cc_submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/user/submissions'));
@@ -203,6 +204,28 @@ class Forms_Module extends Module {
     private function initialiseUpdate($old_version){
         $old_version = str_replace(array(".", "-"), "", $old_version);
         $queries = new Queries();
+        
+        if($old_version < 170) {
+            try {
+                $queries->alterTable('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $queries->alterTable('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
+                $queries->alterTable('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
+                $queries->alterTable('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
+                $queries->alterTable('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
+                
+                // Update main admin group permissions
+                $group = $queries->getWhere('groups', array('id', '=', 2));
+                $group = $group[0];
+                
+                $group_permissions = json_decode($group->permissions, TRUE);
+                $group_permissions['forms.anonymous'] = 1;
+                
+                $group_permissions = json_encode($group_permissions);
+                $queries->update('groups', 2, array('permissions' => $group_permissions));
+            } catch(Exception $e){
+                // Error
+            }
+        }
         
         if($old_version < 160) {
             try {
@@ -298,7 +321,7 @@ class Forms_Module extends Module {
         $queries = new Queries();
         if(!$queries->tableExists('forms')){
             try {
-                $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
                 
                 $queries->create('forms', array(
                     'url' => '/apply',
@@ -343,7 +366,7 @@ class Forms_Module extends Module {
         
         if(!$queries->tableExists('forms_comments')){
             try {
-                $queries->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `content` mediumtext NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $queries->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
             } catch(Exception $e){
                 // Error
             }
@@ -351,7 +374,7 @@ class Forms_Module extends Module {
         
         if(!$queries->tableExists('forms_fields')){
             try {
-                $queries->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `options` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $queries->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
                 
                 $queries->create('forms_fields', array(
                     'form_id' => 1,
@@ -417,6 +440,7 @@ class Forms_Module extends Module {
             $group_permissions['forms.view-submissions'] = 1;
             $group_permissions['forms.manage-submission'] = 1;
             $group_permissions['forms.delete-submissions'] = 1;
+            $group_permissions['forms.anonymous'] = 1;
             
             $group_permissions = json_encode($group_permissions);
             $queries->update('groups', 2, array('permissions' => $group_permissions));
