@@ -602,6 +602,7 @@ if(!isset($_GET['action'])){
                             // Turn array of inputted forms into string of forms
                             $forms_string .= $item . ',';
                         }
+                        $forms_string = rtrim($forms_string, ',');
                         
                         // Update database
                         $queries->update('forms_statuses', $status->id, array(
@@ -631,7 +632,7 @@ if(!isset($_GET['action'])){
                     $status_array[] = array(
                         'id' => $status->id,
                         'html' => $status->html,
-                        'selected' => in_array($status->id, $forms)
+                        'selected' => in_array($form->id, $forms)
                     );
                 }
             }
