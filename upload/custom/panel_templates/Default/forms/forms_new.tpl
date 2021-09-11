@@ -48,25 +48,25 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label for="InputName">{$FORM_NAME}</label>
-										<input type="text" name="form_name" class="form-control" id="InputName" placeholder="{$FORM_NAME}">
+										<input type="text" name="form_name" class="form-control" id="InputName" placeholder="{$FORM_NAME}" value="{$FORM_NAME_VALUE}">
 									</div>
 									<div class="form-group">
 										<label for="InputUrl">{$FORM_URL}</label>
-										<input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}">
+										<input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}" value="{$FORM_URL_VALUE}">
 									</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
 										<label for="InputUrl">{$FORM_ICON}</label>
-										<input type="text" name="form_icon" class="form-control" id="InputIcon" placeholder="{$FORM_ICON}">
+										<input type="text" name="form_icon" class="form-control" id="InputIcon" placeholder="{$FORM_ICON}" value="{$FORM_ICON_VALUE}">
 									</div>
 									<div class="form-group">
 										<label for="link_location">{$FORM_LINK_LOCATION}</label>
 											<select class="form-control" id="link_location" name="link_location">
-											<option value="1">{$LINK_NAVBAR}</option>
-											<option value="2">{$LINK_MORE}</option>
-											<option value="3">{$LINK_FOOTER}</option>
-											<option value="4">{$LINK_NONE}</option>
+											<option value="1"{if $LINK_LOCATION_VALUE eq 1} selected{/if}>{$LINK_NAVBAR}</option>
+											<option value="2"{if $LINK_LOCATION_VALUE eq 2} selected{/if}>{$LINK_MORE}</option>
+											<option value="3"{if $LINK_LOCATION_VALUE eq 3} selected{/if}>{$LINK_FOOTER}</option>
+											<option value="4"{if $LINK_LOCATION_VALUE eq 4} selected{/if}>{$LINK_NONE}</option>
 										</select>
 									</div>
 								</div>
@@ -79,7 +79,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
 									  <label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
-									  <input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch" />
+									  <input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
 								    </div>
                                 </div>
                                 
