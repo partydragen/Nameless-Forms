@@ -82,7 +82,8 @@ $language = array(
 	'status_edit_success' => 'Status successfully edited.',
 	'status_deleted_successfully' => 'Status deleted successfully.',
 	'delete_status' => 'Are you sure you want to delete this status?',
-
+    'select_statuses_to_form' => 'Select statuses to be used on this form',
+    
 	// Errors
 	'input_form_name' => 'Please input a form name.',
 	'input_form_url' => 'Please input a form url.',

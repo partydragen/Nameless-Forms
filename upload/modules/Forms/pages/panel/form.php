@@ -569,6 +569,78 @@ if(!isset($_GET['action'])){
             
             $template_file = 'forms/form_permissions.tpl';
         break;
+        case 'statuses':
+            // Form permissions
+            if(Input::exists()){
+                $errors = array();
+                
+                if(Token::check(Input::get('token'))){
+                    $selected_statuses = (isset($_POST['status']) && is_array($_POST['status']) ? $_POST['status'] : array());
+                    
+                    // Get statuses from database
+                    $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
+                    foreach($statuses as $status){
+                        $forms = (!empty($status->fids) ? explode(',', $status->fids) : array());
+                        
+                        if(in_array($status->id, $selected_statuses)) {
+                            // Add Status
+                            if(!in_array($form->id, $forms)) {
+                                $forms[] = $form->id;
+                            }
+                        } else {
+                            // Remove status from form
+                            if(in_array($form->id, $forms)) {
+                                if (($key = array_search($form->id, $forms)) !== false) {
+                                    unset($forms[$key]);
+                                }
+                            }
+                        }
+
+                        // Create string containing selected forms IDs
+                        $forms_string = '';
+                        foreach($forms as $item){
+                            // Turn array of inputted forms into string of forms
+                            $forms_string .= $item . ',';
+                        }
+                        
+                        // Update database
+                        $queries->update('forms_statuses', $status->id, array(
+                            'fids' => $forms_string,
+                        ));
+                    }
+                    
+                    Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
+                    Redirect::to(URL::build('/panel/form/', 'form='.$form->id.'&action=statuses'));
+                    die();
+                } else
+                    $errors[] = $language->get('general', 'invalid_token');
+            }
+            
+            // Get statuses from database
+            $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
+            $status_array = array();
+            if(count($statuses)){
+                foreach($statuses as $status){
+                    $forms = (!empty($status->fids) ? explode(',', $status->fids) : array());
+                    
+                    $status_array[] = array(
+                        'id' => $status->id,
+                        'html' => $status->html,
+                        'selected' => in_array($status->id, $forms)
+                    );
+                }
+            }
+
+            $smarty->assign(array(
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+                'BACK' => $language->get('general', 'back'),
+                'BACK_LINK' => URL::build('/panel/forms'),
+                'SELECT_STATUSES' => $forms_language->get('forms', 'select_statuses_to_form'),
+                'ALL_STATUSES' => $status_array,
+            ));
+            
+            $template_file = 'forms/form_statuses.tpl';
+        break;
         default:
             Redirect::to(URL::build('/panel/forms'));
             die();
@@ -606,6 +678,8 @@ $smarty->assign(array(
     'GENERAL_SETTINGS_LINK' => URL::build('/panel/form/', 'form='.$form->id),
     'PERMISSIONS' => $language->get('admin', 'permissions'),
     'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=permissions'),
+    'STATUSES' => $forms_language->get('forms', 'statuses'),
+    'STATUSES_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=statuses'),
     'GUEST_VALUE' => $form->guest
 ));
 

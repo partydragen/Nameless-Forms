@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -82,6 +82,7 @@ $language = array(
 	'status_edit_success' => 'Estado actualizado con exito.',
 	'status_deleted_successfully' => 'Estado eliminado con exito.',
 	'delete_status' => 'Seguro que quieres eliminar este estado?',
+    'select_statuses_to_form' => 'Select statuses to be used on this form',
 
 	// Errors
 	'input_form_name' => 'Por favor introdusca un nombre a el formulario.',

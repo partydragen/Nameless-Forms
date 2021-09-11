@@ -47,6 +47,9 @@
                           <li class="nav-item">
                             <a class="nav-link active">{$PERMISSIONS}</a>
                           </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{$STATUSES_LINK}">{$STATUSES}</a>
+                          </li>
                         </ul>
                         
                         </br>
