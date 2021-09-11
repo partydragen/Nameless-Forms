@@ -31,6 +31,7 @@ $group_ids = implode(',', $user_groups);
 $timeago = new Timeago(TIMEZONE);
 
 if(!isset($_GET['view'])){
+    $submissions = array();
     $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($user->data()->id))->results();
     
     if(count($submissions_query)){
@@ -56,8 +57,6 @@ if(!isset($_GET['view'])){
         $pagination = $paginator->generate(7, $url);
         
         // Get all submissions
-        $submissions = array();
-        
         foreach($results->data as $submission){
             $form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
             $form = $form[0];
@@ -162,7 +161,7 @@ if(!isset($_GET['view'])){
                         'username' => Output::getClean($form->title),
                         'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean($user->data()->nickname)), $forms_language->get('forms', 'updated_submission_text')),
                         'content_full' => Output::getClean(Input::get('content')),
-                        'avatar_url' => $user->getAvatar(null, 128, true),
+                        'avatar_url' => $user->getAvatar(128, true),
                         'title' => Output::getClean($form->title),
                         'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->id)
                     ));
