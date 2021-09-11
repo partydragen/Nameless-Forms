@@ -155,7 +155,7 @@ if(Input::exists()){
                     $id = $id[0];
 
                     $fielderror = $queries->getWhere('forms_fields', array('id', '=', $id));
-                    if (count($field)) {
+                    if (count($fielderror)) {
                         $fielderror = $fielderror[0];
 
                         if(strpos($item, 'is required') !== false){
