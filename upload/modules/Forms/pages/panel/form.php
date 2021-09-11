@@ -609,6 +609,11 @@ if(!isset($_GET['action'])){
                         ));
                     }
                     
+                    // Save to database
+                    $queries->update('forms', $form->id, array(
+                        'comment_status' => Output::getClean($_POST['comment_status'])
+                    ));
+                    
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
                     Redirect::to(URL::build('/panel/form/', 'form='.$form->id.'&action=statuses'));
                     die();
@@ -637,6 +642,9 @@ if(!isset($_GET['action'])){
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'SELECT_STATUSES' => $forms_language->get('forms', 'select_statuses_to_form'),
                 'ALL_STATUSES' => $status_array,
+                'CHANGE_STATUS_ON_COMMENT' => $forms_language->get('forms', 'change_status_on_comment'),
+                'COMMENT_STATUS_VALUE' => $form->comment_status,
+                'DISABLED' => $language->get('user', 'disabled'),
             ));
             
             $template_file = 'forms/form_statuses.tpl';

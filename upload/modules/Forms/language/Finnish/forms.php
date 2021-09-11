@@ -83,6 +83,7 @@ $language = array(
 	'status_deleted_successfully' => 'Tila poistettiin onnistuneesti.',
 	'delete_status' => 'Oletko varma, että haluat poistaa tämän tilan?',
     'select_statuses_to_form' => 'Select statuses to be used on this form',
+    'change_status_on_comment' => 'Change status when user is commenting?',
 
 	// Errors
 	'input_form_name' => 'Anna lomakkeen nimi.',

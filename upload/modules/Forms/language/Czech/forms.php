@@ -83,6 +83,7 @@ $language = array(
 	'status_deleted_successfully' => 'Stav úspěšně odstraněn.',
 	'delete_status' => 'Opravdu chcete odstranit tento stav?',
     'select_statuses_to_form' => 'Select statuses to be used on this form',
+    'change_status_on_comment' => 'Change status when user is commenting?',
 
 	// Errors
 	'input_form_name' => 'Zadejte prosím název formuláře.',

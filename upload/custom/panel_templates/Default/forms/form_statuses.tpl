@@ -67,6 +67,16 @@
                                 </div>
                                 {/foreach}
                             </div>
+
+                            <div class="form-group">
+                                <label for="status_forms">{$CHANGE_STATUS_ON_COMMENT}</label>
+                                <select class="form-control" id="comment_status" name="comment_status">
+                                  <option value="0"{if $COMMENT_STATUS_VALUE eq 0} selected{/if}>{$DISABLED}</option>
+                                  {foreach from=$ALL_STATUSES item=status}
+									<option value="{$status.id}"{if $COMMENT_STATUS_VALUE eq {$status.id}} selected{/if}>{$status.html}</option>
+                                  {/foreach}
+								</select>
+                            </div>
                           
                             <div class="form-group">
                                 <input type="hidden" name="token" value="{$TOKEN}">

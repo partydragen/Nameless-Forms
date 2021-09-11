@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -150,10 +150,17 @@ if(!isset($_GET['view'])){
                         'created' => date('U'),
                         'content' => Output::getClean(nl2br(Input::get('content')))
                     ));
+                    
+                    // Update status on comment?
+                    $status = $submission->status_id;
+                    if($form->comment_status != 0) {
+                        $status = $form->comment_status;
+                    }
 
                     $queries->update('forms_replies', $submission->id, array(
                         'updated_by' => $user->data()->id,
-                        'updated' => date('U')
+                        'updated' => date('U'),
+                        'status_id' => $status
                     ));
                     
                     HookHandler::executeEvent('updatedFormSubmission', array(

@@ -83,6 +83,7 @@ $language = array(
 	'status_deleted_successfully' => 'Estado excluído com sucesso.',
 	'delete_status' => 'Tem certeza que quer excluir esse estado?',
     'select_statuses_to_form' => 'Select statuses to be used on this form',
+    'change_status_on_comment' => 'Change status when user is commenting?',
 
 	// Errors
 	'input_form_name' => 'Por favor insira o nome do formulário.',
