@@ -175,7 +175,9 @@ class Forms_Module extends Module {
         
         // Check for module updates
         if(isset($_GET['route']) && $user->isLoggedIn() && $user->hasPermission('admincp.update')){
-            if(rtrim($_GET['route'], '/') == '/panel/forms/submissions' || rtrim($_GET['route'], '/') == '/panel/forms' || rtrim($_GET['route'], '/') == '/panel/form' || rtrim($_GET['route'], '/') == '/panel/forms/statuses'){
+            // Page belong to this module?
+            $page = $pages->getActivePage();
+            if($page['module'] == 'Forms'){
 
                 $cache->setCache('forms_module_cache');
                 if($cache->isCached('update_check')){
@@ -194,7 +196,7 @@ class Forms_Module extends Module {
                         'CURRENT_VERSION' => str_replace('{x}', $this->getVersion(), $this->_forms_language->get('forms', 'current_version_x')),
                         'NEW_VERSION' => str_replace('{x}', Output::getClean($update_check->new_version), $this->_forms_language->get('forms', 'new_version_x')),
                         'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
-                        'UPDATE_LINK' => 'https://namelessmc.com/resources/resource/43-forms-module/'
+                        'UPDATE_LINK' => Output::getClean($update_check->link)
                     ));
                 }
             }
