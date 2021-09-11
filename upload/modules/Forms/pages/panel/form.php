@@ -180,7 +180,6 @@ if(!isset($_GET['action'])){
         'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : Output::getClean(Output::getDecoded($form->content))),
         'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha'),
         'ENABLE_CAPTCHA_VALUE' => $form->captcha,
-        'FIELDS' => $forms_language->get('forms', 'fields'),
         'NEW_FIELD' => $forms_language->get('forms', 'new_field'),
         'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=new'),
         'FIELDS_LIST' => $fields_array,
@@ -434,6 +433,44 @@ if(!isset($_GET['action'])){
             Redirect::to(URL::build('/panel/form/', 'form='.$form->id));
             die();
         break;
+        case 'fields':
+            // Get form fields from database
+            $fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
+            $fields_array = array();
+            if(count($fields)){
+                foreach($fields as $field){
+                    $fields_array[] = array(
+                        'name' => Output::getClean($field->name),
+                        'order' => Output::getClean($field->order),
+                        'type' => $field_types[$field->type]['name'],
+                        'required' => Output::getClean($field->required),
+                        'edit_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=edit&id='.$field->id),
+                        'delete_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=delete&amp;id=' . $field->id)
+                    );
+                }
+            }
+            
+            $smarty->assign(array(
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+                'BACK' => $language->get('general', 'back'),
+                'BACK_LINK' => URL::build('/panel/forms'),
+                'FIELD_NAME' => $language->get('admin', 'field_name'),
+                'ORDER' => $forms_language->get('forms', 'field_order'),
+                'TYPE' => $language->get('admin', 'type'),
+                'REQUIRED' => $language->get('admin', 'required'),
+                'ACTIONS' => $language->get('general', 'actions'),
+                'NEW_FIELD' => $forms_language->get('forms', 'new_field'),
+                'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=new'),
+                'FIELDS_LIST' => $fields_array,
+                'NONE_FIELDS_DEFINED' => $forms_language->get('forms', 'none_fields_defined'),
+                'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
+                'CONFIRM_DELETE_FIELD' => $forms_language->get('forms', 'delete_field'),
+                'YES' => $language->get('general', 'yes'),
+                'NO' => $language->get('general', 'no')
+            ));
+            
+            $template_file = 'forms/form_fields.tpl';
+        break;
         case 'permissions':
             // Form permissions
             if(Input::exists()){
@@ -685,6 +722,8 @@ $smarty->assign(array(
     'SUBMIT' => $language->get('general', 'submit'),
     'GENERAL_SETTINGS' => $language->get('admin', 'general_settings'),
     'GENERAL_SETTINGS_LINK' => URL::build('/panel/form/', 'form='.$form->id),
+    'FIELDS' => $forms_language->get('forms', 'fields'),
+    'FIELDS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=fields'),
     'PERMISSIONS' => $language->get('admin', 'permissions'),
     'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=permissions'),
     'STATUSES' => $forms_language->get('forms', 'statuses'),
