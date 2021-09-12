@@ -73,6 +73,24 @@
                 <input type="number" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
                 {elseif $field.type == "7"}
                 <input type="email" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
+                {elseif $field.type == "8"}
+                  {foreach from=$field.options item=option}
+                  <div class="field">
+                    <div class="ui radio checkbox">
+                      <input type="radio" name="{$field.id}" value="{$option}" {if $field.required}required{/if}>
+                      <label>{$option}</label>
+                    </div>
+                  </div>
+                  {/foreach}
+                {elseif $field.type == "9"}
+                  {foreach from=$field.options item=option}
+                  <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" name="{$field.id}[]" value="{$option}">
+                      <label>{$option}</label>
+                    </div>
+                  </div>
+                  {/foreach}
                 {/if}
               </div>
             {/foreach}

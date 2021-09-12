@@ -77,7 +77,7 @@ if(Input::exists()){
             foreach($fields as $field){
                 $field_validation = array();
                 
-                if($field->required == 1) {
+                if($field->required == 1 /*&& $field->type != 9*/) {
                     $field_validation['required'] = true;
                 }
                 
@@ -93,8 +93,14 @@ if(Input::exists()){
                     $to_validate[$field->id] = $field_validation;
                 }
             }
-
-            $validation = $validate->check($_POST, $to_validate);
+            
+            // Modify post validation
+            $validate_post = array();
+            foreach($_POST as $key => $item){
+                $validate_post[$key] = !is_array($item) ? $item : true ;
+            }
+            
+            $validation = $validate->check($validate_post, $to_validate);
             if($validation->passed()){
                 // Validation passed
                 try {
@@ -122,9 +128,11 @@ if(Input::exists()){
                             if(is_numeric($key)) {
                                 $inserts[] = '(?,?,?),';
                                 
+                                $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
+                                
                                 $field_values[] = Output::getClean($submission_id);
                                 $field_values[] = Output::getClean($key);
-                                $field_values[] = Output::getClean(nl2br($item));
+                                $field_values[] = Output::getClean($value);
                             }
                         }
                         
@@ -199,7 +207,7 @@ foreach($fields as $field){
     $fields_array[] = array(
         'id' => Output::getClean($field->id),
         'name' => Output::getClean($field->name),
-        'value' => (isset($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
+        'value' => (isset($_POST[$field->id]) && !is_array($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
         'type' => Output::getClean($field->type),
         'required' => Output::getClean($field->required),
         'options' => $options,
@@ -207,6 +215,7 @@ foreach($fields as $field){
     );
 }
 
+// Captcha
 if ($captcha) {
     $smarty->assign('CAPTCHA', CaptchaBase::getActiveProvider()->getHtml());
     $template->addJSFiles(array(CaptchaBase::getActiveProvider()->getJavascriptSource() => array()));

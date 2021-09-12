@@ -63,6 +63,8 @@ $language = array(
     'help_box' => 'Texto de ajuda',
     'barrier' => 'Linha divisória',
     'number' => 'Número',
+    'radio' => 'Radio',
+    'checkbox' => 'Checkbox',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
 	

@@ -42,6 +42,8 @@ $field_types[4] = array('id' => 4, 'name' => $forms_language->get('forms', 'help
 $field_types[5] = array('id' => 5, 'name' => $forms_language->get('forms', 'barrier'));
 $field_types[6] = array('id' => 6, 'name' => $forms_language->get('forms', 'number'));
 $field_types[7] = array('id' => 7, 'name' => $language->get('general', 'email_address'));
+$field_types[8] = array('id' => 8, 'name' => $forms_language->get('forms', 'radio'));
+$field_types[9] = array('id' => 9, 'name' => $forms_language->get('forms', 'checkbox'));
 
 if(!isset($_GET['action'])){
     // Editing form

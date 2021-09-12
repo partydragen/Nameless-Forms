@@ -63,6 +63,8 @@ $language = array(
 	'help_box' => 'Text nápovědy',
 	'barrier' => 'Oddělovač',
 	'number' => 'Číslo',
+    'radio' => 'Radio',
+    'checkbox' => 'Checkbox',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
 

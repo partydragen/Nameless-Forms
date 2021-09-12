@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -63,6 +63,8 @@ $language = array(
 	'help_box' => 'Help Text',
 	'barrier' => 'Dividing Line',
     'number' => 'Number',
+    'radio' => 'Radio',
+    'checkbox' => 'Checkbox',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
 

@@ -63,6 +63,8 @@ $language = array(
 	'help_box' => 'Help Text',
 	'barrier' => 'Dividing Line',
 	'delete_field' => 'Bist du sicher, dass du dieses Feld löschen möchtest?',
+    'radio' => 'Radio',
+    'checkbox' => 'Checkbox',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
 	
