@@ -51,7 +51,13 @@
                   {elseif $field.type == 4}
                       {', '|implode:$field.options}
                   {else}
-                      <label for="{$field.id}">{$field.name} {if $field.required} <span class="text-danger"><strong>*</strong></span>{/if}</label>
+                      <label for="{$field.id}">{$field.name} {if $field.required} <span class="text-danger"><strong>*</strong></span>{/if}
+                        {if $field.info}
+                        <div class="ui icon mini blue button" data-tooltip="{$field.info}" data-position="top left" data-inverted="" data-variation="mini">
+                          <i class="question circle icon"></i>
+                        </div>
+                        {/if}
+                      </label>
                   {/if}
                 {if $field.type == "1"}
                 <input type="text" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>

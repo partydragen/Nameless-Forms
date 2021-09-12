@@ -60,6 +60,10 @@
 								<label for="InputOptions">{$OPTIONS} - {$OPTIONS_HELP}</label>
 								<textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS}"></textarea>
 							</div>
+                            <div class="form-group">
+								<label for="InputName">{$INFO}</label>
+								<textarea rows="2" class="form-control" name="info" id="info" placeholder="{$INFO}">{$INFO_VALUE}</textarea>
+							</div>
                             <div class="row">
 							  <div class="col-md-4">
                                 <div class="form-group">

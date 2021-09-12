@@ -242,6 +242,7 @@ if(!isset($_GET['action'])){
                                 'type' => $type,
                                 'required' => $required,
                                 'options' => htmlspecialchars($options),
+                                'info' => Output::getClean(nl2br(Input::get('info'))),
                                 'order' => Input::get('order'),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum')
@@ -348,6 +349,7 @@ if(!isset($_GET['action'])){
                                 'type' => $type,
                                 'required' => $required,
                                 'options' => htmlspecialchars($options),
+                                'info' => Output::getClean(nl2br(Input::get('info'))),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
                                 '`order`' => Input::get('order')
@@ -407,6 +409,7 @@ if(!isset($_GET['action'])){
                 'OPTIONS' => $forms_language->get('forms', 'options'),
                 'OPTIONS_HELP' => $forms_language->get('forms', 'options_help'),
                 'OPTIONS_VALUE' => $options,
+                'INFO_VALUE' => Output::getClean($field->info),
                 'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
                 'ORDER_VALUE' => $field->order,
                 'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),

@@ -203,6 +203,7 @@ foreach($fields as $field){
         'type' => Output::getClean($field->type),
         'required' => Output::getClean($field->required),
         'options' => $options,
+        'info' => Output::getPurified(Output::getDecoded($field->info))
     );
 }
 
