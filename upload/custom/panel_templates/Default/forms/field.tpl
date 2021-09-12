@@ -57,8 +57,8 @@
 								</select>
 							</div>
 							<div class="form-group">
-								<label for="InputOptions">{$OPTIONS} - {$OPTIONS_HELP}</label>
-								<textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS}">{$OPTIONS_VALUE}</textarea>
+								<label for="InputOptions">{$OPTIONS} / {$CHECKBOX} / {$RADIO} - {$OPTIONS_HELP}</label>
+								<textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS} / {$CHECKBOX} / {$RADIO}">{$OPTIONS_VALUE}</textarea>
 							</div>
                             <div class="form-group">
 								<label for="InputName">{$INFO}</label>
