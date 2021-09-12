@@ -190,13 +190,25 @@ if(!isset($_GET['view'])){
         
     // Get answers and questions
     $answer_array = array();
-    $answers = json_decode($submission->content, true);
-    foreach($answers as $answer){
-        $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
-        $answer_array[] = array(
-            'question' => $question[0]->name,
-            'answer' => Output::getPurified(Output::getDecoded($answer[1]))
-        );
+    if(empty($submission->content)) {
+        // New fields generation
+        $fields = DB::getInstance()->query('SELECT name, value FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', array($submission->id))->results();
+        foreach($fields as $field){
+            $answer_array[] = array(
+                'question' => Output::getClean($field->name),
+                'answer' => Output::getPurified(Output::getDecoded($field->value))
+            );
+        }
+    } else {
+        // Legacy fields generation
+        $answers = json_decode($submission->content, true);
+        foreach($answers as $answer){
+            $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
+            $answer_array[] = array(
+                'question' => Output::getClean($question[0]->name),
+                'answer' => Output::getPurified(Output::getDecoded($answer[1]))
+            );
+        }
     }
         
     // Get comments

@@ -98,16 +98,6 @@ if(Input::exists()){
             if($validation->passed()){
                 // Validation passed
                 try {
-                    // Convert to content
-                    $content = array();
-                    unset($_POST['token']);
-                    foreach($_POST as $key => $item){
-                        if(is_numeric($key)) {
-                            $content[] = array($key, Output::getClean(nl2br($item)));
-                        }
-                    }
-                    $content = json_encode($content);
-                    
                     // Get user id if logged in
                     $user_id = $user->isLoggedIn() ? $user->data()->id : null;
 
@@ -118,34 +108,59 @@ if(Input::exists()){
                         'updated_by' => $user_id,
                         'created' => date('U'),
                         'updated' => date('U'),
-                        'content' =>  $content,
+                        'content' =>  '',
                         'status_id' => 1
                     ));
-                    
                     $submission_id = $queries->getLastId();
                     
-                    HookHandler::executeEvent('newFormSubmission', array(
-                        'event' => 'newFormSubmission',
-                        'username' => Output::getClean($form->title),
-                        'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
-                        'content_full' => '',
-                        'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
-                        'title' => Output::getClean($form->title),
-                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
-                    ));
-
-                    if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
-                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                        Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
-                        die();
-                    } else {
-                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                        Redirect::to(URL::build($form->url));
-                        die();
+                    try {
+                        // Save field values to database
+                        unset($_POST['token']);
+                        $inserts = array();
+                        $field_values = array();
+                        foreach($_POST as $key => $item){
+                            if(is_numeric($key)) {
+                                $inserts[] = '(?,?,?),';
+                                
+                                $field_values[] = Output::getClean($submission_id);
+                                $field_values[] = Output::getClean($key);
+                                $field_values[] = Output::getClean(nl2br($item));
+                            }
+                        }
+                        
+                        $query = 'INSERT INTO nl2_forms_replies_fields (submission_id, field_id, value) VALUES ';
+                        $query .= implode('', $inserts);
+                        DB::getInstance()->createQuery(rtrim($query, ','), $field_values);
+                    } catch (Exception $e) {
+                        $errors[] = $e->getMessage();
+                        $queries->delete('forms_replies', array('id', '=', $submission_id));
                     }
-                                                
+                    
+                    if(!count($errors)) {
+                        // Trigger new submission event
+                        HookHandler::executeEvent('newFormSubmission', array(
+                            'event' => 'newFormSubmission',
+                            'username' => Output::getClean($form->title),
+                            'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
+                            'content_full' => '',
+                            'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
+                            'title' => Output::getClean($form->title),
+                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
+                        ));
+
+                        // Redirect to submission view if user have view access, if not redirect back 
+                        if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
+                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                            Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
+                            die();
+                        } else {
+                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                            Redirect::to(URL::build($form->url));
+                            die();
+                        }
+                    }
                 } catch (Exception $e) {
-                   $errors[] = $e->getMessage();
+                    $errors[] = $e->getMessage();
                 }
             } else {
                 // Validation errors

@@ -2,7 +2,7 @@
 /*
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -207,6 +207,29 @@ class Forms_Module extends Module {
         $old_version = str_replace(array(".", "-"), "", $old_version);
         $queries = new Queries();
         
+        if($old_version < 180) {
+            try {
+                // Generate table
+                try {
+                    $engine = Config::get('mysql/engine');
+                    $charset = Config::get('mysql/charset');
+                } catch(Exception $e){
+                    $engine = 'InnoDB';
+                    $charset = 'utf8mb4';
+                }
+                if(!$engine || is_array($engine))
+                    $engine = 'InnoDB';
+                if(!$charset || is_array($charset))
+                    $charset = 'latin1';
+                        
+                $queries->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                
+                DB::getInstance()->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
+            } catch(Exception $e){
+                // Error
+            }
+        }
+        
         if($old_version < 170) {
             try {
                 $queries->alterTable('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
@@ -399,7 +422,17 @@ class Forms_Module extends Module {
         
         if(!$queries->tableExists('forms_replies')){
             try {
-                $queries->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NOT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $queries->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+            } catch(Exception $e){
+                // Error
+            }
+        }
+        
+        if(!$queries->tableExists('forms_replies_fields')){
+            try {
+                $queries->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                
+                DB::getInstance()->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
             } catch(Exception $e){
                 // Error
             }

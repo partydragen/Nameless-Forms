@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -78,29 +78,9 @@ if(!isset($_GET['view'])){
     
     if(!isset($_GET['form']) && !isset($_GET['status']) && !isset($_GET['user'])){
         // sort by open submissions
-        /*$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC')->results();
-        $url = URL::build('/panel/forms/submissions/', '');*/
-        
         $url_parameters = true;
         $where .= ' AND status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1)';
     } else {
-        /*if(isset($_GET['form']) && isset($_GET['status'])){
-            // Sort by form and status
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
-        } else if(isset($_GET['form'])) {
-            // sort by form
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form']))->results();
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&');
-        } else if(isset($_GET['status'])) {
-            // sort by status
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['status']))->results();
-
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
-        } else {
-            Redirect::to(URL::build('/panel/forms/submissions/'));
-        }*/
-        
         if(isset($_GET['form'])) {
             $url_parameters .= 'form=' . $_GET['form'] . '&';
             $where .= ' AND form_id = ?';
@@ -430,13 +410,25 @@ if(!isset($_GET['view'])){
         
         // Get answers and questions
         $answer_array = array();
-        $answers = json_decode($submission->content, true);
-        foreach($answers as $answer){
-            $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
-            $answer_array[] = array(
-                'question' => $question[0]->name,
-                'answer' => Output::getPurified(Output::getDecoded($answer[1]))
-            );
+        if(empty($submission->content)) {
+            // New fields generation
+            $fields = DB::getInstance()->query('SELECT name, value FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', array($submission->id))->results();
+            foreach($fields as $field){
+                $answer_array[] = array(
+                    'question' => Output::getClean($field->name),
+                    'answer' => Output::getPurified(Output::getDecoded($field->value))
+                );
+            }
+        } else {
+            // Legacy fields generation
+            $answers = json_decode($submission->content, true);
+            foreach($answers as $answer){
+                $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
+                $answer_array[] = array(
+                    'question' => Output::getClean($question[0]->name),
+                    'answer' => Output::getPurified(Output::getDecoded($answer[1]))
+                );
+            }
         }
         
         // Get comments
@@ -569,6 +561,7 @@ if(!isset($_GET['view'])){
                 if($forms->canDeleteSubmission($group_ids, $_GET['id'])){
                     try {
                         $queries->delete('forms_replies', array('id', '=', $_GET['id']));
+                        $queries->delete('forms_replies_fields', array('submissions_id', '=', $_GET['id']));
                         $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
                     } catch(Exception $e){
                         die($e->getMessage());
