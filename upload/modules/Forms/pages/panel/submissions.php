@@ -561,7 +561,7 @@ if(!isset($_GET['view'])){
                 if($forms->canDeleteSubmission($group_ids, $_GET['id'])){
                     try {
                         $queries->delete('forms_replies', array('id', '=', $_GET['id']));
-                        $queries->delete('forms_replies_fields', array('submissions_id', '=', $_GET['id']));
+                        $queries->delete('forms_replies_fields', array('submission_id', '=', $_GET['id']));
                         $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
                     } catch(Exception $e){
                         die($e->getMessage());
