@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -75,27 +75,35 @@ if(Input::exists()){
             $to_validate = array();
             
             foreach($fields as $field){
-                if($field->required == 1) {
-                    $to_validate[$field->id] = array(
-                        'required' => true
-                    );
+                $field_validation = array();
+                
+                if($field->required == 1 /*&& $field->type != 9*/) {
+                    $field_validation['required'] = true;
+                }
+                
+                if($field->min != 0) {
+                    $field_validation['min'] = $field->min;
+                }
+                
+                if($field->max != 0) {
+                    $field_validation['max'] = $field->max;
+                }
+                
+                if(count($field_validation)) {
+                    $to_validate[$field->id] = $field_validation;
                 }
             }
             
-            $validation = $validate->check($_POST, $to_validate);
+            // Modify post validation
+            $validate_post = array();
+            foreach($_POST as $key => $item){
+                $validate_post[$key] = !is_array($item) ? $item : true ;
+            }
+            
+            $validation = $validate->check($validate_post, $to_validate);
             if($validation->passed()){
                 // Validation passed
                 try {
-                    // Convert to content
-                    $content = array();
-                    unset($_POST['token']);
-                    foreach($_POST as $key => $item){
-                        if(is_numeric($key)) {
-                            $content[] = array($key, Output::getClean(nl2br($item)));
-                        }
-                    }
-                    $content = json_encode($content);
-                    
                     // Get user id if logged in
                     $user_id = $user->isLoggedIn() ? $user->data()->id : null;
 
@@ -106,34 +114,61 @@ if(Input::exists()){
                         'updated_by' => $user_id,
                         'created' => date('U'),
                         'updated' => date('U'),
-                        'content' =>  $content,
+                        'content' =>  '',
                         'status_id' => 1
                     ));
-                    
                     $submission_id = $queries->getLastId();
                     
-                    HookHandler::executeEvent('newFormSubmission', array(
-                        'event' => 'newFormSubmission',
-                        'username' => Output::getClean($form->title),
-                        'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
-                        'content_full' => '',
-                        'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(null, 128, true) : null),
-                        'title' => Output::getClean($form->title),
-                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
-                    ));
-
-                    if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
-                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                        Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
-                        die();
-                    } else {
-                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                        Redirect::to(URL::build($form->url));
-                        die();
+                    try {
+                        // Save field values to database
+                        unset($_POST['token']);
+                        $inserts = array();
+                        $field_values = array();
+                        foreach($_POST as $key => $item){
+                            if(is_numeric($key)) {
+                                $inserts[] = '(?,?,?),';
+                                
+                                $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
+                                
+                                $field_values[] = Output::getClean($submission_id);
+                                $field_values[] = Output::getClean($key);
+                                $field_values[] = Output::getClean($value);
+                            }
+                        }
+                        
+                        $query = 'INSERT INTO nl2_forms_replies_fields (submission_id, field_id, value) VALUES ';
+                        $query .= implode('', $inserts);
+                        DB::getInstance()->createQuery(rtrim($query, ','), $field_values);
+                    } catch (Exception $e) {
+                        $errors[] = $e->getMessage();
+                        $queries->delete('forms_replies', array('id', '=', $submission_id));
                     }
-                                                
+                    
+                    if(!count($errors)) {
+                        // Trigger new submission event
+                        HookHandler::executeEvent('newFormSubmission', array(
+                            'event' => 'newFormSubmission',
+                            'username' => Output::getClean($form->title),
+                            'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
+                            'content_full' => '',
+                            'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
+                            'title' => Output::getClean($form->title),
+                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
+                        ));
+
+                        // Redirect to submission view if user have view access, if not redirect back 
+                        if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
+                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                            Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
+                            die();
+                        } else {
+                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                            Redirect::to(URL::build($form->url));
+                            die();
+                        }
+                    }
                 } catch (Exception $e) {
-                   $errors[] = $e->getMessage();
+                    $errors[] = $e->getMessage();
                 }
             } else {
                 // Validation errors
@@ -143,9 +178,16 @@ if(Input::exists()){
                     $id = $id[0];
 
                     $fielderror = $queries->getWhere('forms_fields', array('id', '=', $id));
-                    if (count($field)) {
+                    if (count($fielderror)) {
                         $fielderror = $fielderror[0];
-                        $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
+
+                        if(strpos($item, 'is required') !== false){
+                            $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
+                        } else if(strpos($item, 'minimum') !== false){
+                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->min), $forms_language->get('forms', 'x_field_minimum_y'));
+                        } else if(strpos($item, 'maximum') !== false){
+                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->max), $forms_language->get('forms', 'x_field_maximum_y'));
+                        }
                     }
                 }
             }
@@ -165,13 +207,15 @@ foreach($fields as $field){
     $fields_array[] = array(
         'id' => Output::getClean($field->id),
         'name' => Output::getClean($field->name),
-        'value' => (isset($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
+        'value' => (isset($_POST[$field->id]) && !is_array($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
         'type' => Output::getClean($field->type),
         'required' => Output::getClean($field->required),
         'options' => $options,
+        'info' => Output::getPurified(Output::getDecoded($field->info))
     );
 }
 
+// Captcha
 if ($captcha) {
     $smarty->assign('CAPTCHA', CaptchaBase::getActiveProvider()->getHtml());
     $template->addJSFiles(array(CaptchaBase::getActiveProvider()->getJavascriptSource() => array()));

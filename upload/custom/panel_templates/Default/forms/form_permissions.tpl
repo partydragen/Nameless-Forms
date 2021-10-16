@@ -45,7 +45,13 @@
                             <a class="nav-link" href="{$GENERAL_SETTINGS_LINK}">{$GENERAL_SETTINGS}</a>
                           </li>
                           <li class="nav-item">
+                            <a class="nav-link" href="{$FIELDS_LINK}">{$FIELDS}</a>
+                          </li>
+                          <li class="nav-item">
                             <a class="nav-link active">{$PERMISSIONS}</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{$STATUSES_LINK}">{$STATUSES}</a>
                           </li>
                         </ul>
                         

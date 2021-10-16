@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -63,6 +63,10 @@ $language = array(
     'help_box' => 'Ohjeteksti',
     'barrier' => 'Eroittava viiva',
     'number' => 'Number',
+    'radio' => 'Radio',
+    'checkbox' => 'Checkbox',
+    'minimum_characters' => 'Minimum Characters (0 to disable)',
+    'maximum_characters' => 'Maximum Characters (0 to disable)',
 	
 	// Statuses
 	'statuses' => 'tilat',
@@ -80,6 +84,8 @@ $language = array(
 	'status_edit_success' => 'Tila muokattiin onnistuneesti.',
 	'status_deleted_successfully' => 'Tila poistettiin onnistuneesti.',
 	'delete_status' => 'Oletko varma, että haluat poistaa tämän tilan?',
+    'select_statuses_to_form' => 'Select statuses to be used on this form',
+    'change_status_on_comment' => 'Change status when user is commenting?',
 
 	// Errors
 	'input_form_name' => 'Anna lomakkeen nimi.',
@@ -92,6 +98,8 @@ $language = array(
 	'input_field_name' => 'Anna kentän nimi.',
 	'field_name_minimum' => 'Kentän nimi täytyy olla vähintään 2 characters.',
 	'field_name_maximum' => 'Kentän nimi saa olla enintään 255 characters.',
+    'x_field_minimum_y' => '{x} must be a minimum of {y} characters.',
+    'x_field_maximum_y' => '{x} must be a maximum of {y} characters.',
 	
 	// Submissions
 	'submissions' => 'Hakemukset',
@@ -109,6 +117,10 @@ $language = array(
     'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
     'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
     'delete_submissions_or_comments' => 'Delete submissions or comments',
+    'no_comment' => 'No comment',
+    'anonymous' => 'Anonymous',
+    'submit_as_anonymous' => 'Submit as anonymous',
+    'send_notify_email' => 'Send notify email (Will add submit slowness)',
 	
 	// Update alerts
 	'new_update_available_x' => 'There is a new update available for the module {x}',
@@ -121,6 +133,17 @@ $language = array(
     'new_form_submission' => 'New form submission',
     'updated_form_submission' => 'New form submission comment',
     'new_submission_text' => 'New submission created in {x} by {y}',
-    'updated_submission_text' => 'New submission comment in {x} by {y}'
-    //'updated_submission_text' => 'Submission updated in {x} by {y}'
+    'updated_submission_text' => 'New submission comment in {x} by {y}',
+    
+    // Email
+    'submission_updated_subject' => 'Your {x} submission has been updated',
+    'submission_updated_message' => '
+        There has been an update regarding your submission for {form}.</br>
+        </br>
+        Current Status: {status}</br>
+        Updated by: {updated_by}</br>
+        Comment: {comment}</br>
+        </br>
+        You can view your full submission and updates by clicking here <a href="{link}">{link}</a>
+    '
 );

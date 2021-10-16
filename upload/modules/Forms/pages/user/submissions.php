@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -31,6 +31,7 @@ $group_ids = implode(',', $user_groups);
 $timeago = new Timeago(TIMEZONE);
 
 if(!isset($_GET['view'])){
+    $submissions = array();
     $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($user->data()->id))->results();
     
     if(count($submissions_query)){
@@ -56,8 +57,6 @@ if(!isset($_GET['view'])){
         $pagination = $paginator->generate(7, $url);
         
         // Get all submissions
-        $submissions = array();
-        
         foreach($results->data as $submission){
             $form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
             $form = $form[0];
@@ -66,17 +65,30 @@ if(!isset($_GET['view'])){
             $status = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
             $status = $status[0];
             
-            $updated_by_user = new User($submission->updated_by);
+            // Check if last updater is anonymous
+            if($submission->updated_by != 0) {
+                $updated_by_user = new User($submission->updated_by);
+                
+                $updated_by_name = $updated_by_user->getDisplayname();
+                $updated_by_profile = $updated_by_user->getProfileURL();
+                $updated_by_style = $updated_by_user->getGroupClass();
+                $updated_by_avatar = $updated_by_user->getAvatar();
+            } else {
+                $updated_by_name = $forms_language->get('forms', 'anonymous');
+                $updated_by_profile = null;
+                $updated_by_style = null;
+                $updated_by_avatar = null;
+            }
             
             $submissions[] = array(
                 'id' => $submission->id,
                 'form_name' => $form->title,
                 'status' => $status->html,
                 'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
-                'updated_by_name' => $updated_by_user->getDisplayname(),
-                'updated_by_profile' => $updated_by_user->getProfileURL(),
-                'updated_by_style' => $updated_by_user->getGroupClass(),
-                'updated_by_avatar' => $updated_by_user->getAvatar(),
+                'updated_by_name' => $updated_by_name,
+                'updated_by_profile' => $updated_by_profile,
+                'updated_by_style' => $updated_by_style,
+                'updated_by_avatar' => $updated_by_avatar,
                 'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
                 'link' => URL::build('/user/submissions/', 'view=' . $submission->id),
             );
@@ -138,10 +150,17 @@ if(!isset($_GET['view'])){
                         'created' => date('U'),
                         'content' => Output::getClean(nl2br(Input::get('content')))
                     ));
+                    
+                    // Update status on comment?
+                    $status = $submission->status_id;
+                    if($form->comment_status != 0) {
+                        $status = $form->comment_status;
+                    }
 
                     $queries->update('forms_replies', $submission->id, array(
                         'updated_by' => $user->data()->id,
-                        'updated' => date('U')
+                        'updated' => date('U'),
+                        'status_id' => $status
                     ));
                     
                     HookHandler::executeEvent('updatedFormSubmission', array(
@@ -149,7 +168,7 @@ if(!isset($_GET['view'])){
                         'username' => Output::getClean($form->title),
                         'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean($user->data()->nickname)), $forms_language->get('forms', 'updated_submission_text')),
                         'content_full' => Output::getClean(Input::get('content')),
-                        'avatar_url' => $user->getAvatar(null, 128, true),
+                        'avatar_url' => $user->getAvatar(128, true),
                         'title' => Output::getClean($form->title),
                         'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->id)
                     ));
@@ -171,25 +190,52 @@ if(!isset($_GET['view'])){
         
     // Get answers and questions
     $answer_array = array();
-    $answers = json_decode($submission->content, true);
-    foreach($answers as $answer){
-        $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
-        $answer_array[] = array(
-            'question' => $question[0]->name,
-            'answer' => Output::getPurified(Output::getDecoded($answer[1]))
-        );
+    if(empty($submission->content)) {
+        // New fields generation
+        $fields = DB::getInstance()->query('SELECT name, value FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', array($submission->id))->results();
+        foreach($fields as $field){
+            $answer_array[] = array(
+                'question' => Output::getClean($field->name),
+                'answer' => Output::getPurified(Output::getDecoded($field->value))
+            );
+        }
+    } else {
+        // Legacy fields generation
+        $answers = json_decode($submission->content, true);
+        foreach($answers as $answer){
+            $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
+            $answer_array[] = array(
+                'question' => Output::getClean($question[0]->name),
+                'answer' => Output::getPurified(Output::getDecoded($answer[1]))
+            );
+        }
     }
         
     // Get comments
     $comments = $queries->getWhere('forms_comments', array('form_id', '=', $submission->id));
     $smarty_comments = array();
     foreach($comments as $comment){
-        $comment_user = new User($comment->user_id);
+
+        // Check if comment user is 
+        if($comment->anonymous != 1) {
+            $comment_user = new User($comment->user_id);
+                
+            $user_name = $comment_user->getDisplayname();
+            $user_profile = $comment_user->getProfileURL();
+            $user_style = $comment_user->getGroupClass();
+            $user_avatar = $comment_user->getAvatar();
+        } else {
+            $user_name = $forms_language->get('forms', 'anonymous');
+            $user_profile = null;
+            $user_style = null;
+            $user_avatar = null;
+        }
+        
         $smarty_comments[] = array(
-            'username' => $comment_user->getDisplayname(),
-            'profile' => $comment_user->getProfileURL(),
-            'style' => $comment_user->getGroupClass(),
-            'avatar' => $comment_user->getAvatar(),
+            'username' => $user_name,
+            'profile' => $user_profile,
+            'style' => $user_style,
+            'avatar' => $user_avatar,
             'content' => Output::getPurified(Output::getDecoded($comment->content)),
             'date' => date('d M Y, H:i', $comment->created),
             'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())

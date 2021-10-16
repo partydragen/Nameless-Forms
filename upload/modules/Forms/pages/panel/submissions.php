@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr11
  *
  *  License: MIT
  *
@@ -78,29 +78,9 @@ if(!isset($_GET['view'])){
     
     if(!isset($_GET['form']) && !isset($_GET['status']) && !isset($_GET['user'])){
         // sort by open submissions
-        /*$submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1) AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC')->results();
-        $url = URL::build('/panel/forms/submissions/', '');*/
-        
         $url_parameters = true;
         $where .= ' AND status_id IN (SELECT id FROM nl2_forms_statuses WHERE open = 1)';
     } else {
-        /*if(isset($_GET['form']) && isset($_GET['status'])){
-            // Sort by form and status
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form'], $_GET['status']))->results();
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&' . (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
-        } else if(isset($_GET['form'])) {
-            // sort by form
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE form_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['form']))->results();
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['form']) ? 'form=' . $_GET['form'] : '') . '&');
-        } else if(isset($_GET['status'])) {
-            // sort by status
-            $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE status_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', array($_GET['status']))->results();
-
-            $url = URL::build('/panel/forms/submissions/',  (isset($_GET['status']) ? 'status=' . $_GET['status'] : '') . '&');
-        } else {
-            Redirect::to(URL::build('/panel/forms/submissions/'));
-        }*/
-        
         if(isset($_GET['form'])) {
             $url_parameters .= 'form=' . $_GET['form'] . '&';
             $where .= ' AND form_id = ?';
@@ -170,8 +150,8 @@ if(!isset($_GET['view'])){
             }
             
             // Is user a guest or a user
-            if($submission->updated_by == null){
-                $updated_by_name = $forms_language->get('forms', 'guest');
+            if($submission->updated_by == null || $submission->updated_by == 0){
+                $updated_by_name = ($submission->updated_by == null ? $forms_language->get('forms', 'guest') : $forms_language->get('forms', 'anonymous'));
                 $updated_by_profile = null;
                 $updated_by_style = null;
                 $updated_by_avatar = null;
@@ -261,7 +241,7 @@ if(!isset($_GET['view'])){
 } else {
     if(!isset($_GET['action'])){
         // Get submission by id
-        $submission = $queries->getWhere('forms_replies', array('id', '=', $_GET['view']));
+        $submission = DB::getInstance()->query('SELECT nl2_forms_replies.*, nl2_forms.title AS form_title, nl2_forms_statuses.html AS status_html FROM nl2_forms_replies LEFT JOIN nl2_forms_statuses ON status_id=nl2_forms_statuses.id LEFT JOIN nl2_forms ON form_id=nl2_forms.id WHERE nl2_forms_replies.id = ?', array($_GET['view']))->results();
         if(!count($submission)){
             Redirect::to(URL::build('/panel/forms/submissions'));
             die();
@@ -273,10 +253,6 @@ if(!isset($_GET['view'])){
             Redirect::to(URL::build('/panel/forms/submissions'));
             die();
         }
-        
-        // Get form from id
-        $form = $queries->getWhere('forms', array('id', '=', $submission->form_id));
-        $form = $form[0];
         
         // Check input
         if(Input::exists()){
@@ -296,28 +272,36 @@ if(!isset($_GET['view'])){
                 if($validation->passed()){
                     $any_changes = false;
                     
-                    $status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
-                    if(count($status)){
-                        $groups = explode(',', $status[0]->gids);
-                        $hasperm = false;
-                        foreach ($user_groups as $group_id) {
-                            if(in_array($group_id, $groups)) {
-                                $hasperm = true;
-                                break;
+                    // Submit as anonymous?
+                    if(isset($_POST['anonymous']) && $_POST['anonymous'] == 'on') $anonymous = 1;
+                    else $anonymous = 0;
+                    
+                    // Send notify email?
+                    if(isset($_POST['notify_email']) && $_POST['notify_email'] == 'on') $sendEmail = 1;
+                    else $sendEmail = 0;
+                    
+                    // Check if status have changed
+                    $status = $submission->status_id;
+                    $status_html = $submission->status_html;
+                    if($submission->status_id != $_POST['status']) {
+                        $status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
+                        if(count($status)){
+                            $groups = explode(',', $status[0]->gids);
+                            $hasperm = false;
+                            foreach ($user_groups as $group_id) {
+                                if(in_array($group_id, $groups)) {
+                                    $hasperm = true;
+                                    break;
+                                }
                             }
-                        }
-                        
-                        if($hasperm) {
-                            $status = $_POST['status'];
-                                
-                            if($submission->status_id != $_POST['status']) {
+                            
+                            if($hasperm) {
+                                $status_html = $status[0]->html;
+                                $status = $_POST['status'];
                                 $any_changes = true;
                             }
-                        } else {
-                            $status = $submission->status_id;
                         }
-                    } else
-                        $status = $submission->status_id;
+                    }
                     
                     if(!empty(Input::get('content'))) {
                         $any_changes = true;
@@ -325,6 +309,7 @@ if(!isset($_GET['view'])){
                             'form_id' => $submission->id,
                             'user_id' => $user->data()->id,
                             'created' => date('U'),
+                            'anonymous' => $anonymous,
                             'content' => Output::getClean(nl2br(Input::get('content')))
                         ));
                     }
@@ -332,7 +317,7 @@ if(!isset($_GET['view'])){
                     // Was there any changes?
                     if($any_changes == true) {
                         $queries->update('forms_replies', $submission->id, array(
-                            'updated_by' => $user->data()->id,
+                            'updated_by' => ($anonymous != 1 ? $user->data()->id : 0),
                             'updated' => date('U'),
                             'status_id' => $status
                         ));
@@ -341,13 +326,72 @@ if(!isset($_GET['view'])){
                         if($submission->user_id != null) {
                             $target_user = new User($submission->user_id);
                             if($target_user && $forms->canViewOwnSubmission(implode(',', $user->getAllGroupIds()), $submission->form_id)) {
+                                // Send alert to user
                                 Alert::create(
                                     $submission->user_id,
                                     'submission_update',
-                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
-                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($form->title))),
+                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($submission->form_title))),
+                                    array('path' => ROOT_PATH . '/modules/Forms/language', 'file' => 'forms', 'term' => 'your_submission_updated', 'replace' => array('{x}'), 'replace_with' => array(Output::getClean($submission->form_title))),
                                     URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id))
                                 );
+                                
+                                // Send email to user of new changes to submission
+                                if($sendEmail == 1) {
+                                    $link = rtrim(Util::getSelfURL(), '/') . URL::build('/user/submissions/', 'view=' . $submission->id);
+                                    $comment = (!empty(Input::get('content')) ? Input::get('content') : $forms_language->get('forms', 'no_comment'));
+                                    $subject = SITE_NAME . ' - ' . str_replace('{x}', Output::getClean($submission->form_title), $forms_language->get('forms', 'submission_updated_subject'));
+                                    $message = str_replace(array('{form}', '{status}', '{updated_by}', '{comment}', '{link}'), array(Output::getClean($submission->form_title), $status_html, ($anonymous == 0 ? $user->getDisplayname() : $forms_language->get('forms', 'anonymous')), $comment, $link), $forms_language->get('forms', 'submission_updated_message'));
+                                    
+                                    $php_mailer = $queries->getWhere('settings', array('name', '=', 'phpmailer'));
+                                    $php_mailer = $php_mailer[0]->value;
+                                    if ($php_mailer == '1') {
+                                        // PHP Mailer
+                                        $email = array(
+                                            'to' => array('email' => Output::getClean($target_user->data()->email), 'name' => $target_user->getDisplayname()),
+                                            'subject' => $subject,
+                                            'message' => $message
+                                        );
+
+                                        $sent = Email::send($email, 'mailer');
+
+                                        if (isset($sent['error'])) {
+                                            // Error, log it
+                                            $queries->create('email_errors', array(
+                                                'type' => 3, // 3 = forgot password
+                                                'content' => $sent['error'],
+                                                'at' => date('U'),
+                                                'user_id' => $target_user->data()->id
+                                            ));
+                                        }
+                                        
+                                    } else {
+                                        // PHP mail function
+                                        $headers = 'From: ' . $siteemail . "\r\n" .
+                                            'Reply-To: ' . $siteemail . "\r\n" .
+                                            'X-Mailer: PHP/' . phpversion() . "\r\n" .
+                                            'MIME-Version: 1.0' . "\r\n" .
+                                            'Content-type: text/html; charset=UTF-8' . "\r\n";
+
+                                        $email = array(
+                                            'to' => $target_user->data()->email,
+                                            'subject' => $subject,
+                                            'message' => $message,
+                                            'headers' => $headers
+                                        );
+
+                                        $sent = Email::send($email, 'php');
+
+                                        if (isset($sent['error'])) {
+                                            // Error, log it
+                                            $queries->create('email_errors', array(
+                                                'type' => 3, // 3 = forgot password
+                                                'content' => $sent['error'],
+                                                'at' => date('U'),
+                                                'user_id' => $target_user->data()->id
+                                            ));
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -366,13 +410,25 @@ if(!isset($_GET['view'])){
         
         // Get answers and questions
         $answer_array = array();
-        $answers = json_decode($submission->content, true);
-        foreach($answers as $answer){
-            $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
-            $answer_array[] = array(
-                'question' => $question[0]->name,
-                'answer' => Output::getPurified(Output::getDecoded($answer[1]))
-            );
+        if(empty($submission->content)) {
+            // New fields generation
+            $fields = DB::getInstance()->query('SELECT name, value FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', array($submission->id))->results();
+            foreach($fields as $field){
+                $answer_array[] = array(
+                    'question' => Output::getClean($field->name),
+                    'answer' => Output::getPurified(Output::getDecoded($field->value))
+                );
+            }
+        } else {
+            // Legacy fields generation
+            $answers = json_decode($submission->content, true);
+            foreach($answers as $answer){
+                $question = $queries->getWhere('forms_fields', array('id', '=', $answer[0]));
+                $answer_array[] = array(
+                    'question' => Output::getClean($question[0]->name),
+                    'answer' => Output::getPurified(Output::getDecoded($answer[1]))
+                );
+            }
         }
         
         // Get comments
@@ -386,15 +442,13 @@ if(!isset($_GET['view'])){
                 'profile' => URL::build('/panel/user/' . Output::getClean($comment->user_id . '-' . $comment_user->getDisplayname(true))),
                 'style' => $comment_user->getGroupClass(),
                 'avatar' => $comment_user->getAvatar(),
+                'anonymous' => $comment->anonymous,
                 'content' => Output::getPurified(Output::getDecoded($comment->content)),
                 'date' => date('d M Y, H:i', $comment->created),
                 'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage()),
                 'delete_link' => ($user->hasPermission('forms.delete-submissions') ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_comment&id=' . Output::getClean($comment->id)) : null)
             );
         }
-        
-        // Get comments
-        $currentstatus = $queries->getWhere('forms_statuses', array('id', '=', $submission->status_id));
         
         // Is user a guest or a user
         if($submission->user_id == null){
@@ -432,17 +486,23 @@ if(!isset($_GET['view'])){
                 
                     $statuses[] = array(
                         'id' => $status->id,
-                        'active' => (($currentstatus[0]->id == $status->id) ? true : false),
+                        'active' => (($submission->status_id == $status->id) ? true : false),
                         'html' => $status->html,
                         'permission' => $perms
                     );
                 }
             }
         }
+        
+        // Can user view own submission?
+        $can_view_own = false;
+        if($submission->user_id != null && $target_user && $forms->canViewOwnSubmission(implode(',', $user->getAllGroupIds()), $submission->form_id)) {
+            $can_view_own = true;
+        }
 
         $smarty->assign(array(
-            'FORM_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'form_x')),
-            'CURRENT_STATUS_X' => str_replace('{x}', $currentstatus[0]->html, $forms_language->get('forms', 'current_status_x')),
+            'FORM_X' => str_replace('{x}', Output::getClean($submission->form_title), $forms_language->get('forms', 'form_x')),
+            'CURRENT_STATUS_X' => str_replace('{x}', $submission->status_html, $forms_language->get('forms', 'current_status_x')),
             'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
             'LAST_UPDATED_DATE' => date('d M Y, H:i', $submission->updated),
             'LAST_UPDATED_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
@@ -464,8 +524,29 @@ if(!isset($_GET['view'])){
             'YES' => $language->get('general', 'yes'),
             'NO' => $language->get('general', 'no'),
             'STATUSES' => $statuses,
+            'CAN_USE_ANONYMOUS' => ($can_view_own && $user->hasPermission('forms.anonymous') ? true : false),
+            'ANONYMOUS' => $forms_language->get('forms', 'anonymous'),
+            'SUBMIT_AS_ANONYMOUS' => $forms_language->get('forms', 'submit_as_anonymous'),
+            'SEND_NOTIFY_EMAIL' => $forms_language->get('forms', 'send_notify_email'),
+            'CAN_SEND_EMAIL' => $can_view_own,
             'TOKEN' => Token::get()
         ));
+        
+        $template->addCSSFiles(array(
+            (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => array()
+        ));
+
+        $template->addJSFiles(array(
+            (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => array()
+        ));
+
+        $template->addJSScript('
+            var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));
+
+            elems.forEach(function(html) {
+                var switchery = new Switchery(html, {color: \'#23923d\', secondaryColor: \'#e56464\'});
+            });
+        ');
         
         $template_file = 'forms/submissions_view.tpl';
     } else {
@@ -477,9 +558,10 @@ if(!isset($_GET['view'])){
                     die();
                 }
                 
-                if($forms->canDeleteSubmission($group_ids, $submission->form_id)){
+                if($forms->canDeleteSubmission($group_ids, $_GET['id'])){
                     try {
                         $queries->delete('forms_replies', array('id', '=', $_GET['id']));
+                        $queries->delete('forms_replies_fields', array('submission_id', '=', $_GET['id']));
                         $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
                     } catch(Exception $e){
                         die($e->getMessage());

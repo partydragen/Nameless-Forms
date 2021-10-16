@@ -71,7 +71,7 @@
                           {foreach from=$COMMENTS item=comment}
                             <div class="card">
                               <div class="card-header">
-                                <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}</a>:
+                                <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}{if $comment.anonymous} ({$ANONYMOUS}){/if}</a>:
                                 <span class="pull-right" data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
                                 {if $comment.delete_link}
                                     <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteCommentModal('{$comment.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
@@ -89,19 +89,29 @@
                         <hr />
                         
                         <form action="" method="post">
-                        {if count($STATUSES)}
-                        <div class="form-group">
-                          {foreach from=$STATUSES item=status}
-                          <div class="form-check-inline">
-                          <input type="radio" class="form-check-input" name="status" id="{$status.id}" value="{$status.id}"{if $status.active} checked="checked"{/if} {if !$status.permission}disabled{/if}>
-                          <label class="form-check-label" for="{$status.id}">{$status.html} </label>
+                          {if count($STATUSES)}
+                          <div class="form-group">
+                            {foreach from=$STATUSES item=status}
+                            <div class="form-check-inline">
+                            <input type="radio" class="form-check-input" name="status" id="{$status.id}" value="{$status.id}"{if $status.active} checked="checked"{/if} {if !$status.permission}disabled{/if}>
+                            <label class="form-check-label" for="{$status.id}">{$status.html} </label>
+                            </div>
+                            {/foreach}
                           </div>
-                          {/foreach}
-                        </div>
-                        {/if}
+                          {/if}
                         
                           <div class="form-group">
                             <textarea class="form-control" name="content" rows="5" placeholder="{$NEW_COMMENT}"></textarea>
+                          </div>
+                          <div class="form-group">
+                            {if $CAN_USE_ANONYMOUS}
+                            <label for="inputAnonymous">{$SUBMIT_AS_ANONYMOUS}</label>
+							<input id="inputAnonymous" name="anonymous" type="checkbox" class="js-switch" />
+                            {/if}
+                            {if $CAN_SEND_EMAIL}
+                            <label for="InputNotifyEmail">{$SEND_NOTIFY_EMAIL}</label>
+							<input id="inputNotifyEmail" name="notify_email" type="checkbox" class="js-switch" />
+                             {/if}
                           </div>
                           <div class="form-group">
                             <input type="hidden" name="token" value="{$TOKEN}">

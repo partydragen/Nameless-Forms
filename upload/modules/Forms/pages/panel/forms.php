@@ -102,38 +102,42 @@ if(!isset($_GET['action'])){
                     if($validation->passed()){
                         // Create form
                         try {
-                            // Get link location
-                            if(isset($_POST['link_location'])){
-                                switch($_POST['link_location']){
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                        $location = $_POST['link_location'];
-                                        break;
-                                    default:
-                                    $location = 1;
-                                }
-                            } else
-                            $location = 1;
+                            if(strpos(Input::get('form_url'), '/') === 0) {
+                                // Get link location
+                                if(isset($_POST['link_location'])){
+                                    switch($_POST['link_location']){
+                                        case 1:
+                                        case 2:
+                                        case 3:
+                                        case 4:
+                                            $location = $_POST['link_location'];
+                                            break;
+                                        default:
+                                        $location = 1;
+                                    }
+                                } else
+                                $location = 1;
 
-                            // Enable captcha?
-                            if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
-                            else $captcha = 0;
-                                    
-                            // Save to database
-                            $queries->create('forms', array(
-                                'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
-                                'title' => Output::getClean(Input::get('form_name')),
-                                'link_location' => $location,
-                                'icon' => Input::get('form_icon'),
-                                'captcha' => $captcha,
-                                'content' => Output::getClean(Input::get('content'))
-                            ));
+                                // Enable captcha?
+                                if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
+                                else $captcha = 0;
                                         
-                            Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
-                            Redirect::to(URL::build('/panel/forms'));
-                            die();
+                                // Save to database
+                                $queries->create('forms', array(
+                                    'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
+                                    'title' => Output::getClean(Input::get('form_name')),
+                                    'link_location' => $location,
+                                    'icon' => Input::get('form_icon'),
+                                    'captcha' => $captcha,
+                                    'content' => Output::getClean(Input::get('content'))
+                                ));
+                                            
+                                Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
+                                Redirect::to(URL::build('/panel/forms'));
+                                die();
+                            } else {
+                                $errors[] = 'Form URL must begin with a /';
+                            }
                         } catch(Exception $e){
                             $errors[] = $e->getMessage();
                         }
@@ -184,16 +188,21 @@ if(!isset($_GET['action'])){
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'FORM_NAME' => $forms_language->get('forms', 'form_name'),
+                'FORM_NAME_VALUE' => (isset($_POST['form_name']) ? Output::getClean(Input::get('form_name')) : ''),
                 'FORM_ICON' => $forms_language->get('forms', 'form_icon'),
+                'FORM_ICON_VALUE' => (isset($_POST['form_icon']) ? Input::get('form_icon') : ''),
                 'FORM_URL' => $forms_language->get('forms', 'form_url'),
+                'FORM_URL_VALUE' => (isset($_POST['form_url']) ? Output::getClean(Input::get('form_url')) : ''),
                 'FORM_LINK_LOCATION' => $forms_language->get('forms', 'link_location'),
+                'LINK_LOCATION_VALUE' => (isset($_POST['link_location']) ? Output::getClean(Input::get('link_location')) : ''),
                 'LINK_NAVBAR' => $language->get('admin', 'page_link_navbar'),
                 'LINK_MORE' => $language->get('admin', 'page_link_more'),
                 'LINK_FOOTER' => $language->get('admin', 'page_link_footer'),
                 'LINK_NONE' => $language->get('admin', 'page_link_none'),
                 'CONTENT' => $language->get('admin', 'description'),
                 'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : ''),
-                'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha')
+                'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha'),
+                'ENABLE_CAPTCHA_VALUE' => (isset($_POST['captcha']) && $_POST['captcha'] == 'on' ? 1 : 0),
             ));
             
             $template->addCSSFiles(array(
