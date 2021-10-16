@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr10
+ *  NamelessMC version 2.0.0-pr12
  *
  *  License: MIT
  *
@@ -243,7 +243,7 @@ if(!isset($_GET['action'])){
             }
 
             // Get a list of all groups
-            $group_list = $queries->getWhere('groups', array('staff', '=', 1));
+            $group_list = $queries->getWhere('groups', array('id', '<>', 0));
             $template_groups = array();
 
             // Get a list of groups which have access to the status
