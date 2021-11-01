@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr11
+ *  NamelessMC version 2.0.0-pr12
  *
  *  License: MIT
  *
@@ -38,12 +38,12 @@ if(!isset($_GET['view'])){
         // Get page
         if(isset($_GET['p'])){
             if(!is_numeric($_GET['p'])){
-                Redirect::to($url);
+                Redirect::to(URL::build('/user/submissions/'));
                 die();
             } else {
                 if($_GET['p'] == 1){
                     // Avoid bug in pagination class
-                    Redirect::to($url);
+                    Redirect::to(URL::build('/user/submissions/'));
                     die();
                 }
                 $p = $_GET['p'];
@@ -54,7 +54,7 @@ if(!isset($_GET['view'])){
         
         $paginator = new Paginator((isset($template_pagination) ? $template_pagination : array()));
         $results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
-        $pagination = $paginator->generate(7, $url);
+        $pagination = $paginator->generate(7, URL::build('/user/submissions/', true));
         
         // Get all submissions
         foreach($results->data as $submission){
