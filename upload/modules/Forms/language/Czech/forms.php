@@ -63,10 +63,10 @@ $language = array(
     'help_box' => 'Text nápovědy',
     'barrier' => 'Oddělovač',
     'number' => 'Číslo',
-    'radio' => 'Radio',
-    'checkbox' => 'Checkbox',
-    'minimum_characters' => 'Minimum Characters (0 to disable)',
-    'maximum_characters' => 'Maximum Characters (0 to disable)',
+    'radio' => 'Výběr z možností',
+    'checkbox' => 'Zaškrtávací políčka',
+    'minimum_characters' => 'Minimální počet znaků (0 pro zakázání)',
+    'maximum_characters' => 'Maximální počet znaků (0 pro zakázání)',
 
     // Statuses
     'statuses' => 'Stavy',
@@ -84,8 +84,8 @@ $language = array(
     'status_edit_success' => 'Stav úspěšně upraven.',
     'status_deleted_successfully' => 'Stav úspěšně odstraněn.',
     'delete_status' => 'Opravdu chcete odstranit tento stav?',
-    'select_statuses_to_form' => 'Select statuses to be used on this form',
-    'change_status_on_comment' => 'Change status when user is commenting?',
+    'select_statuses_to_form' => 'Vyberte stavy k použití u tohoto formuláře',
+    'change_status_on_comment' => 'Změnit stav, když uživatel odešle komentář?',
 
     // Errors
     'input_form_name' => 'Zadejte prosím název formuláře.',
@@ -98,8 +98,8 @@ $language = array(
     'input_field_name' => 'Zadejte prosím název pole.',
     'field_name_minimum' => 'Název pole musí obsahovat minimálně 2 znaky.',
     'field_name_maximum' => 'Název pole může obsahovat maximálně 255 znaků.',
-    'x_field_minimum_y' => '{x} must be a minimum of {y} characters.',
-    'x_field_maximum_y' => '{x} must be a maximum of {y} characters.',
+    'x_field_minimum_y' => '{x} musí mít minimálně {y} znaků.',
+    'x_field_maximum_y' => '{x} musí mít maximálně {y} znaků.',
     
     // Submissions
     'submissions' => 'Odpovědi',
@@ -112,15 +112,15 @@ $language = array(
     'your_submission_updated' => 'Vaše odpověď byla upravena',
     'user' => 'Uživatel',
     'updated_by' => 'Upravil',
-    'sort' => 'Pořadí',
+    'sort' => 'Seřadit',
     'id_or_username' => 'ID nebo jméno',
     'confirm_delete_comment' => 'Opravdu chcete odstranit tento komentář?',
     'confirm_delete_submisssion' => 'Opravdu chcete odstranit tuto odpověď?',
     'delete_submissions_or_comments' => 'Mazat odpovědi nebo komentáře',
-    'no_comment' => 'No comment',
-    'anonymous' => 'Anonymous',
-    'submit_as_anonymous' => 'Submit as anonymous',
-    'send_notify_email' => 'Send notify email (Will add submit slowness)',
+    'no_comment' => 'Žádný komentář',
+    'anonymous' => 'Anonymní',
+    'submit_as_anonymous' => 'Odesláno jako anonymní',
+    'send_notify_email' => 'Poslat oznamovací e-mail (zpoždí odeslání)',
     
     // Update alerts
     'new_update_available_x' => 'Je dostupná nová aktualizace doplňku {x}',
@@ -136,14 +136,14 @@ $language = array(
     'updated_submission_text' => 'Komentář nové odpovědi u formuláře {x} od uživatele {y}',
     
     // Email
-    'submission_updated_subject' => 'Your {x} submission has been updated',
+    'submission_updated_subject' => 'Nová aktivita u odpovědi {x}',
     'submission_updated_message' => '
-        There has been an update regarding your submission for {form}.</br>
+        U vaší odpovědi u formuláře {form} byla zjištěna nová aktivita.</br>
         </br>
-        Current Status: {status}</br>
-        Updated by: {updated_by}</br>
-        Comment: {comment}</br>
+        Aktuálnís stav: {status}</br>
+        Aktualizoval: {updated_by}</br>
+        Komentář: {comment}</br>
         </br>
-        You can view your full submission and updates by clicking here <a href="{link}">{link}</a>
+        Celou vaši odpověď a změny si můžete zobrazit kliknutím na tento odkaz: <a href="{link}">{link}</a>
     '
 );
