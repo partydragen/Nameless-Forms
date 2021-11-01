@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr11
+ *  NamelessMC version 2.0.0-pr12
  *
  *  License: MIT
  *
@@ -281,12 +281,12 @@ if(!isset($_GET['view'])){
                     else $sendEmail = 0;
                     
                     // Check if status have changed
-                    $status = $submission->status_id;
+                    $status_id = $submission->status_id;
                     $status_html = $submission->status_html;
                     if($submission->status_id != $_POST['status']) {
-                        $status = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
-                        if(count($status)){
-                            $groups = explode(',', $status[0]->gids);
+                        $status_query = $queries->getWhere('forms_statuses', array('id', '=', $_POST['status']));
+                        if(count($status_query)){
+                            $groups = explode(',', $status_query[0]->gids);
                             $hasperm = false;
                             foreach ($user_groups as $group_id) {
                                 if(in_array($group_id, $groups)) {
@@ -296,8 +296,8 @@ if(!isset($_GET['view'])){
                             }
                             
                             if($hasperm) {
-                                $status_html = $status[0]->html;
-                                $status = $_POST['status'];
+                                $status_html = $status_query[0]->html;
+                                $status_id = $_POST['status'];
                                 $any_changes = true;
                             }
                         }
@@ -319,7 +319,7 @@ if(!isset($_GET['view'])){
                         $queries->update('forms_replies', $submission->id, array(
                             'updated_by' => ($anonymous != 1 ? $user->data()->id : 0),
                             'updated' => date('U'),
-                            'status_id' => $status
+                            'status_id' => $status_id
                         ));
                         
                         // Alert user?
@@ -598,7 +598,7 @@ if(!isset($_GET['view'])){
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
+Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets, $template);
 
 if(Session::exists('submission_success'))
     $success = Session::flash('submission_success');
