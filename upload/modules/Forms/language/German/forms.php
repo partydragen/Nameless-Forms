@@ -33,17 +33,17 @@ $language = array(
 	'forms_view_submissions' => 'AdminCP &raquo; Formulare &raquo; Formulare',
 	'forms_manage' => 'AdminCP &raquo; Formulare &raquo; Abgesendet',
     'can_post_submission' => 'Can post submission',
-    'can_view_own_submission' => 'Can view own submission',
-    'can_view_submissions' => 'Can view submissions',
-    'can_delete_submissions' => 'Can delete submissions',
-    'show_navigation_link_for_guest' => 'Show navigation link for guest and ask they to login if them don\'t have post permission',
+    'can_view_own_submission' => 'Kann eigenes Formular einsehen',
+    'can_view_submissions' => 'Kann Formulare einsehen',
+    'can_delete_submissions' => 'Kann Formulare löschen',
+    'show_navigation_link_for_guest' => 'Navigationslink für Gäste anzeigen und sie auffordern, sich einzuloggen, wenn sie keine Berechtigung haben',
 	
 	// Form
 	'editing_x' => 'Ändere {x}', // Don't replace {x}
 	'form_created_successfully' => 'Formular erfolgreich erstellt.',
 	'form_updated_successfully' => 'Formular erfolgreich geändert.',
 	'form_deleted_successfully' => 'Formular erfolgreich gelöscht.',
-    'enable_captcha' => 'Enable Captcha on this form?',
+    'enable_captcha' => 'Captcha für dieses Formular aktivieren?',
 	
 	// Fields
 	'field' => 'Feld',
@@ -60,11 +60,11 @@ $language = array(
 	'options' => 'Optionen',
 	'options_help' => 'Jede Option in einer neuen Zeile; kann leer gelassen werden (Nur bei Optionen)',
 	'field_order' => 'Reihenfolge',
-	'help_box' => 'Help Text',
-	'barrier' => 'Dividing Line',
+	'help_box' => 'Hilfs Text',
+	'barrier' => 'Trennlinie',
 	'delete_field' => 'Bist du sicher, dass du dieses Feld löschen möchtest?',
     'radio' => 'Radio',
-    'checkbox' => 'Checkbox',
+    'checkbox' => 'Kontrollkästchen',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
 	
@@ -77,15 +77,15 @@ $language = array(
 	'marked_as_open' => 'Als offen markiert',
 	'status_name' => 'Status Name',
 	'status_html' => 'Status HTML',
-	'status_forms' => 'Select forms where this status will be displayed on. (Ctrl+click to select/deselect multiple)',
-	'status_groups' => 'Select groups who are allowed to select this status. (Ctrl+click to select/deselect multiple)',
+	'status_forms' => 'Wähle Formulare aus, auf denen dieser Status angezeigt werden soll. (Strg+Klick zum Auswählen/Abwählen mehrerer)',
+	'status_groups' => 'Wähle Gruppen aus, die diesen Status auswählen dürfen. (Strg+Klick zum Auswählen/Abwählen mehrerer)',
 	'status_creation_success' => 'Status erfolgreich erstellt.',
 	'status_creation_error' => 'Es ist ein Fehler aufgetreten! Bitte überprüfe, dass die HTML nicht mehr als 1024 Zeichen enthält.',
 	'status_edit_success' => 'Status erfolgreich geändert.',
 	'status_deleted_successfully' => 'Status erfolgreich gelöscht.',
 	'delete_status' => 'Bist du dir sicher, diesen Status zu löschen??',
-    'select_statuses_to_form' => 'Select statuses to be used on this form',
-    'change_status_on_comment' => 'Change status when user is commenting?',
+    'select_statuses_to_form' => 'Wähle die Status, die in diesem Formular verwendet werden sollen',
+    'change_status_on_comment' => 'Status ändern, wenn der Benutzer einen Kommentar abgibt?',
 
 	// Errors
 	'input_form_name' => 'Bitte füge einen Formularnamen hinzu.',
@@ -98,8 +98,8 @@ $language = array(
 	'input_field_name' => 'Bitte füge einen Feldnamen hinzu.',
 	'field_name_minimum' => 'Der Feldname muss mindestens 2 Zeichen lang sein.',
 	'field_name_maximum' => 'Der Feldname darf aus maximal 255 Zeichen bestehen.',
-    'x_field_minimum_y' => '{x} must be a minimum of {y} characters.',
-    'x_field_maximum_y' => '{x} must be a maximum of {y} characters.',
+    'x_field_minimum_y' => '{x} muss aus mindestens {y} Zeichen bestehen.',
+    'x_field_maximum_y' => '{x} darf maximal {y} Zeichen lang sein.',
 	
 	// Submissions
 	'submissions' => 'Formulare',
@@ -112,38 +112,38 @@ $language = array(
 	'your_submission_updated' => 'Dein Formular wurde verändert!',
 	'user' => 'Benutzer',
 	'updated_by' => 'Geändert von',
-	'sort' => 'Sort',
-    'id_or_username' => 'ID or Username',
-    'confirm_delete_comment' => 'Are you sure you want to delete this comment?',
-    'confirm_delete_submisssion' => 'Are you sure you want to delete this submission?',
-    'delete_submissions_or_comments' => 'Delete submissions or comments',
-    'no_comment' => 'No comment',
-    'anonymous' => 'Anonymous',
-    'submit_as_anonymous' => 'Submit as anonymous',
-    'send_notify_email' => 'Send notify email (Will add submit slowness)',
+	'sort' => 'Sortierung',
+    'id_or_username' => 'ID oder Username',
+    'confirm_delete_comment' => 'Sicher das du diesen Kommentar löschen willst?',
+    'confirm_delete_submisssion' => 'Sicher das du dieses Formular löschen möchtest?',
+    'delete_submissions_or_comments' => 'Formulare oder Kommentare löschen',
+    'no_comment' => 'Kein Kommentar',
+    'anonymous' => 'Anonym',
+    'submit_as_anonymous' => 'Anonym übermitteln',
+    'send_notify_email' => 'Benachrichtigungs E-Mail senden (wird die Übermittlung verlangsamen)',
 	
 	// Update alerts
-	'new_update_available_x' => 'There is a new update available for the module {x}',
-	'new_urgent_update_available_x' => 'There is a new urgent update available for the module {x}. Please update as soon as possible!',
-	'current_version_x' => 'Current module version: {x}',
-	'new_version_x' => 'New module version: {x}',
-	'view_resource' => 'View Resource',
+	'new_update_available_x' => 'Es gibt ein neues Update für das Modul {x}',
+	'new_urgent_update_available_x' => 'Es gibt ein neues dringendes Update für das Modul {x}. Bitte aktualisiere so schnell wie möglich!',
+	'current_version_x' => 'Aktuelle Modulversion: {x}',
+	'new_version_x' => 'Neue Modulversion: {x}',
+	'view_resource' => 'Ressource anzeigen',
     
     // Hook
-    'new_form_submission' => 'New form submission',
-    'updated_form_submission' => 'New form submission comment',
-    'new_submission_text' => 'New submission created in {x} by {y}',
-    'updated_submission_text' => 'New submission comment in {x} by {y}',
+    'new_form_submission' => 'Neue Formularübermittlung',
+    'updated_form_submission' => 'Neuer Kommentar zur Formularübermittlung',
+    'new_submission_text' => 'Neue Vorlage erstellt in {x} durch {y}',
+    'updated_submission_text' => 'Neues Formular erstellt in {x} durch {y}',
     
     // Email
-    'submission_updated_subject' => 'Your {x} submission has been updated',
+    'submission_updated_subject' => 'Dein {x} Beitrag wurde aktualisiert',
     'submission_updated_message' => '
-        There has been an update regarding your submission for {form}.</br>
+        Es gab eine Aktualisierung bezüglich deiner Bewerbung für {form}.</br>
         </br>
-        Current Status: {status}</br>
-        Updated by: {updated_by}</br>
-        Comment: {comment}</br>
+        Aktueller Status: {status}</br>
+        Aktualisiert von: {updated_by}</br>
+        Kommentar: {comment}</br>
         </br>
-        You can view your full submission and updates by clicking here <a href="{link}">{link}</a>
+        Du kannst deinen vollständigen Beitrag und die Aktualisierung einsehen, in dem du hier klickst <a href="{link}">{link}</a>
     '
 );
