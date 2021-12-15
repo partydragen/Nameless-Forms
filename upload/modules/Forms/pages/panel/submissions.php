@@ -254,6 +254,9 @@ if(!isset($_GET['view'])){
             die();
         }
         
+        // Does user have permission to delete submissions or comments
+        $can_delete = $forms->canDeleteSubmission($group_ids, $submission->form_id);
+        
         // Check input
         if(Input::exists()){
             $errors = array();
@@ -446,7 +449,7 @@ if(!isset($_GET['view'])){
                 'content' => Output::getPurified(Output::getDecoded($comment->content)),
                 'date' => date('d M Y, H:i', $comment->created),
                 'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage()),
-                'delete_link' => ($user->hasPermission('forms.delete-submissions') ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_comment&id=' . Output::getClean($comment->id)) : null)
+                'delete_link' => ($can_delete ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_comment&id=' . Output::getClean($comment->id)) : null)
             );
         }
         
@@ -517,7 +520,7 @@ if(!isset($_GET['view'])){
             'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
             'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
             'ANSWERS' => $answer_array,
-            'DELETE_LINK' => ($forms->canDeleteSubmission($group_ids, $submission->form_id) ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_submission&id=' . Output::getClean($submission->id)) : null),
+            'DELETE_LINK' => ($can_delete ? URL::build('/panel/forms/submissions/', 'view='.Output::getClean($submission->id).'&action=delete_submission&id=' . Output::getClean($submission->id)) : null),
             'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
             'CONFIRM_DELETE_SUBMISSION' => $forms_language->get('forms', 'confirm_delete_submisssion'),
             'CONFIRM_DELETE_COMMENT' => $forms_language->get('forms', 'confirm_delete_comment'),
@@ -578,8 +581,9 @@ if(!isset($_GET['view'])){
                     Redirect::to(URL::build('/panel/forms/submissions'));
                     die();
                 }
-                
-                if($user->hasPermission('forms.delete-submissions')){
+                $comment = DB::getInstance()->query('SELECT id, form_id as submission_id FROM nl2_forms_comments WHERE id = ?', array($_GET['id']))->first();
+                $submission = DB::getInstance()->query('SELECT id, form_id FROM nl2_forms_replies WHERE id = ?', array($comment->submission_id))->first();
+                if($submission && $forms->canDeleteSubmission($group_ids, $submission->form_id)){
                     try {
                         $queries->delete('forms_comments', array('id', '=', $_GET['id']));
                     } catch(Exception $e){
