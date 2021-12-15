@@ -558,11 +558,12 @@ if(!isset($_GET['view'])){
                     die();
                 }
                 
-                if($forms->canDeleteSubmission($group_ids, $_GET['id'])){
+                $submission = DB::getInstance()->query('SELECT id, form_id FROM nl2_forms_replies WHERE id = ?', array($_GET['id']))->first();
+                if($submission && $forms->canDeleteSubmission($group_ids, $submission->form_id)){
                     try {
-                        $queries->delete('forms_replies', array('id', '=', $_GET['id']));
-                        $queries->delete('forms_replies_fields', array('submission_id', '=', $_GET['id']));
-                        $queries->delete('forms_comments', array('form_id', '=', $_GET['id']));
+                        $queries->delete('forms_replies', array('id', '=', $submission->id));
+                        $queries->delete('forms_replies_fields', array('submission_id', '=', $submission->id));
+                        $queries->delete('forms_comments', array('form_id', '=', $submission->id));
                     } catch(Exception $e){
                         die($e->getMessage());
                     }
