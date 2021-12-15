@@ -28,21 +28,21 @@ $language = array(
 	'actions' => 'Acties',
 	'guest' => 'Gast',
 	
-	// Permissions
-	'forms_view_submissions' => 'StaffCP &raquo; Formulieren &raquo; Inzendingen',
-	'forms_manage' => 'StaffCP &raquo; Formulieren &raquo; Formulieren',
-  'can_post_submission' => 'Kan inzendingen maken',
-  'can_view_own_submission' => 'Kan eigen inzendingen bekijken',
-  'can_view_submissions' => 'Kan inzendingen bekijken',
-  'can_delete_submissions' => 'Kan inzendingen verwijderen',
-  'show_navigation_link_for_guest' => 'Toon navigatie link voor gasten en vraag om in te loggen als ze geen toegang hebben',
+ 	 // Permissions
+  	'forms_view_submissions' => 'StaffCP &raquo; Formulieren &raquo; Inzendingen',
+  	'forms_manage' => 'StaffCP &raquo; Formulieren &raquo; Formulieren',
+  	'can_post_submission' => 'Kan inzendingen maken',
+  	'can_view_own_submission' => 'Kan eigen inzendingen bekijken',
+  	'can_view_submissions' => 'Kan inzendingen bekijken',
+  	'can_delete_submissions' => 'Kan inzendingen verwijderen',
+  	'show_navigation_link_for_guest' => 'Toon navigatie link voor gasten en vraag om in te loggen als ze geen toegang hebben',
 	
 	// Form
 	'editing_x' => '{x} aan het wijzigen', // Don't replace {x}
 	'form_created_successfully' => 'Formulier successvol aangemaakt.',
 	'form_updated_successfully' => 'Formulier successvol aangepast.',
 	'form_deleted_successfully' => 'Form successvol verwijderd.',
-  'enable_captcha' => 'Zet captcha aan voor dit formulier?',
+  	'enable_captcha' => 'Zet captcha aan voor dit formulier?',
 	
 	// Fields
 	'field' => 'Veld',
@@ -62,11 +62,11 @@ $language = array(
 	'delete_field' => 'Ben je zeker dat je dit veld wilt verwijderen?',
 	'help_box' => 'Help Text',
 	'barrier' => 'Verdelende Line',
-  'number' => 'Nummer',
-  'radio' => 'Radio',
-  'checkbox' => 'Selectievakje',
-  'minimum_characters' => 'Minimum Karakters (0 om uit te schakelen)',
-  'maximum_characters' => 'Maximum Karakters (0 om uit te schakelen)',
+  	'number' => 'Nummer',
+  	'radio' => 'Radio',
+  	'checkbox' => 'Selectievakje',
+  	'minimum_characters' => 'Minimum Karakters (0 om uit te schakelen)',
+  	'maximum_characters' => 'Maximum Karakters (0 om uit te schakelen)',
 
 	// Statuses
 	'statuses' => 'Statussen',
@@ -84,8 +84,8 @@ $language = array(
 	'status_edit_success' => 'Status successvol aangepast.',
 	'status_deleted_successfully' => 'Status successvol verwijderd.',
 	'delete_status' => 'Ben je zeker dat je deze status wilt verwijderen?',
-  'select_statuses_to_form' => 'Selecteer statussen die gebruikt zullen worden op dit formulier',
-  'change_status_on_comment' => 'Wijzig status wanneer de gebruiker reageert?',
+  	'select_statuses_to_form' => 'Selecteer statussen die gebruikt zullen worden op dit formulier',
+  	'change_status_on_comment' => 'Wijzig status wanneer de gebruiker reageert?',
     
 	// Errors
 	'input_form_name' => 'Vul alstublieft een formuliernaam in.',
@@ -98,8 +98,8 @@ $language = array(
 	'input_field_name' => 'Vul alstublieft een veldnaam in.',
 	'field_name_minimum' => 'Het veldnaam moet minimaal 2 karakters lang zijn.',
 	'field_name_maximum' => 'THet veldnaam mag maximaal 255 karakters lang zijn.',
-  'x_field_minimum_y' => '{x} moet minimaal {y} karakters lang zijn.',
-  'x_field_maximum_y' => '{x} max maximaal {y} karakters lang zijn.',
+  	'x_field_minimum_y' => '{x} moet minimaal {y} karakters lang zijn.',
+  	'x_field_maximum_y' => '{x} max maximaal {y} karakters lang zijn.',
 	
 	// Submissions
 	'submissions' => 'Inzendingen',
@@ -113,14 +113,14 @@ $language = array(
 	'user' => 'Gebruiker',
 	'updated_by' => 'Bijgewerkt door',
 	'sort' => 'Sorteer',
-  'id_or_username' => 'ID of Gebruikersnaam',
-  'confirm_delete_comment' => 'Ben je zeker dat je deze opmerking wilt verwijderen?',
-  'confirm_delete_submisssion' => 'Ben je zeker dat je deze inzending wilt verwijderen?',
-  'delete_submissions_or_comments' => 'Verwijder inzending of opmerking',
-  'no_comment' => 'Geen opmerkingen',
-  'anonymous' => 'Anoniem',
-  'submit_as_anonymous' => 'Zend anoniem in',
-  'send_notify_email' => 'Zend notificatie email (voegt inzend vertraging toe)',
+  	'id_or_username' => 'ID of Gebruikersnaam',
+  	'confirm_delete_comment' => 'Ben je zeker dat je deze opmerking wilt verwijderen?',
+  	'confirm_delete_submisssion' => 'Ben je zeker dat je deze inzending wilt verwijderen?',
+  	'delete_submissions_or_comments' => 'Verwijder inzending of opmerking',
+  	'no_comment' => 'Geen opmerkingen',
+  	'anonymous' => 'Anoniem',
+  	'submit_as_anonymous' => 'Zend anoniem in',
+  	'send_notify_email' => 'Zend notificatie email (voegt inzend vertraging toe)',
 	
 	// Update alerts
 	'new_update_available_x' => 'Er is een nieuwe update voor de module {x}',
@@ -129,21 +129,21 @@ $language = array(
 	'new_version_x' => 'Nieuwe module versie: {x}',
 	'view_resource' => 'Bekijk bron',
     
-  // Hook
-  'new_form_submission' => 'Nieuw formulier ingediend',
-  'updated_form_submission' => 'Nieuwe opmerking bij een formulier',
-  'new_submission_text' => 'Nieuwe inzending aangemaakt in {x} door {y}',
-  'updated_submission_text' => 'Nieuwe opmerking voor een inzending in {x} door {y}',
+  	// Hook
+  	'new_form_submission' => 'Nieuw formulier ingediend',
+  	'updated_form_submission' => 'Nieuwe opmerking bij een formulier',
+  	'new_submission_text' => 'Nieuwe inzending aangemaakt in {x} door {y}',
+  	'updated_submission_text' => 'Nieuwe opmerking voor een inzending in {x} door {y}',
     
-  // Email
-  'submission_updated_subject' => 'Je {x} inzending is geupdate',
-  'submission_updated_message' => '
-      Er is een update over je inzending voor {form}.</br>
-      </br>
-      Huidige Status: {status}</br>
-      Aangepast door: {updated_by}</br>
-      Opmerking: {comment}</br>
-      </br>
-      Je kan je volledige inzending bekijken door hier te klikken <a href="{link}">{link}</a>
-  '
+  	// Email
+  	'submission_updated_subject' => 'Je {x} inzending is geupdate',
+  	'submission_updated_message' => '
+      		Er is een update over je inzending voor {form}.</br>
+      		</br>
+      		Huidige Status: {status}</br>
+      		Aangepast door: {updated_by}</br>
+      		Opmerking: {comment}</br>
+      		</br>
+      		Je kan je volledige inzending bekijken door hier te klikken <a href="{link}">{link}</a>
+  	'
 );
