@@ -36,9 +36,9 @@
                     <div class="card-body">
                         <h5 style="display:inline">{$EDITING_FORM}</h5>
                         <div class="float-md-right">
-							<a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
+                            <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
-						<hr>
+                        <hr>
 
                         <ul class="nav nav-tabs">
                           <li class="nav-item">
@@ -56,86 +56,88 @@
                         </ul>
                         
                         </br>
-						
+                        
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
-						
-						<form role="form" action="" method="post">
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="InputName">{$FORM_NAME}</label>
-										<input type="text" name="form_name" class="form-control" id="InputName" placeholder="{$FORM_NAME}" value="{$FORM_NAME_VALUE}">
-									</div>
-									<div class="form-group">
-										<label for="InputUrl">{$FORM_URL}</label>
-										<input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}" value="{$FORM_URL_VALUE}">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="InputUrl">{$FORM_ICON}</label>
-										<input type="text" name="form_icon" class="form-control" id="InputIcon" placeholder="{$FORM_ICON}" value="{$FORM_ICON_VALUE}">
-									</div>
-									<div class="form-group">
-										<label for="link_location">{$FORM_LINK_LOCATION}</label>
-										<select class="form-control" id="link_location" name="link_location">
-											<option value="1"{if $LINK_LOCATION_VALUE eq 1} selected{/if}>{$LINK_NAVBAR}</option>
-											<option value="2"{if $LINK_LOCATION_VALUE eq 2} selected{/if}>{$LINK_MORE}</option>
-											<option value="3"{if $LINK_LOCATION_VALUE eq 3} selected{/if}>{$LINK_FOOTER}</option>
-											<option value="4"{if $LINK_LOCATION_VALUE eq 4} selected{/if}>{$LINK_NONE}</option>
-										</select>
-									</div>
-								</div>
-								<div class="col-md-12">
+                        
+                        <form role="form" action="" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="InputName">{$FORM_NAME}</label>
+                                        <input type="text" name="form_name" class="form-control" id="InputName" placeholder="{$FORM_NAME}" value="{$FORM_NAME_VALUE}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="InputUrl">{$FORM_URL}</label>
+                                        <input type="text" name="form_url" class="form-control" id="InputURL" placeholder="{$FORM_URL}" value="{$FORM_URL_VALUE}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="InputUrl">{$FORM_ICON}</label>
+                                        <input type="text" name="form_icon" class="form-control" id="InputIcon" placeholder="{$FORM_ICON}" value="{$FORM_ICON_VALUE}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="link_location">{$FORM_LINK_LOCATION}</label>
+                                        <select class="form-control" id="link_location" name="link_location">
+                                            <option value="1"{if $LINK_LOCATION_VALUE eq 1} selected{/if}>{$LINK_NAVBAR}</option>
+                                            <option value="2"{if $LINK_LOCATION_VALUE eq 2} selected{/if}>{$LINK_MORE}</option>
+                                            <option value="3"{if $LINK_LOCATION_VALUE eq 3} selected{/if}>{$LINK_FOOTER}</option>
+                                            <option value="4"{if $LINK_LOCATION_VALUE eq 4} selected{/if}>{$LINK_NONE}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
                                   <div class="form-group">
                                       <label for="inputContent">{$CONTENT}</label>
                                       <textarea name="content" id="inputContent">{$CONTENT_VALUE}</textarea>
                                   </div>
-								</div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-										<label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
-										<input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
-									</div>
+                                        <label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
+                                        <input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
+                                    </div>
                                 </div>
-							</div>
-							<div class="form-group">
-								<input type="hidden" name="token" value="{$TOKEN}">
-								<input type="submit" class="btn btn-primary" value="{$SUBMIT}">
-							</div>
-						</form>
-						
-						</br>
-						
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="token" value="{$TOKEN}">
+                                <input type="submit" class="btn btn-primary" value="{$SUBMIT}">
+                            </div>
+                        </form>
+                        
+                        </br>
+                        
                         <h5 style="display:inline">{$FIELDS}</h5>
                         <div class="float-md-right">
-							<a href="{$NEW_FIELD_LINK}" class="btn btn-primary">{$NEW_FIELD}</a>
+                            <a href="{$NEW_FIELD_LINK}" class="btn btn-primary">{$NEW_FIELD}</a>
                         </div>
-						<hr>
-						{if count($FIELDS_LIST)}
-							{foreach from=$FIELDS_LIST item=field}
-							<div class="row">
-								<div class="col-md-4">
-									<a href="{$field.edit_link}">{$field.name}</a>
-								</div>
-								<div class="col-md-4">
-									{$field.type}
-								</div>
-								<div class="col-md-4">
+                        <hr>
+                        {if count($FIELDS_LIST)}
+                            {foreach from=$FIELDS_LIST item=field}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <a href="{$field.edit_link}">{$field.name}</a>
+                                </div>
+                                <div class="col-md-4">
+                                    {$field.type}
+                                </div>
+                                <div class="col-md-4">
                                     <div class="float-md-right">
                                         <a class="btn btn-warning btn-sm" href="{$field.edit_link}"><i class="fas fa-edit fa-fw"></i></a>
                                         <button class="btn btn-danger btn-sm" type="button" onclick="showDeleteModal('{$field.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
                                     </div>
-								</div>
-							</div>
-							<hr>
-							{/foreach}
+                                </div>
+                            </div>
+                            <hr>
+                            {/foreach}
                         {else}
                             {$NONE_FIELDS_DEFINED}
                         {/if}
                         
+                        {if !isset($PARTYDRAGEN_PREMIUM)}
                         <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
+                        {/if}
                     </div>
                 </div>
 

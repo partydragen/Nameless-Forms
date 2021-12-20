@@ -36,9 +36,9 @@
                     <div class="card-body">
                         <h5 style="display:inline">{$EDITING_FORM}</h5>
                         <div class="float-md-right">
-							<a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
+                            <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
-						<hr>
+                        <hr>
                         
                         <ul class="nav nav-tabs">
                           <li class="nav-item">
@@ -56,15 +56,15 @@
                         </ul>
                         
                         </br>
-						
+                        
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
-						
+                        
                         <form role="form" action="" method="post">
                             <div class="form-group">
-								<label for="InputGuest">{$SHOW_NAVIGATION_LINK_FOR_GUEST}</label>
-								<input id="inputGuest" name="guest" type="checkbox" class="js-switch"{if $GUEST_VALUE eq 1} checked{/if} />
-							</div>
+                                <label for="InputGuest">{$SHOW_NAVIGATION_LINK_FOR_GUEST}</label>
+                                <input id="inputGuest" name="guest" type="checkbox" class="js-switch"{if $GUEST_VALUE eq 1} checked{/if} />
+                            </div>
                                     
                             <script>
                               var groups = [];
@@ -126,7 +126,9 @@
                             </div>
                         </form>
                         
+                        {if !isset($PARTYDRAGEN_PREMIUM)}
                         <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
+                        {/if}
                     </div>
                 </div>
 

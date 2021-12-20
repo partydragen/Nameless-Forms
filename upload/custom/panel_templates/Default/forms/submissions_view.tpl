@@ -35,7 +35,7 @@
 
                 <div class="card shadow mb-4">
                     <div class="card-body">
-			  
+              
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
 
@@ -45,7 +45,7 @@
                             <div class="col-md-4"><h4>{$LAST_UPDATED} <span class="pull-right" data-toggle="tooltip" data-original-title="{$LAST_UPDATED_DATE}">{$LAST_UPDATED_FRIENDLY}</span></h4></div>
                         </div>
                         <hr>
-				
+                
                         <div class="card">
                           <div class="card-header">
                             {if !empty($USER_AVATAR)}
@@ -65,7 +65,7 @@
                             {/foreach}
                           </div>
                         </div>
-				
+                
                         <h5>{$COMMENTS_TEXT}</h5>
                         {if count($COMMENTS)}
                           {foreach from=$COMMENTS item=comment}
@@ -106,11 +106,11 @@
                           <div class="form-group">
                             {if $CAN_USE_ANONYMOUS}
                             <label for="inputAnonymous">{$SUBMIT_AS_ANONYMOUS}</label>
-							<input id="inputAnonymous" name="anonymous" type="checkbox" class="js-switch" />
+                            <input id="inputAnonymous" name="anonymous" type="checkbox" class="js-switch" />
                             {/if}
                             {if $CAN_SEND_EMAIL}
                             <label for="InputNotifyEmail">{$SEND_NOTIFY_EMAIL}</label>
-							<input id="inputNotifyEmail" name="notify_email" type="checkbox" class="js-switch" />
+                            <input id="inputNotifyEmail" name="notify_email" type="checkbox" class="js-switch" />
                              {/if}
                           </div>
                           <div class="form-group">
@@ -119,7 +119,9 @@
                           </div>
                         </form>
 
+                        {if !isset($PARTYDRAGEN_PREMIUM)}
                         <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
+                        {/if}
                     </div>
                 </div>
 
@@ -159,7 +161,7 @@
         </div>
     </div>
 </div>
-	
+    
 <div class="modal fade" id="deleteCommentModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

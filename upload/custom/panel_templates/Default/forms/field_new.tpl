@@ -34,38 +34,38 @@
 
                 <div class="card shadow mb-4">
                     <div class="card-body">
-						<h5 style="display:inline">{$NEW_FIELD_FOR_X}</h5>
+                        <h5 style="display:inline">{$NEW_FIELD_FOR_X}</h5>
                         <div class="float-md-right">
-							<a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
+                            <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
-						<hr>
-						
+                        <hr>
+                        
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
-						
-						<form role="form" action="" method="post">
-							<div class="form-group">
-								<label for="InputName">{$FIELD_NAME}</label>
-								<input type="text" name="field_name" class="form-control" id="InputName" placeholder="{$FIELD_NAME}">
-							</div>
-							<div class="form-group">
-								<label for="type">{$TYPE}</label>
-								<select class="form-control" id="type" name="type">
-									{foreach from=$TYPES item=type}
-									<option value="{$type.id}">{$type.name}</option>
-                                  {/foreach}
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="InputOptions">{$OPTIONS} / {$CHECKBOX} / {$RADIO} - {$OPTIONS_HELP}</label>
-								<textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS} / {$CHECKBOX} / {$RADIO}"></textarea>
-							</div>
+                        
+                        <form role="form" action="" method="post">
                             <div class="form-group">
-								<label for="InputName">{$INFO}</label>
-								<textarea rows="2" class="form-control" name="info" id="info" placeholder="{$INFO}">{$INFO_VALUE}</textarea>
-							</div>
+                                <label for="InputName">{$FIELD_NAME}</label>
+                                <input type="text" name="field_name" class="form-control" id="InputName" placeholder="{$FIELD_NAME}">
+                            </div>
+                            <div class="form-group">
+                                <label for="type">{$TYPE}</label>
+                                <select class="form-control" id="type" name="type">
+                                    {foreach from=$TYPES item=type}
+                                    <option value="{$type.id}">{$type.name}</option>
+                                  {/foreach}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="InputOptions">{$OPTIONS} / {$CHECKBOX} / {$RADIO} - {$OPTIONS_HELP}</label>
+                                <textarea rows="5" class="form-control" name="options" id="options" placeholder="{$OPTIONS} / {$CHECKBOX} / {$RADIO}"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="InputName">{$INFO}</label>
+                                <textarea rows="2" class="form-control" name="info" id="info" placeholder="{$INFO}">{$INFO_VALUE}</textarea>
+                            </div>
                             <div class="row">
-							  <div class="col-md-4">
+                              <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="InputOrder">{$FIELD_ORDER}</label>
                                     <input type="number" min="1" class="form-control" id="InputOrder" name="order" value="5">
@@ -84,17 +84,19 @@
                                 </div>
                               </div>
                             </div>
-							<div class="form-group">
-								<label for="inputrequired">{$REQUIRED}</label>
-								<input id="inputrequired" name="required" type="checkbox" class="js-switch" />
-							</div>
-							<div class="form-group">
-								<input type="hidden" name="token" value="{$TOKEN}">
-								<input type="submit" class="btn btn-primary" value="{$SUBMIT}">
-							</div>
-						</form>
-						
+                            <div class="form-group">
+                                <label for="inputrequired">{$REQUIRED}</label>
+                                <input id="inputrequired" name="required" type="checkbox" class="js-switch" />
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="token" value="{$TOKEN}">
+                                <input type="submit" class="btn btn-primary" value="{$SUBMIT}">
+                            </div>
+                        </form>
+                        
+                        {if !isset($PARTYDRAGEN_PREMIUM)}
                         <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
+                        {/if}
                     </div>
                 </div>
 

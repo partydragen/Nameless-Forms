@@ -36,9 +36,9 @@
                     <div class="card-body">
                         <h5 style="display:inline">{$EDITING_FORM}</h5>
                         <div class="float-md-right">
-							<a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
+                            <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
-						<hr>
+                        <hr>
                         
                         <ul class="nav nav-tabs">
                           <li class="nav-item">
@@ -56,10 +56,10 @@
                         </ul>
                         
                         </br>
-						
+                        
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
-						
+                        
                         <form role="form" action="" method="post">
                             <div class="form-group">
                                 <label for="status_forms">{$SELECT_STATUSES}</label></br>
@@ -76,9 +76,9 @@
                                 <select class="form-control" id="comment_status" name="comment_status">
                                   <option value="0"{if $COMMENT_STATUS_VALUE eq 0} selected{/if}>{$DISABLED}</option>
                                   {foreach from=$ALL_STATUSES item=status}
-									<option value="{$status.id}"{if $COMMENT_STATUS_VALUE eq {$status.id}} selected{/if}>{$status.html}</option>
+                                    <option value="{$status.id}"{if $COMMENT_STATUS_VALUE eq {$status.id}} selected{/if}>{$status.html}</option>
                                   {/foreach}
-								</select>
+                                </select>
                             </div>
                           
                             <div class="form-group">
@@ -87,7 +87,9 @@
                             </div>
                         </form>
                         
+                        {if !isset($PARTYDRAGEN_PREMIUM)}
                         <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></p></center>
+                        {/if}
                     </div>
                 </div>
 

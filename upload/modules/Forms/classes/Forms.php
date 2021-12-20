@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr9
+ *  NamelessMC version 2.0.0-pr12
  *
  *  License: MIT
  */
@@ -89,6 +89,55 @@ class Forms {
         if (isset($info->message)) {
             die($info->message);
         }
+        
+        return $update_check;
+    }
+    
+    /*
+     *  Check for Module updates
+     *  Returns JSON object with information about any updates
+     */
+    public static function pdp($cache, $state = null) {
+        if($state == null) {
+            $cache->setCache('pdp');
+            if($cache->isCached('pdp')){
+                return $cache->retrieve('pdp');
+            }
+            
+            return array();
+        } else {
+            $state = json_decode($state, true);
+            if(isset($state['pdp'])) {
+                $cache->setCache('pdp');
+                $cache->store('pdp', array($state['pdp']['key'] => $state['pdp']['value']));
+                return array($state['pdp']['key'] => $state['pdp']['value']);
+            } else if($state != null){
+                $cache->setCache('pdp');
+                $cache->store('pdp', array());
+                return array();
+            }
+            
+            return array();
+        }
+    }
+    
+    /*
+     *  Is user a supporter of Partydragen?
+     *  https://partydragen.com/patreon/
+     */
+    public static function premiumCheck($current_version = null) {
+        $queries = new Queries();
+
+        $uid = $queries->getWhere('settings', array('name', '=', 'unique_id'));
+        $uid = $uid[0]->value;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_URL, 'https://api.partydragen.com/premium.php?uid=' . $uid);
+
+        $update_check = curl_exec($ch);
+        curl_close($ch);
         
         return $update_check;
     }

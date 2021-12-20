@@ -21,7 +21,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.8.2';
+        $module_version = '1.8.3';
         $nameless_version = '2.0.0-pr12';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -186,6 +186,7 @@ class Forms_Module extends Module {
                     require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
                     $update_check = Forms::updateCheck();
                     $cache->store('update_check', $update_check, 3600);
+                    Forms::pdp($cache, $update_check);
                 }
 
                 $update_check = json_decode($update_check);
@@ -309,22 +310,6 @@ class Forms_Module extends Module {
             }
         }
 
-        if($old_version < 150) {
-            try {
-                // Update main admin group permissions
-                $group = $queries->getWhere('groups', array('id', '=', 2));
-                $group = $group[0];
-                
-                $group_permissions = json_decode($group->permissions, TRUE);
-                $group_permissions['forms.delete-submissions'] = 1;
-                
-                $group_permissions = json_encode($group_permissions);
-                $queries->update('groups', 2, array('permissions' => $group_permissions));
-            } catch(Exception $e){
-                // Error
-            }
-        }
-        
         if($old_version < 134) {
             try {
                 $queries->alterTable('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
@@ -480,7 +465,6 @@ class Forms_Module extends Module {
             $group_permissions['forms.manage'] = 1;
             $group_permissions['forms.view-submissions'] = 1;
             $group_permissions['forms.manage-submission'] = 1;
-            $group_permissions['forms.delete-submissions'] = 1;
             $group_permissions['forms.anonymous'] = 1;
             
             $group_permissions = json_encode($group_permissions);

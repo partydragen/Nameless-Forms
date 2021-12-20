@@ -21,6 +21,7 @@ define('PARENT_PAGE', 'forms');
 define('PANEL_PAGE', 'forms');
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/backend_init.php');
+require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 
 if(!isset($_GET['action'])){
     // incase if i want to split statuses later
@@ -356,6 +357,7 @@ $page_load = microtime(true) - $start;
 define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
+$smarty->assign(Forms::pdp($cache));
 
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 
