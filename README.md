@@ -9,7 +9,7 @@ The Forms module allow you to create multiple forms for users to do, Like Applic
 - Activate the module in the StaffCP -> Modules tab
 
 ## Patreon
-If you like to help out with the development and get early access to new updates and new modules check out [https://www.patreon.com/partydragen/](https://www.patreon.com/partydragen)
+If you like to help out with the development and get early access to new updates and new modules check out [https://partydragen.com/patreon/](https://partydragen.com/patreon/)
 
 ## NamelessHosting:
 Create your own free NamelessMC website at NamelessHosting for free at [https://namelesshosting.com](https://namelesshosting.com/)
