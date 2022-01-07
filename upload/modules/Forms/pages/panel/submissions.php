@@ -327,7 +327,7 @@ if(!isset($_GET['view'])){
                         // Alert user?
                         if($submission->user_id != null) {
                             $target_user = new User($submission->user_id);
-                            if($target_user && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds()), $submission->form_id)) {
+                            if($target_user && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds(true)), $submission->form_id)) {
                                 // Send alert to user
                                 Alert::create(
                                     $submission->user_id,
