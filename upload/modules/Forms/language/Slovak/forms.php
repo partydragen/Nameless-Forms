@@ -65,6 +65,7 @@ $language = array(
     'number' => 'Číslo',
     'radio' => 'Výber z možností',
     'checkbox' => 'Zaškrtávacie políčka',
+    'file' => 'File (Pictures)',
     'minimum_characters' => 'Minimálny počet znakov (0 na vypnutie)',
     'maximum_characters' => 'Maximálny počet znakov (0 na vypnutie)',
 
@@ -100,6 +101,9 @@ $language = array(
     'field_name_maximum' => 'Názov poľa môže mať maximálne 255 znakov.',
     'x_field_minimum_y' => '{x} musí mať minimálne {y} znakov.',
     'x_field_maximum_y' => '{x} môže mať maximálne {y} znakov.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
 
     // Submissions
     'submissions' => 'Odpovede',

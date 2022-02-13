@@ -43,7 +43,7 @@
             </br></br>
           {/if}
         
-          <form class="ui form" action="" method="post" id="forms">
+          <form class="ui form" action="" method="post" id="forms" enctype="multipart/form-data">
             {foreach from=$FIELDS item=field}
               <div class="field">
                   {if $field.type == 5}
@@ -60,37 +60,44 @@
                       </label>
                   {/if}
                 {if $field.type == "1"}
-                <input type="text" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
+                  <input type="text" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
                 {elseif $field.type == "2"}
-                <select class="ui fluid dropdown" name="{$field.id}" id="{$field.id}" {if $field.required}required{/if}>
-                  {foreach from=$field.options item=option}
-                  <option value="{$option}" {if $option eq $field.value} selected{/if}>{$option}</option>
-                  {/foreach}
-                </select>
+                  <select class="ui fluid dropdown" name="{$field.id}" id="{$field.id}" {if $field.required}required{/if}>
+                    {foreach from=$field.options item=option}
+                      <option value="{$option}" {if $option eq $field.value} selected{/if}>{$option}</option>
+                    {/foreach}
+                  </select>
                 {elseif $field.type == "3"}
-                <textarea name="{$field.id}" id="{$field.id}" {if $field.required}required{/if}>{$field.value}</textarea>
+                  <textarea name="{$field.id}" id="{$field.id}" {if $field.required}required{/if}>{$field.value}</textarea>
                 {elseif $field.type == "6"}
-                <input type="number" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
+                  <input type="number" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
                 {elseif $field.type == "7"}
-                <input type="email" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
+                  <input type="email" name="{$field.id}" id="{$field.id}" value="{$field.value}" placeholder="{$field.name}" {if $field.required}required{/if}>
                 {elseif $field.type == "8"}
                   {foreach from=$field.options item=option}
-                  <div class="field">
-                    <div class="ui radio checkbox">
-                      <input type="radio" name="{$field.id}" value="{$option}" {if $field.required}required{/if}>
-                      <label>{$option}</label>
+                    <div class="field">
+                      <div class="ui radio checkbox">
+                        <input type="radio" name="{$field.id}" value="{$option}" {if $field.required}required{/if}>
+                        <label>{$option}</label>
+                      </div>
                     </div>
-                  </div>
                   {/foreach}
                 {elseif $field.type == "9"}
                   {foreach from=$field.options item=option}
-                  <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" name="{$field.id}[]" value="{$option}">
-                      <label>{$option}</label>
+                    <div class="field">
+                      <div class="ui checkbox">
+                        <input type="checkbox" name="{$field.id}[]" value="{$option}">
+                        <label>{$option}</label>
+                      </div>
                     </div>
-                  </div>
                   {/foreach}
+                {elseif $field.type == "10"}
+                  <div class="field">
+                    <input type="file" class="inputFile" name="{$field.id}" id="uploadFileButton{$field.id}" value="{$field.value}" hidden onchange="$('#fileName{$field.id}').html(this.files[0].name);" />
+                    <label class="ui icon labeled default button" for="uploadFileButton{$field.id}">
+                        <i class="ui cloud upload icon"></i> <span id="fileName{$field.id}">Choose file</span>
+                    </label>
+                  </div>
                 {/if}
               </div>
             {/foreach}

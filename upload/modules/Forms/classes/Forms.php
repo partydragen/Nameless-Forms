@@ -9,15 +9,15 @@
  */
 
 class Forms {
-    private $_db;
+    private DB $_db;
     
     // Constructor, connect to database
-    public function __construct(){
+    public function __construct() {
         $this->_db = DB::getInstance();
     }
     
     // Can the user post a submission in the given form?
-    public function canPostSubmission($group_ids, $form_id) {
+    public function canPostSubmission($group_ids, $form_id): bool {
         if (is_array($group_ids)) {
             $group_ids = implode(',', $group_ids);
         }
@@ -26,7 +26,7 @@ class Forms {
     }
     
     // Can the user view a submission in the given form?
-    public function canViewOwnSubmission($group_ids, $form_id) {
+    public function canViewOwnSubmission($group_ids, $form_id): bool {
         if (is_array($group_ids)) {
             $group_ids = implode(',', $group_ids);
         }
@@ -35,7 +35,7 @@ class Forms {
     }
     
     // Can the user view a submission in the given form?
-    public function canViewSubmission($group_ids, $form_id) {
+    public function canViewSubmission($group_ids, $form_id): bool {
         if (is_array($group_ids)) {
             $group_ids = implode(',', $group_ids);
         }
@@ -44,7 +44,7 @@ class Forms {
     }
     
     // Can the user view a submission in the given form?
-    public function canDeleteSubmission($group_ids, $form_id) {
+    public function canDeleteSubmission($group_ids, $form_id): bool {
         if (is_array($group_ids)) {
             $group_ids = implode(',', $group_ids);
         }
@@ -69,8 +69,8 @@ class Forms {
         $uid = $uid[0]->value;
         
         $enabled_modules = Module::getModules();
-        foreach($enabled_modules as $enabled_item){
-            if($enabled_item->getName() == 'Forms'){
+        foreach ($enabled_modules as $enabled_item) {
+            if ($enabled_item->getName() == 'Forms') {
                 $module = $enabled_item;
                 break;
             }
@@ -98,20 +98,20 @@ class Forms {
      *  Returns JSON object with information about any updates
      */
     public static function pdp($cache, $state = null) {
-        if($state == null) {
+        if ($state == null) {
             $cache->setCache('pdp');
-            if($cache->isCached('pdp')){
+            if ($cache->isCached('pdp')) {
                 return $cache->retrieve('pdp');
             }
             
             return array();
         } else {
             $state = json_decode($state, true);
-            if(isset($state['pdp'])) {
+            if (isset($state['pdp'])) {
                 $cache->setCache('pdp');
                 $cache->store('pdp', array($state['pdp']['key'] => $state['pdp']['value']));
                 return array($state['pdp']['key'] => $state['pdp']['value']);
-            } else if($state != null){
+            } else if ($state != null) {
                 $cache->setCache('pdp');
                 $cache->store('pdp', array());
                 return array();

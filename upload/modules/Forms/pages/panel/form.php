@@ -11,7 +11,7 @@
  */
 
 // Can the user view the panel?
-if(!$user->handlePanelPageLoad('forms.manage')) {
+if (!$user->handlePanelPageLoad('forms.manage')) {
     require_once(ROOT_PATH . '/403.php');
     die();
 }
@@ -21,60 +21,73 @@ define('PARENT_PAGE', 'forms');
 define('PANEL_PAGE', 'forms');
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/backend_init.php');
-require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 
-if(!is_numeric($_GET['form'])){
+if (!is_numeric($_GET['form'])) {
     Redirect::to(URL::build('/panel/forms'));
     die();
-} else {
-    $form = $queries->getWhere('forms', array('id', '=', $_GET['form']));
-    if(!count($form)){
-        Redirect::to(URL::build('/panel/forms'));
-        die();
-    }
 }
-$form = $form[0];
 
-$field_types = array();
-$field_types[1] = array('id' => 1, 'name' => $language->get('admin', 'text'));
-$field_types[2] = array('id' => 2, 'name' => $forms_language->get('forms', 'options'));
-$field_types[3] = array('id' => 3, 'name' => $language->get('admin', 'textarea'));
-$field_types[4] = array('id' => 4, 'name' => $forms_language->get('forms', 'help_box'));
-$field_types[5] = array('id' => 5, 'name' => $forms_language->get('forms', 'barrier'));
-$field_types[6] = array('id' => 6, 'name' => $forms_language->get('forms', 'number'));
-$field_types[7] = array('id' => 7, 'name' => $language->get('general', 'email_address'));
-$field_types[8] = array('id' => 8, 'name' => $forms_language->get('forms', 'radio'));
-$field_types[9] = array('id' => 9, 'name' => $forms_language->get('forms', 'checkbox'));
+$form = new Form($_GET['form']);
+if (!$form->exists()) {
+    Redirect::to(URL::build('/panel/forms'));
+    die();
+}
 
-if(!isset($_GET['action'])){
+$field_types = [];
+$field_types[1] = ['id' => 1, 'name' => $language->get('admin', 'text')];
+$field_types[2] = ['id' => 2, 'name' => $forms_language->get('forms', 'options')];
+$field_types[3] = ['id' => 3, 'name' => $language->get('admin', 'textarea')];
+$field_types[4] = ['id' => 4, 'name' => $forms_language->get('forms', 'help_box')];
+$field_types[5] = ['id' => 5, 'name' => $forms_language->get('forms', 'barrier')];
+$field_types[6] = ['id' => 6, 'name' => $forms_language->get('forms', 'number')];
+$field_types[7] = ['id' => 7, 'name' => $language->get('general', 'email_address')];
+$field_types[8] = ['id' => 8, 'name' => $forms_language->get('forms', 'radio')];
+$field_types[9] = ['id' => 9, 'name' => $forms_language->get('forms', 'checkbox')];
+
+if (!isset($_GET['action'])) {
     // Editing form
-    if(Input::exists()){
-        $errors = array();
-        if(Token::check(Input::get('token'))){
+    if (Input::exists()) {
+        $errors = [];
+
+        if (Token::check(Input::get('token'))) {
             // Validate input
             $validate = new Validate();
-            $validation = $validate->check($_POST, array(
-                'form_name' => array(
-                    'required' => true,
-                    'min' => 2,
-                    'max' => 32
-                ),
-                'form_url' => array(
-                    'required' => true,
-                    'min' => 2,
-                    'max' => 32
-                ),
-                'form_icon' => array(
-                    'max' => 64
-                )
-            ));
+            $validation = $validate->check($_POST, [
+                'form_name' => [
+                    Validate::REQUIRED => true,
+                    Validate::MIN => 2,
+                    Validate::MAX => 32
+                ],
+                'form_url' => [
+                    Validate::REQUIRED => true,
+                    Validate::MIN => 2,
+                    Validate::MAX => 32
+                ],
+                'form_icon' => [
+                    Validate::MAX => 64
+                ]
+            ])->messages([
+                'form_name' => [
+                    Validate::REQUIRED => $forms_language->get('forms', 'input_form_name'),
+                    Validate::MIN => $forms_language->get('forms', 'form_name_minimum'),
+                    Validate::MAX => $forms_language->get('forms', 'form_name_maximum')
+                ],
+                'form_url' => [
+                    Validate::REQUIRED => $forms_language->get('forms', 'input_form_url'),
+                    Validate::MIN => $forms_language->get('forms', 'form_url_minimum'),
+                    Validate::MAX => $forms_language->get('forms', 'form_url_maximum')
+                ],
+                'form_icon' => [
+                    Validate::MAX => $forms_language->get('forms', 'form_icon_maximum')
+                ]
+            ]);
                                 
-            if($validation->passed()){
+            if ($validation->passed()) {
                 // Update form
                 try {
                     // Get link location
-                    if(isset($_POST['link_location'])){
-                        switch($_POST['link_location']){
+                    if (isset($_POST['link_location'])) {
+                        switch ($_POST['link_location']) {
                             case 1:
                             case 2:
                             case 3:
@@ -88,60 +101,28 @@ if(!isset($_GET['action'])){
                     $location = 1;
                     
                     // Enable captcha?
-                    if(isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
+                    if (isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
                     else $captcha = 0;
                                     
                     // Save to database
-                    $queries->update('forms', $form->id, array(
+                    $form->update([
                         'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
                         'title' => Output::getClean(Input::get('form_name')),
                         'link_location' => $location,
                         'icon' => Input::get('form_icon'),
                         'captcha' => $captcha,
                         'content' => Output::getClean(Input::get('content'))
-                    ));
+                    ]);
                                         
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
-                    Redirect::to(URL::build('/panel/form/', 'form=' . Output::getClean($form->id)));
+                    Redirect::to(URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)));
                     die();
-                } catch(Exception $e){
+                } catch (Exception $e) {
                     $errors[] = $e->getMessage();
                 }
             } else {
-                // Errors
-                foreach($validation->errors() as $item){
-                    if(strpos($item, 'is required') !== false){
-                        switch($item){
-                            case (strpos($item, 'form_name') !== false):
-                                $errors[] = $forms_language->get('forms', 'input_form_name');
-                            break;
-                            case (strpos($item, 'form_url') !== false):
-                                $errors[] = $forms_language->get('forms', 'input_form_url');
-                            break;
-                        }
-                    } else if(strpos($item, 'minimum') !== false){
-                        switch($item){
-                            case (strpos($item, 'form_name') !== false):
-                                $errors[] = $forms_language->get('forms', 'form_name_minimum');
-                            break;
-                            case (strpos($item, 'form_url') !== false):
-                                $errors[] = $forms_language->get('forms', 'form_url_minimum');
-                            break;
-                        }
-                    } else if(strpos($item, 'maximum') !== false){
-                        switch($item){
-                            case (strpos($item, 'form_name') !== false):
-                                $errors[] = $forms_language->get('forms', 'form_name_maximum');
-                            break;
-                            case (strpos($item, 'form_url') !== false):
-                                $errors[] = $forms_language->get('forms', 'form_url_maximum');
-                            break;
-                            case (strpos($item, 'form_icon') !== false):
-                                $errors[] = $forms_language->get('forms', 'form_icon_maximum');
-                            break;
-                        }
-                    }
-                }
+                // Validation Errors
+                $errors = $validation->errors();
             }
         } else {
             // Invalid token
@@ -150,96 +131,99 @@ if(!isset($_GET['action'])){
     }
     
     // Get form fields from database
-    $fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
-    $fields_array = array();
-    if(count($fields)){
-        foreach($fields as $field){
-            $fields_array[] = array(
-                'name' => Output::getClean($field->name),
-                'type' => $field_types[$field->type]['name'],
-                'edit_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=edit&id='.$field->id),
-                'delete_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=delete&amp;id=' . $field->id)
-            );
-        }
+    $fields_array = [];
+    foreach ($form->getFields() as $field) {
+        $fields_array[] = [
+            'name' => Output::getClean($field->name),
+            'type' => $field_types[$field->type]['name'],
+            'edit_link' => URL::build('/panel/form/', 'form='.$form->data()->id .'&amp;action=edit&id='.$field->id),
+            'delete_link' => URL::build('/panel/form/', 'form='.$form->data()->id .'&amp;action=delete&amp;id=' . $field->id)
+        ];
     }
 
-    $smarty->assign(array(
-        'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+    $smarty->assign([
+        'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
         'BACK' => $language->get('general', 'back'),
         'BACK_LINK' => URL::build('/panel/forms'),
         'FORM_NAME' => $forms_language->get('forms', 'form_name'),
-        'FORM_NAME_VALUE' => Output::getClean(htmlspecialchars_decode($form->title)),
+        'FORM_NAME_VALUE' => Output::getClean(htmlspecialchars_decode($form->data()->title)),
         'FORM_ICON' => $forms_language->get('forms', 'form_icon'),
-        'FORM_ICON_VALUE' => Output::getClean(htmlspecialchars_decode($form->icon)),
+        'FORM_ICON_VALUE' => Output::getClean(htmlspecialchars_decode($form->data()->icon)),
         'FORM_URL' => $forms_language->get('forms', 'form_url'),
-        'FORM_URL_VALUE' => Output::getClean(htmlspecialchars_decode($form->url)),
+        'FORM_URL_VALUE' => Output::getClean(htmlspecialchars_decode($form->data()->url)),
         'FORM_LINK_LOCATION' => $forms_language->get('forms', 'link_location'),
-        'LINK_LOCATION_VALUE' => $form->link_location,
+        'LINK_LOCATION_VALUE' => $form->data()->link_location,
         'LINK_NAVBAR' => $language->get('admin', 'page_link_navbar'),
         'LINK_MORE' => $language->get('admin', 'page_link_more'),
         'LINK_FOOTER' => $language->get('admin', 'page_link_footer'),
         'LINK_NONE' => $language->get('admin', 'page_link_none'),
         'CONTENT' => $language->get('admin', 'description'),
-        'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : Output::getClean(Output::getDecoded($form->content))),
+        'CONTENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : Output::getClean(Output::getDecoded($form->data()->content))),
         'ENABLE_CAPTCHA' => $forms_language->get('forms', 'enable_captcha'),
-        'ENABLE_CAPTCHA_VALUE' => $form->captcha,
+        'ENABLE_CAPTCHA_VALUE' => $form->data()->captcha,
         'NEW_FIELD' => $forms_language->get('forms', 'new_field'),
-        'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=new'),
+        'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=new'),
         'FIELDS_LIST' => $fields_array,
         'NONE_FIELDS_DEFINED' => $forms_language->get('forms', 'none_fields_defined'),
         'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
         'CONFIRM_DELETE_FIELD' => $forms_language->get('forms', 'delete_field'),
         'YES' => $language->get('general', 'yes'),
         'NO' => $language->get('general', 'no')
-    ));
+    ]);
     
-    $template->addCSSFiles(array(
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => array()
-    ));
+    $template->addCSSFiles([
+        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => []
+    ]);
 
-    $template->addJSFiles(array(
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => array(),
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => array()
-    ));
+    $template->addJSFiles([
+        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => [],
+        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => []
+    ]);
 
     $template->addJSScript(Input::createEditor('inputContent', true));
     
     $template_file = 'forms/form.tpl';
 } else {
-    switch($_GET['action']){
+    switch($_GET['action']) {
         case 'new':
             // New Field
-            if(Input::exists()){
-                $errors = array();
-                if(Token::check(Input::get('token'))){
+            if (Input::exists()) {
+                $errors = [];
+                if (Token::check(Input::get('token'))) {
                     // Validate input
                     $validate = new Validate();
-                    $validation = $validate->check($_POST, array(
-                        'field_name' => array(
-                            'required' => true,
-                            'min' => 2,
-                            'max' => 255
-                        )
-                    ));
+                    $validation = $validate->check($_POST, [
+                        'field_name' => [
+                            Validate::REQUIRED => true,
+                            Validate::MIN => 2,
+                            Validate::MAX => 255
+                        ]
+                    ])->messages([
+                        'field_name' => [
+                            Validate::REQUIRED => $forms_language->get('forms', 'input_field_name'),
+                            Validate::MIN => $forms_language->get('forms', 'field_name_minimum'),
+                            Validate::MAX => $forms_language->get('forms', 'field_name_maximum')
+                        ]
+                    ]);
                                         
-                    if($validation->passed()){
+                    if ($validation->passed()) {
                         // Create field
                         try {
                             // Get field type
                             $type = 1;
-                            if(array_key_exists($_POST['type'], $field_types)) {
+                            if (array_key_exists($_POST['type'], $field_types)) {
                                 $type = $_POST['type'];
                             }
                                                 
                             // Is this field required
-                            if(isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
+                            if (isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
                             else $required = 0;
                                                 
                             // Get options into a string
                             $options = str_replace("\n", ',', Input::get('options'));
                                             
                             // Save to database
-                            $queries->create('forms_fields', array(
+                            $queries->create('forms_fields', [
                                 'form_id' => $_GET['form'],
                                 'name' => Output::getClean(Input::get('field_name')),
                                 'type' => $type,
@@ -249,47 +233,27 @@ if(!isset($_GET['action'])){
                                 'order' => Input::get('order'),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum')
-                            ));
+                            ]);
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_created_successfully'));
-                            Redirect::to(URL::build('/panel/form/', 'form=' . $form->id));
+                            Redirect::to(URL::build('/panel/form/', 'form=' . $form->data()->id));
                             die();
-                        } catch(Exception $e){
+                        } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
                     } else {
-                        // Errors
-                        foreach($validation->errors() as $item){
-                            if(strpos($item, 'is required') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'input_field_name');
-                                    break;
-                                }
-                            } else if(strpos($item, 'minimum') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'field_name_minimum');
-                                    break;
-                                }
-                            } else if(strpos($item, 'maximum') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'field_name_maximum');
-                                    break;
-                                }
-                            }
-                        }
+                        // Validation Errors
+                        $errors = $validation->errors();
                     }
                 } else {
                     $errors[] = $language->get('general', 'invalid_token');
                 }
             }
         
-            $smarty->assign(array(
-                'NEW_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'new_field_for_x')),
+            $smarty->assign([
+                'NEW_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'new_field_for_x')),
                 'BACK' => $language->get('general', 'back'),
-                'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
+                'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
                 'TYPE' => $language->get('admin', 'type'),
                 'TYPES' =>  $field_types,
@@ -301,17 +265,17 @@ if(!isset($_GET['action'])){
                 'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),
                 'MAXIMUM_CHARACTERS' => $forms_language->get('forms', 'maximum_characters'),
                 'REQUIRED' => $language->get('admin', 'required'),
-            ));
+            ]);
         
             $template_file = 'forms/field_new.tpl';
         break;
         case 'edit':
-            if(!is_numeric($_GET['id'])){
+            if (!is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
                 die();
             } else {
-                $field = $queries->getWhere('forms_fields', array('id', '=', $_GET['id']));
-                if(!count($field)){
+                $field = $queries->getWhere('forms_fields', ['id', '=', $_GET['id']]);
+                if (!count($field)) {
                     Redirect::to(URL::build('/panel/forms'));
                     die();
                 }
@@ -319,37 +283,43 @@ if(!isset($_GET['action'])){
             $field = $field[0];
 
             // Edit Field
-            if(Input::exists()){
-                $errors = array();
-                if(Token::check(Input::get('token'))){
+            if (Input::exists()) {
+                $errors = [];
+                if (Token::check(Input::get('token'))) {
                     // Validate input
                     $validate = new Validate();
-                    $validation = $validate->check($_POST, array(
-                        'field_name' => array(
-                            'required' => true,
-                            'min' => 2,
-                            'max' => 255
-                        )
-                    ));
+                    $validation = $validate->check($_POST, [
+                        'field_name' => [
+                            Validate::REQUIRED => true,
+                            Validate::MIN => 2,
+                            Validate::MAX => 255
+                        ]
+                    ])->messages([
+                        'field_name' => [
+                            Validate::REQUIRED => $forms_language->get('forms', 'input_field_name'),
+                            Validate::MIN => $forms_language->get('forms', 'field_name_minimum'),
+                            Validate::MAX => $forms_language->get('forms', 'field_name_maximum')
+                        ]
+                    ]);
                                         
-                    if($validation->passed()){
+                    if ($validation->passed()) {
                         // Create field
                         try {
                             // Get field type
                             $type = 1;
-                            if(array_key_exists($_POST['type'], $field_types)) {
+                            if (array_key_exists($_POST['type'], $field_types)) {
                                 $type = $_POST['type'];
                             }
                                                 
                             // Is this field required
-                            if(isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
+                            if (isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
                             else $required = 0;
                                                 
                             // Get options into a string
                             $options = str_replace("\n", ',', Input::get('options'));
                                             
                             // Save to database
-                            $queries->update('forms_fields', $field->id, array(
+                            $queries->update('forms_fields', $field->id, [
                                 'name' => Output::getClean(Input::get('field_name')),
                                 'type' => $type,
                                 'required' => $required,
@@ -358,37 +328,17 @@ if(!isset($_GET['action'])){
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
                                 '`order`' => Input::get('order')
-                            ));
+                            ]);
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_updated_successfully'));
-                            Redirect::to(URL::build('/panel/form/', 'form=' . $form->id));
+                            Redirect::to(URL::build('/panel/form/', 'form=' . $form->data()->id));
                             die();
-                        } catch(Exception $e){
+                        } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
                     } else {
-                        // Errors
-                        foreach($validation->errors() as $item){
-                            if(strpos($item, 'is required') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'input_field_name');
-                                    break;
-                                }
-                            } else if(strpos($item, 'minimum') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'field_name_minimum');
-                                    break;
-                                }
-                            } else if(strpos($item, 'maximum') !== false){
-                                switch($item){
-                                    case (strpos($item, 'field_name') !== false):
-                                        $errors[] = $forms_language->get('forms', 'field_name_maximum');
-                                    break;
-                                }
-                            }
-                        }
+                        // Validation Errors
+                        $errors = $validation->errors();
                     }
                 } else {
                     $errors[] = $language->get('general', 'invalid_token');
@@ -396,16 +346,16 @@ if(!isset($_GET['action'])){
             }
             
              // Get already inputted options
-            if($field->options == null){
+            if ($field->options == null) {
                 $options = '';
             } else {
                 $options = str_replace(',', "\n", htmlspecialchars($field->options));
             }
         
-            $smarty->assign(array(
-                'EDITING_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_field_for_x')),
+            $smarty->assign([
+                'EDITING_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_field_for_x')),
                 'BACK' => $language->get('general', 'back'),
-                'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
+                'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
                 'FIELD_NAME_VALUE' => Output::getClean($field->name),
                 'TYPE' => $language->get('admin', 'type'),
@@ -425,43 +375,40 @@ if(!isset($_GET['action'])){
                 'MAXIMUM_CHARACTERS_VALUE' => $field->max,
                 'REQUIRED' => $language->get('admin', 'required'),
                 'REQUIRED_VALUE' => $field->required,
-            ));
+            ]);
         
             $template_file = 'forms/field.tpl';
         break;
         case 'delete':
             // Delete Field
-            if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
+            if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
                 die();
             }
-            $queries->update('forms_fields', $_GET['id'], array(
+            $queries->update('forms_fields', $_GET['id'], [
                 'deleted' => 1
-            ));
+            ]);
                 
             Session::flash('staff_forms', $forms_language->get('forms', 'field_deleted_successfully'));
-            Redirect::to(URL::build('/panel/form/', 'form='.$form->id));
+            Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id));
             die();
         break;
         case 'fields':
             // Get form fields from database
-            $fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
-            $fields_array = array();
-            if(count($fields)){
-                foreach($fields as $field){
-                    $fields_array[] = array(
-                        'name' => Output::getClean($field->name),
-                        'order' => Output::getClean($field->order),
-                        'type' => $field_types[$field->type]['name'],
-                        'required' => Output::getClean($field->required),
-                        'edit_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=edit&id='.$field->id),
-                        'delete_link' => URL::build('/panel/form/', 'form='.$form->id .'&amp;action=delete&amp;id=' . $field->id)
-                    );
-                }
+            $fields_array = [];
+            foreach ($form->getFields() as $field) {
+                $fields_array[] = [
+                    'name' => Output::getClean($field->name),
+                    'order' => Output::getClean($field->order),
+                    'type' => $field_types[$field->type]['name'],
+                    'required' => Output::getClean($field->required),
+                    'edit_link' => URL::build('/panel/form/', 'form='.$form->data()->id .'&amp;action=edit&id='.$field->id),
+                    'delete_link' => URL::build('/panel/form/', 'form='.$form->data()->id .'&amp;action=delete&amp;id=' . $field->id)
+                ];
             }
             
-            $smarty->assign(array(
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+            $smarty->assign([
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -470,31 +417,31 @@ if(!isset($_GET['action'])){
                 'REQUIRED' => $language->get('admin', 'required'),
                 'ACTIONS' => $language->get('general', 'actions'),
                 'NEW_FIELD' => $forms_language->get('forms', 'new_field'),
-                'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=new'),
+                'NEW_FIELD_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=new'),
                 'FIELDS_LIST' => $fields_array,
                 'NONE_FIELDS_DEFINED' => $forms_language->get('forms', 'none_fields_defined'),
                 'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
                 'CONFIRM_DELETE_FIELD' => $forms_language->get('forms', 'delete_field'),
                 'YES' => $language->get('general', 'yes'),
                 'NO' => $language->get('general', 'no')
-            ));
+            ]);
             
             $template_file = 'forms/form_fields.tpl';
         break;
         case 'permissions':
             // Form permissions
-            if(Input::exists()){
-                $errors = array();
+            if (Input::exists()) {
+                $errors = [];
                 
-                if(Token::check(Input::get('token'))){
+                if (Token::check(Input::get('token'))) {
                     // Display navigation link for guest?
-                    if(isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
+                    if (isset($_POST['guest']) && $_POST['guest'] == 'on') $guest = 1;
                     else $guest = 0;
                     
                     // Save to database
-                    $queries->update('forms', $form->id, array(
+                    $form->update([
                         'guest' => $guest
-                    ));
+                    ]);
                     
                     // Update form permissions
                     $post = Input::get('perm-post-0');
@@ -503,12 +450,12 @@ if(!isset($_GET['action'])){
                     $delete_submissions = 0;
                     
                     $groups = DB::getInstance()->query('SELECT id FROM nl2_groups')->results();
-                    $form_perm_query = $queries->getWhere('forms_permissions', array('form_id', '=', $form->id));
+                    $form_perm_query = $queries->getWhere('forms_permissions', ['form_id', '=', $form->data()->id]);
                     
                     $cat_perm_exists = 0;
-                    if(count($form_perm_query)){
-                        foreach($form_perm_query as $query){
-                            if($query->group_id == 0){
+                    if (count($form_perm_query)) {
+                        foreach ($form_perm_query as $query) {
+                            if ($query->group_id == 0) {
                                 $cat_perm_exists = 1;
                                 $update_id = $query->id;
                                 break;
@@ -517,44 +464,44 @@ if(!isset($_GET['action'])){
                     }
                     
                     try {
-                        if($cat_perm_exists != 0){ // Permission already exists, update
+                        if ($cat_perm_exists != 0) { // Permission already exists, update
                             // Update the category
-                            $queries->update('forms_permissions', $update_id, array(
+                            $queries->update('forms_permissions', $update_id, [
                                 'post' => $post,
                                 'view_own' => $view_own,
                                 'view' => $view_submissions,
                                 'can_delete' => $delete_submissions
-                            ));
+                            ]);
                         } else {
                             // Permission doesn't exist, create
-                            $queries->create('forms_permissions', array(
+                            $queries->create('forms_permissions', [
                                 'group_id' => 0,
-                                'form_id' => $form->id,
+                                'form_id' => $form->data()->id,
                                 'post' => $post,
                                 'view_own' => $view_own,
                                 'view' => $view_submissions,
                                 'can_delete' => $delete_submissions
-                            ));
+                            ]);
                         }
-                    } catch(Exception $e) {
+                    } catch (Exception $e) {
                         $errors[] = $e->getMessage();
                     }
                     
-                    foreach($groups as $group){
+                    foreach ($groups as $group) {
                         $post = Input::get('perm-post-' . $group->id);
                         $view_own = Input::get('perm-view_own-' . $group->id);
                         $view_submissions = Input::get('perm-view_submissions-' . $group->id);
                         $delete_submissions = Input::get('perm-delete_submissions-' . $group->id);
                         
-                        if(!($post)) $post = 0;
-                        if(!($view_own)) $view_own = 0;
-                        if(!($view_submissions)) $view_submissions = 0;
-                        if(!($delete_submissions)) $delete_submissions = 0;
+                        if (!($post)) $post = 0;
+                        if (!($view_own)) $view_own = 0;
+                        if (!($view_submissions)) $view_submissions = 0;
+                        if (!($delete_submissions)) $delete_submissions = 0;
                         
                         $cat_perm_exists = 0;
-                        if(count($form_perm_query)){
-                            foreach($form_perm_query as $query){
-                                if($query->group_id == $group->id){
+                        if (count($form_perm_query)) {
+                            foreach ($form_perm_query as $query) {
+                                if ($query->group_id == $group->id) {
                                     $cat_perm_exists = 1;
                                     $update_id = $query->id;
                                     break;
@@ -563,42 +510,42 @@ if(!isset($_GET['action'])){
                         }
                         
                         try {
-                            if($cat_perm_exists != 0){
+                            if ($cat_perm_exists != 0) {
                                 // Permission already exists, update
-                                $queries->update('forms_permissions', $update_id, array(
+                                $queries->update('forms_permissions', $update_id, [
                                     'post' => $post,
                                     'view_own' => $view_own,
                                     'view' => $view_submissions,
                                     'can_delete' => $delete_submissions
-                                ));
+                                ]);
                             } else {
                                 // Permission doesn't exist, create
-                                $queries->create('forms_permissions', array(
+                                $queries->create('forms_permissions', [
                                     'group_id' => $group->id,
-                                    'form_id' => $form->id,
+                                    'form_id' => $form->data()->id,
                                     'post' => $post,
                                     'view_own' => $view_own,
                                     'view' => $view_submissions,
                                     'can_delete' => $delete_submissions
-                                ));
+                                ]);
                             }
-                        } catch(Exception $e) {
+                        } catch (Exception $e) {
                             die($e->getMessage());
                         }
                     }
                     
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
-                    Redirect::to(URL::build('/panel/form/', 'form='.$form->id.'&action=permissions'));
+                    Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id.'&action=permissions'));
                     die();
                 } else
                     $errors[] = $language->get('general', 'invalid_token');
             }
             
-            $guest_query = DB::getInstance()->query('SELECT 0 AS id, post AS can_post, view_own AS can_view_own FROM nl2_forms_permissions WHERE group_id = 0 AND form_id = ?', array($form->id))->results();
-            $group_query = DB::getInstance()->query('SELECT id, name, can_post, can_view_own, can_view, can_delete FROM nl2_groups A LEFT JOIN (SELECT group_id, post AS can_post, `view_own` AS can_view_own, `view` AS can_view, can_delete FROM nl2_forms_permissions WHERE form_id = ?) B ON A.id = B.group_id ORDER BY `order` ASC', array($form->id))->results();
+            $guest_query = DB::getInstance()->query('SELECT 0 AS id, post AS can_post, view_own AS can_view_own FROM nl2_forms_permissions WHERE group_id = 0 AND form_id = ?', [$form->data()->id])->results();
+            $group_query = DB::getInstance()->query('SELECT id, name, can_post, can_view_own, can_view, can_delete FROM nl2_groups A LEFT JOIN (SELECT group_id, post AS can_post, `view_own` AS can_view_own, `view` AS can_view, can_delete FROM nl2_forms_permissions WHERE form_id = ?) B ON A.id = B.group_id ORDER BY `order` ASC', [$form->data()->id])->results();
         
-            $smarty->assign(array(
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+            $smarty->assign([
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'USER' => $language->get('admin', 'user'),
@@ -612,32 +559,32 @@ if(!isset($_GET['action'])){
                 'CAN_VIEW_SUBMISSIONS' => $forms_language->get('forms', 'can_view_submissions'),
                 'CAN_DELETE_SUBMISSIONS' => $forms_language->get('forms', 'can_delete_submissions'),
                 'SHOW_NAVIGATION_LINK_FOR_GUEST' => $forms_language->get('forms', 'show_navigation_link_for_guest'),
-            ));
+            ]);
             
             $template_file = 'forms/form_permissions.tpl';
         break;
         case 'statuses':
             // Form permissions
-            if(Input::exists()){
-                $errors = array();
+            if (Input::exists()) {
+                $errors = [];
                 
-                if(Token::check(Input::get('token'))){
-                    $selected_statuses = (isset($_POST['status']) && is_array($_POST['status']) ? $_POST['status'] : array());
+                if (Token::check(Input::get('token'))) {
+                    $selected_statuses = (isset($_POST['status']) && is_array($_POST['status']) ? $_POST['status'] : []);
                     
                     // Get statuses from database
                     $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
-                    foreach($statuses as $status){
-                        $forms = (!empty($status->fids) ? explode(',', $status->fids) : array());
+                    foreach ($statuses as $status) {
+                        $forms = (!empty($status->fids) ? explode(',', $status->fids) : []);
                         
-                        if(in_array($status->id, $selected_statuses)) {
+                        if (in_array($status->id, $selected_statuses)) {
                             // Add Status
-                            if(!in_array($form->id, $forms)) {
-                                $forms[] = $form->id;
+                            if (!in_array($form->data()->id, $forms)) {
+                                $forms[] = $form->data()->id;
                             }
                         } else {
                             // Remove status from form
-                            if(in_array($form->id, $forms)) {
-                                if (($key = array_search($form->id, $forms)) !== false) {
+                            if (in_array($form->data()->id, $forms)) {
+                                if (($key = array_search($form->data()->id, $forms)) !== false) {
                                     unset($forms[$key]);
                                 }
                             }
@@ -645,25 +592,25 @@ if(!isset($_GET['action'])){
 
                         // Create string containing selected forms IDs
                         $forms_string = '';
-                        foreach($forms as $item){
+                        foreach ($forms as $item) {
                             // Turn array of inputted forms into string of forms
                             $forms_string .= $item . ',';
                         }
                         $forms_string = rtrim($forms_string, ',');
                         
                         // Update database
-                        $queries->update('forms_statuses', $status->id, array(
+                        $queries->update('forms_statuses', $status->id, [
                             'fids' => $forms_string,
-                        ));
+                        ]);
                     }
                     
                     // Save to database
-                    $queries->update('forms', $form->id, array(
+                    $form->update([
                         'comment_status' => Output::getClean($_POST['comment_status'])
-                    ));
+                    ]);
                     
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
-                    Redirect::to(URL::build('/panel/form/', 'form='.$form->id.'&action=statuses'));
+                    Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id.'&action=statuses'));
                     die();
                 } else
                     $errors[] = $language->get('general', 'invalid_token');
@@ -671,29 +618,29 @@ if(!isset($_GET['action'])){
             
             // Get statuses from database
             $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
-            $status_array = array();
-            if(count($statuses)){
-                foreach($statuses as $status){
-                    $forms = (!empty($status->fids) ? explode(',', $status->fids) : array());
+            $status_array = [];
+            if (count($statuses)) {
+                foreach ($statuses as $status) {
+                    $forms = (!empty($status->fids) ? explode(',', $status->fids) : []);
                     
-                    $status_array[] = array(
+                    $status_array[] = [
                         'id' => $status->id,
                         'html' => $status->html,
-                        'selected' => in_array($form->id, $forms)
-                    );
+                        'selected' => in_array($form->data()->id, $forms)
+                    ];
                 }
             }
 
-            $smarty->assign(array(
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->title), $forms_language->get('forms', 'editing_x')),
+            $smarty->assign([
+                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'SELECT_STATUSES' => $forms_language->get('forms', 'select_statuses_to_form'),
                 'ALL_STATUSES' => $status_array,
                 'CHANGE_STATUS_ON_COMMENT' => $forms_language->get('forms', 'change_status_on_comment'),
-                'COMMENT_STATUS_VALUE' => $form->comment_status,
+                'COMMENT_STATUS_VALUE' => $form->data()->comment_status,
                 'DISABLED' => $language->get('user', 'disabled'),
-            ));
+            ]);
             
             $template_file = 'forms/form_statuses.tpl';
         break;
@@ -705,24 +652,24 @@ if(!isset($_GET['action'])){
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
 
-if(Session::exists('staff_forms'))
+if (Session::exists('staff_forms'))
     $success = Session::flash('staff_forms');
 
-if(isset($success))
-    $smarty->assign(array(
+if (isset($success))
+    $smarty->assign([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
-    ));
+    ]);
 
-if(isset($errors) && count($errors))
-    $smarty->assign(array(
+if (isset($errors) && count($errors))
+    $smarty->assign([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
-    ));
+    ]);
 
-$smarty->assign(array(
+$smarty->assign([
     'PARENT_PAGE' => PARENT_PAGE,
     'PAGE' => PANEL_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
@@ -731,23 +678,23 @@ $smarty->assign(array(
     'TOKEN' => Token::get(),
     'SUBMIT' => $language->get('general', 'submit'),
     'GENERAL_SETTINGS' => $language->get('admin', 'general_settings'),
-    'GENERAL_SETTINGS_LINK' => URL::build('/panel/form/', 'form='.$form->id),
+    'GENERAL_SETTINGS_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id),
     'FIELDS' => $forms_language->get('forms', 'fields'),
-    'FIELDS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=fields'),
+    'FIELDS_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=fields'),
     'PERMISSIONS' => $language->get('admin', 'permissions'),
-    'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=permissions'),
+    'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=permissions'),
     'STATUSES' => $forms_language->get('forms', 'statuses'),
-    'STATUSES_LINK' => URL::build('/panel/form/', 'form='.$form->id.'&amp;action=statuses'),
-    'GUEST_VALUE' => $form->guest
-));
+    'STATUSES_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=statuses'),
+    'GUEST_VALUE' => $form->data()->guest
+]);
 
-$template->addCSSFiles(array(
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => array()
-));
+$template->addCSSFiles([
+    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => []
+]);
 
-$template->addJSFiles(array(
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => array()
-));
+$template->addJSFiles([
+    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => []
+]);
 
 $template->addJSScript('
     var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));

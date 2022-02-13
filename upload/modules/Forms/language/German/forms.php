@@ -65,6 +65,7 @@ $language = array(
     'delete_field' => 'Bist du sicher, dass du dieses Feld löschen möchtest?',
     'radio' => 'Radio',
     'checkbox' => 'Checkbox',
+    'file' => 'File (Pictures)',
     'minimum_characters' => 'Mindestzeichen (0 bis Deaktivierung)',
     'maximum_characters' => 'Maximale Zeichen (0 bis deaktivieren)',
     
@@ -100,6 +101,9 @@ $language = array(
     'field_name_maximum' => 'Der Feldname darf aus maximal 255 Zeichen bestehen.',
     'x_field_minimum_y' => '{x} muss aus mindestens {y} Zeichen bestehen.',
     'x_field_maximum_y' => '{x} darf maximal {y} Zeichen lang sein.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
     
     // Submissions
     'submissions' => 'Formulare',

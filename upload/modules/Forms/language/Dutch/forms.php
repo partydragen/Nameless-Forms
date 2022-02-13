@@ -3,7 +3,7 @@
  *	Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr11
+ *  NamelessMC version 2.0.0-pr12
  *
  *  License: MIT
  *
@@ -65,6 +65,7 @@ $language = array(
   	'number' => 'Nummer',
   	'radio' => 'Radio',
   	'checkbox' => 'Selectievakje',
+    'file' => 'File (Pictures)',
   	'minimum_characters' => 'Minimum Karakters (0 om uit te schakelen)',
   	'maximum_characters' => 'Maximum Karakters (0 om uit te schakelen)',
 
@@ -100,6 +101,9 @@ $language = array(
 	'field_name_maximum' => 'THet veldnaam mag maximaal 255 karakters lang zijn.',
   	'x_field_minimum_y' => '{x} moet minimaal {y} karakters lang zijn.',
   	'x_field_maximum_y' => '{x} max maximaal {y} karakters lang zijn.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
 	
 	// Submissions
 	'submissions' => 'Inzendingen',
