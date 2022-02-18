@@ -95,7 +95,7 @@
                   <div class="field">
                     <input type="file" class="inputFile" name="{$field.id}" id="uploadFileButton{$field.id}" value="{$field.value}" hidden onchange="$('#fileName{$field.id}').html(this.files[0].name);" />
                     <label class="ui icon labeled default button" for="uploadFileButton{$field.id}">
-                        <i class="ui cloud upload icon"></i> <span id="fileName{$field.id}">Choose file</span>
+                        <i class="ui cloud upload icon"></i> <span id="fileName{$field.id}">{$CHOOSE_FILE}</span>
                     </label>
                   </div>
                 {/if}
