@@ -9,31 +9,28 @@
  *
  *  Form page
  */
- 
+
 // Get form info from URL
-$form = $queries->getWhere('forms', array('url', '=', rtrim($route, '/')));
-if(!count($form)){
+$form = new Form(rtrim($route, '/'), 'url');
+if (!$form->exists()) {
     require(ROOT_PATH . '/404.php');
     die();
-} else {
-    $form = $form[0];
 }
 
-require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 $forms = new Forms();
 
 if ($user->isLoggedIn()) {
-    $group_ids = array();
+    $group_ids = [];
     foreach ($user->getGroups() as $group) {
         $group_ids[] = $group->id;
     }
 } else {
-    $group_ids = array(0);
+    $group_ids = [0];
 }
 $group_ids = implode(',', $group_ids);
 
 // Can guests view?
-if(!$forms->canPostSubmission($group_ids, $form->id)){
+if (!$forms->canPostSubmission($group_ids, $form->data()->id)) {
     if (!$user->isLoggedIn()) {
         Redirect::to(URL::build('/login/'));
         die();
@@ -44,95 +41,92 @@ if(!$forms->canPostSubmission($group_ids, $form->id)){
 }
 
 // Always define page name
-define('PAGE', 'form-' . $form->id);
+define('PAGE', 'form-' . $form->data()->id);
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
-
-// Get fields
-$fields = DB::getInstance()->query('SELECT * FROM nl2_forms_fields WHERE form_id = ? AND deleted = 0 ORDER BY `order`', array($form->id))->results();
+require(ROOT_PATH . '/core/includes/bulletproof/bulletproof.php');
 
 // Check if captcha is enabled
-$captcha = $form->captcha ? true : false;
+$captcha = $form->data()->captcha ? true : false;
 if ($captcha) {
     $captcha = CaptchaBase::isCaptchaEnabled();
 }
 
 // Handle input
-if(Input::exists()){
-    if(Token::check(Input::get('token'))){
-        $errors = array();
+if (Input::exists()) {
+    if (Token::check(Input::get('token'))) {
+        $errors = [];
         
         if ($captcha) {
             $captcha_passed = CaptchaBase::getActiveProvider()->validateToken($_POST);
         } else {
             $captcha_passed = true;
         }
-        
+
         // Check if CAPCTHA was success
         if ($captcha_passed) {
             // Validation
-            $validate = new Validate();
-            $to_validate = array();
-            
-            foreach($fields as $field){
-                $field_validation = array();
-                
-                if($field->required == 1 /*&& $field->type != 9*/) {
-                    $field_validation['required'] = true;
-                }
-                
-                if($field->min != 0) {
-                    $field_validation['min'] = $field->min;
-                }
-                
-                if($field->max != 0) {
-                    $field_validation['max'] = $field->max;
-                }
-                
-                if(count($field_validation)) {
-                    $to_validate[$field->id] = $field_validation;
-                }
-            }
-            
-            // Modify post validation
-            $validate_post = array();
-            foreach($_POST as $key => $item){
-                $validate_post[$key] = !is_array($item) ? $item : true ;
-            }
-            
-            $validation = $validate->check($validate_post, $to_validate);
-            if($validation->passed()){
+            $validation = $form->validateFields($forms_language, $language);
+            if ($validation->passed()) {
                 // Validation passed
                 try {
                     // Get user id if logged in
                     $user_id = $user->isLoggedIn() ? $user->data()->id : null;
 
                     // Save to database
-                    $queries->create('forms_replies', array(
-                        'form_id' => $form->id,
+                    $queries->create('forms_replies', [
+                        'form_id' => $form->data()->id,
                         'user_id' => $user_id,
                         'updated_by' => $user_id,
                         'created' => date('U'),
                         'updated' => date('U'),
                         'content' =>  '',
                         'status_id' => 1
-                    ));
+                    ]);
                     $submission_id = $queries->getLastId();
                     
+                    if(!is_dir(ROOT_PATH . '/uploads/forms_submissions'))
+                        mkdir(ROOT_PATH . '/uploads/forms_submissions');
+
                     try {
                         // Save field values to database
-                        unset($_POST['token']);
-                        $inserts = array();
-                        $field_values = array();
-                        foreach($_POST as $key => $item){
-                            if(is_numeric($key)) {
-                                $inserts[] = '(?,?,?),';
-                                
-                                $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
-                                
-                                $field_values[] = Output::getClean($submission_id);
-                                $field_values[] = Output::getClean($key);
-                                $field_values[] = Output::getClean($value);
+                        $inserts = [];
+                        $field_values = [];
+                        foreach ($form->getFields() as $field) {
+                            if ($field->type != 10) {
+                                // Normal POST value
+                                if (isset($_POST[$field->id])) {
+                                    $item = $_POST[$field->id];
+                                    $inserts[] = '(?,?,?),';
+                                    
+                                    $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
+                                    
+                                    $field_values[] = Output::getClean($submission_id);
+                                    $field_values[] = Output::getClean($field->id);
+                                    $field_values[] = Output::getClean($value);
+                                }
+                            } else {
+                                // File Uploading
+                                if (isset($_FILES[$field->id])) {
+                                    $image = new Bulletproof\Image($_FILES[$field->id]);
+                                    $image->setSize(1, 2097152); // between 1b and 4mb
+                                    $image->setDimension(2000, 2000); // 2k x 2k pixel maximum
+                                    $image->setMime(['jpg', 'png', 'jpeg']);
+                                    $image->setLocation(join(DIRECTORY_SEPARATOR, [ROOT_PATH, 'uploads', 'forms_submissions']));
+
+                                    if ($image->getSize() != 0) {
+                                        $upload = $image->upload();
+                                        if ($upload) {
+                                            $inserts[] = '(?,?,?),';
+
+                                            $field_values[] = Output::getClean($submission_id);
+                                            $field_values[] = Output::getClean($field->id);
+                                            $field_values[] = Output::getClean($upload->getName() . '.' . $upload->getMime());
+                                        } else {
+                                            $errors[] = Output::getClean($field->name) . ': ' . $image["error"];
+                                        }
+                                    }
+                                }
                             }
                         }
                         
@@ -141,29 +135,29 @@ if(Input::exists()){
                         DB::getInstance()->createQuery(rtrim($query, ','), $field_values);
                     } catch (Exception $e) {
                         $errors[] = $e->getMessage();
-                        $queries->delete('forms_replies', array('id', '=', $submission_id));
+                        $queries->delete('forms_replies', ['id', '=', $submission_id]);
                     }
                     
-                    if(!count($errors)) {
+                    if (!count($errors)) {
                         // Trigger new submission event
-                        HookHandler::executeEvent('newFormSubmission', array(
+                        HookHandler::executeEvent('newFormSubmission', [
                             'event' => 'newFormSubmission',
-                            'username' => Output::getClean($form->title),
-                            'content' => str_replace(array('{x}', '{y}'), array($form->title, Output::getClean(($user->isLoggedIn() ? $user->data()->nickname : $forms_language->get('forms', 'guest')))), $forms_language->get('forms', 'new_submission_text')),
+                            'username' => Output::getClean($form->data()->title),
+                            'content' => str_replace(['{x}', '{y}'], [$form->data()->title, Output::getClean(($user->isLoggedIn() ? $user->getDisplayname() : $forms_language->get('forms', 'guest')))], $forms_language->get('forms', 'new_submission_text')),
                             'content_full' => '',
                             'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
-                            'title' => Output::getClean($form->title),
+                            'title' => Output::getClean($form->data()->title),
                             'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
-                        ));
+                        ]);
 
                         // Redirect to submission view if user have view access, if not redirect back 
-                        if($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->id)) {
+                        if ($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->data()->id)) {
                             Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
                             Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
                             die();
                         } else {
                             Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                            Redirect::to(URL::build($form->url));
+                            Redirect::to(URL::build($form->data()->url));
                             die();
                         }
                     }
@@ -172,24 +166,7 @@ if(Input::exists()){
                 }
             } else {
                 // Validation errors
-                foreach($validation->errors() as $item){
-                    // Get field name
-                    $id = explode(' ', $item);
-                    $id = $id[0];
-
-                    $fielderror = $queries->getWhere('forms_fields', array('id', '=', $id));
-                    if (count($fielderror)) {
-                        $fielderror = $fielderror[0];
-
-                        if(strpos($item, 'is required') !== false){
-                            $errors[] = str_replace('{x}', Output::getClean($fielderror->name), $language->get('user', 'field_is_required'));
-                        } else if(strpos($item, 'minimum') !== false){
-                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->min), $forms_language->get('forms', 'x_field_minimum_y'));
-                        } else if(strpos($item, 'maximum') !== false){
-                            $errors[] = str_replace(array('{x}', '{y}'), array(Output::getClean($fielderror->name), $fielderror->max), $forms_language->get('forms', 'x_field_maximum_y'));
-                        }
-                    }
-                }
+                $errors = $validation->errors();
             }
         } else {
             // reCAPTCHA failed
@@ -201,10 +178,10 @@ if(Input::exists()){
     }
 }
 
-$fields_array = array();
-foreach($fields as $field){
+$fields_array = [];
+foreach ($form->getFields() as $field) {
     $options = explode(',', Output::getClean($field->options));
-    $fields_array[] = array(
+    $fields_array[] = [
         'id' => Output::getClean($field->id),
         'name' => Output::getClean($field->name),
         'value' => (isset($_POST[$field->id]) && !is_array($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
@@ -212,13 +189,13 @@ foreach($fields as $field){
         'required' => Output::getClean($field->required),
         'options' => $options,
         'info' => Output::getPurified(Output::getDecoded($field->info))
-    );
+    ];
 }
 
 // Captcha
 if ($captcha) {
     $smarty->assign('CAPTCHA', CaptchaBase::getActiveProvider()->getHtml());
-    $template->addJSFiles(array(CaptchaBase::getActiveProvider()->getJavascriptSource() => array()));
+    $template->addJSFiles([CaptchaBase::getActiveProvider()->getJavascriptSource() => []]);
 
     $submitScript = CaptchaBase::getActiveProvider()->getJavascriptSubmit('forms');
     if ($submitScript) {
@@ -231,42 +208,42 @@ if ($captcha) {
     }
 }
 
-if(!empty($form->content)) {
-    $smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->content)));
+if (!empty($form->data()->content)) {
+    $smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->data()->content)));
 }
     
-$smarty->assign(array(
-    'TITLE' => Output::getClean($form->title),
+$smarty->assign([
+    'TITLE' => Output::getClean($form->data()->title),
     'FIELDS' => $fields_array,
     'TOKEN' => Token::get(),
     'SUBMIT' => $language->get('general', 'submit')
-));
+]);
 
-$template->addCSSFiles(array(
-	(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => array()
-));
+$template->addCSSFiles([
+    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => []
+]);
 
-$template->addJSFiles(array(
-	(defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => array()
-));
+$template->addJSFiles([
+    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => []
+]);
     
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
 
-if(Session::exists('submission_success'))
+if (Session::exists('submission_success'))
     $success = Session::flash('submission_success');
 
-if(isset($success))
-    $smarty->assign(array(
+if (isset($success))
+    $smarty->assign([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
-    ));
+    ]);
 
-if(isset($errors) && count($errors))
-    $smarty->assign(array(
+if (isset($errors) && count($errors))
+    $smarty->assign([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
-    ));
+    ]);
 
 $page_load = microtime(true) - $start;
 define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));

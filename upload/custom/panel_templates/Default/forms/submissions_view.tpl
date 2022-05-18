@@ -61,7 +61,11 @@
                           <div class="card-body">
                             {foreach from=$ANSWERS item=answer}
                             <strong>{$answer.question}</strong>
-                            <p>{$answer.answer}</p>
+                            {if $answer.field_type != 10}
+                              <p>{$answer.answer}</p>
+                            {else}
+                              <p><a href="{$PATH_TO_UPLOADS}{$answer.answer}" target="_blank">{$answer.answer}</a></p>
+                            {/if}
                             {/foreach}
                           </div>
                         </div>

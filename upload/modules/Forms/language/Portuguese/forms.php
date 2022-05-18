@@ -65,6 +65,7 @@ $language = array(
     'number' => 'Número',
     'radio' => 'Radio',
     'checkbox' => 'Checkbox',
+    'file' => 'File (Pictures)',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
     
@@ -100,6 +101,9 @@ $language = array(
     'field_name_maximum' => 'O nome do campo deve ser de no máximo 255 caracteres.',
     'x_field_minimum_y' => '{x} must be a minimum of {y} characters.',
     'x_field_maximum_y' => '{x} must be a maximum of {y} characters.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
     
     // Submissions
     'submissions' => 'Envios',
@@ -121,6 +125,7 @@ $language = array(
     'anonymous' => 'Anonymous',
     'submit_as_anonymous' => 'Submit as anonymous',
     'send_notify_email' => 'Send notify email (Will add submit slowness)',
+    'updated_submission_status' => 'Status changed from {status} to {new_status}',
     
     // Update alerts
     'new_update_available_x' => 'Há uma nova atualização disponível para o módulo {x}',
@@ -132,6 +137,7 @@ $language = array(
     // Hook
     'new_form_submission' => 'Envio de novo formulário',
     'updated_form_submission' => 'Novo comentário de envio do formulário',
+    'updated_form_submission_staff' => 'New form submission comment from staff',
     'new_submission_text' => 'Novo envio criado em {x} por {y}',
     'updated_submission_text' => 'Novo comentário de envio em {x} por {y}',
     

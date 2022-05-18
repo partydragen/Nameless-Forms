@@ -65,6 +65,7 @@ $language = array(
     'number' => 'Číslo',
     'radio' => 'Výber z možností',
     'checkbox' => 'Zaškrtávacie políčka',
+    'file' => 'File (Pictures)',
     'minimum_characters' => 'Minimálny počet znakov (0 na vypnutie)',
     'maximum_characters' => 'Maximálny počet znakov (0 na vypnutie)',
 
@@ -100,6 +101,9 @@ $language = array(
     'field_name_maximum' => 'Názov poľa môže mať maximálne 255 znakov.',
     'x_field_minimum_y' => '{x} musí mať minimálne {y} znakov.',
     'x_field_maximum_y' => '{x} môže mať maximálne {y} znakov.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
 
     // Submissions
     'submissions' => 'Odpovede',
@@ -121,6 +125,7 @@ $language = array(
     'anonymous' => 'Anonymný',
     'submit_as_anonymous' => 'Odoslať ako anonymný',
     'send_notify_email' => 'Odoslať email s upozornením (oneskorí odoslanie)',
+    'updated_submission_status' => 'Status changed from {status} to {new_status}',
 
     // Update alerts
     'new_update_available_x' => 'K dispozícii je nová aktualizácia pre modul {x}',
@@ -132,6 +137,7 @@ $language = array(
     // Hook
     'new_form_submission' => 'Nová odpoveď vo formulári',
     'updated_form_submission' => 'Nový komentár v odpovedi formulára',
+    'updated_form_submission_staff' => 'New form submission comment from staff',
     'new_submission_text' => 'Nový príspevok vytvorený v {x} používateľom {y}',
     'updated_submission_text' => 'Nový komentár v odpovedi vytvorený v {x} používateľom {y}',
 

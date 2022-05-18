@@ -65,6 +65,7 @@ $language = array(
     'number' => 'Number',
     'radio' => 'Radio',
     'checkbox' => 'Checkbox',
+    'file' => 'File (Pictures)',
     'minimum_characters' => 'Minimum Characters (0 to disable)',
     'maximum_characters' => 'Maximum Characters (0 to disable)',
     
@@ -100,6 +101,9 @@ $language = array(
     'field_name_maximum' => 'Kentän nimi saa olla enintään 255 characters.',
     'x_field_minimum_y' => '{x} must be a minimum of {y} characters.',
     'x_field_maximum_y' => '{x} must be a maximum of {y} characters.',
+    'comment_minimum' => 'The comment must be a minimum of 3 characters.',
+    'comment_maximum' => 'The comment must be a maximum of 10000 characters.',
+    'form_url_slash' => 'Form URL must begin with a /',
     
     // Submissions
     'submissions' => 'Hakemukset',
@@ -121,6 +125,7 @@ $language = array(
     'anonymous' => 'Anonymous',
     'submit_as_anonymous' => 'Submit as anonymous',
     'send_notify_email' => 'Send notify email (Will add submit slowness)',
+    'updated_submission_status' => 'Status changed from {status} to {new_status}',
     
     // Update alerts
     'new_update_available_x' => 'There is a new update available for the module {x}',
@@ -132,6 +137,7 @@ $language = array(
     // Hook
     'new_form_submission' => 'New form submission',
     'updated_form_submission' => 'New form submission comment',
+    'updated_form_submission_staff' => 'New form submission comment from staff',
     'new_submission_text' => 'New submission created in {x} by {y}',
     'updated_submission_text' => 'New submission comment in {x} by {y}',
     
