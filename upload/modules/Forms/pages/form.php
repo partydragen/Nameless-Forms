@@ -219,12 +219,8 @@ $smarty->assign([
     'SUBMIT' => $language->get('general', 'submit')
 ]);
 
-$template->addCSSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => []
-]);
-
-$template->addJSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => []
+$template->assets()->include([
+    AssetTree::TINYMCE,
 ]);
     
 // Load modules + template
