@@ -215,6 +215,7 @@ $smarty->assign([
     'TITLE' => Output::getClean($form->data()->title),
     'FIELDS' => $fields_array,
     'TOKEN' => Token::get(),
+    'CHOOSE_FILE' => $forms_language->get('forms', 'choose_picture'),
     'SUBMIT' => $language->get('general', 'submit')
 ]);
 

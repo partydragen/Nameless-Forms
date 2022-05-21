@@ -20,6 +20,7 @@
     "forms\/current_status": "Nuvarande Status",
     "forms\/current_status_x": "Nuvarande Status: {{status}}",
     "forms\/current_version_x": "Current module version: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Är du säker på att du vill radera detta fält?",
     "forms\/delete_form": "Är du säker på att du vill radera det här formuläret?<\/br>Varning: Varning: Alla uppgifter som hör till detta formulär raderas (frågor och inlägg)",
     "forms\/delete_status": "Är du säker på att du vill radera detta status?",

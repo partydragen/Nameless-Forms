@@ -20,6 +20,7 @@
     "forms\/current_status": "Aktueller Status",
     "forms\/current_status_x": "Aktueller Status: {{status}}",
     "forms\/current_version_x": "Aktuelle Modulversion: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Bist du sicher, dass du dieses Feld löschen möchtest?",
     "forms\/delete_form": "Bist du sicher darüber, dieses Formular zu löschen?<\/br>Warnung: Alle Daten, welche mit diesem Formular zusammenhängen werden gelöscht",
     "forms\/delete_status": "Bist du dir sicher, diesen Status zu löschen??",

@@ -20,6 +20,7 @@
     "forms\/current_status": "Huidige status",
     "forms\/current_status_x": "Huidige status: {{status}}",
     "forms\/current_version_x": "Huidige module versie: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Ben je zeker dat je dit veld wilt verwijderen?",
     "forms\/delete_form": "Ben je zeker dat je dit formulier wilt verwijderen?<\/br>Waarschuwing: Alle data die tot dit formulier behoort zal verwijderd worden zoals vragen en inzendingen",
     "forms\/delete_status": "Ben je zeker dat je deze status wilt verwijderen?",

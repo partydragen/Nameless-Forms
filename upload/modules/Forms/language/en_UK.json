@@ -20,6 +20,7 @@
     "forms\/current_status": "Current status",
     "forms\/current_status_x": "Current status: {{status}}",
     "forms\/current_version_x": "Current module version: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Are you sure you want to delete this field?",
     "forms\/delete_form": "Are you sure you want to delete this form?<\/br>Warning: All data who belongs to this form will be deleted like questions and submissions",
     "forms\/delete_status": "Are you sure you want to delete this status?",

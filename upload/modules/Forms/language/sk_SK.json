@@ -20,6 +20,7 @@
     "forms\/current_status": "Aktuálny stav",
     "forms\/current_status_x": "Aktuálny stav: {{status}}",
     "forms\/current_version_x": "Aktuálna verzia modulu: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Naozaj chcete odstrániť toto pole?",
     "forms\/delete_form": "Naozaj chcete odstrániť tento formulár?<\/br>Upozornenie: Všetky údaje, ktoré patria do tohto formulára, budú odstránené, ako sú otázky a odpovede",
     "forms\/delete_status": "Naozaj chcete odstrániť tento stav?",

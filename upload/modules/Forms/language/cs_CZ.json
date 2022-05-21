@@ -20,6 +20,7 @@
     "forms\/current_status": "Stav",
     "forms\/current_status_x": "Stav: {{status}}",
     "forms\/current_version_x": "Současná verze doplňku: {{version}}",
+    "forms\/choose_picture": "Choose picture",
     "forms\/delete_field": "Opravdu chcete odstranit toto pole?",
     "forms\/delete_form": "Opravdu chcete odstranit tento formulář?<\/br>Varování: Všechna data související s tímto formulářem, jako otázky a odpovědi, budou smazána",
     "forms\/delete_status": "Opravdu chcete odstranit tento stav?",
