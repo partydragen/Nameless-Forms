@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -33,7 +33,6 @@ $group_ids = implode(',', $group_ids);
 if (!$forms->canPostSubmission($group_ids, $form->data()->id)) {
     if (!$user->isLoggedIn()) {
         Redirect::to(URL::build('/login/'));
-        die();
     } else {
         require(ROOT_PATH . '/403.php');
         die();
@@ -44,7 +43,6 @@ if (!$forms->canPostSubmission($group_ids, $form->data()->id)) {
 define('PAGE', 'form-' . $form->data()->id);
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
-require(ROOT_PATH . '/core/includes/bulletproof/bulletproof.php');
 
 // Check if captcha is enabled
 $captcha = $form->data()->captcha ? true : false;
@@ -140,10 +138,13 @@ if (Input::exists()) {
                     
                     if (!count($errors)) {
                         // Trigger new submission event
-                        HookHandler::executeEvent('newFormSubmission', [
+                        EventHandler::executeEvent('newFormSubmission', [
                             'event' => 'newFormSubmission',
                             'username' => Output::getClean($form->data()->title),
-                            'content' => str_replace(['{x}', '{y}'], [$form->data()->title, Output::getClean(($user->isLoggedIn() ? $user->getDisplayname() : $forms_language->get('forms', 'guest')))], $forms_language->get('forms', 'new_submission_text')),
+                            'content' => $forms_language->get('forms', 'new_submission_text', [
+                                'form' => $form->data()->title,
+                                'user' => Output::getClean(($user->isLoggedIn() ? $user->getDisplayname() : $forms_language->get('forms', 'guest')))
+                            ]),
                             'content_full' => '',
                             'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
                             'title' => Output::getClean($form->data()->title),
@@ -154,11 +155,9 @@ if (Input::exists()) {
                         if ($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->data()->id)) {
                             Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
                             Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
-                            die();
                         } else {
                             Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
                             Redirect::to(URL::build($form->data()->url));
-                            die();
                         }
                     }
                 } catch (Exception $e) {
@@ -228,7 +227,7 @@ $template->addJSFiles([
 ]);
     
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 
 if (Session::exists('submission_success'))
     $success = Session::flash('submission_success');
@@ -244,9 +243,6 @@ if (isset($errors) && count($errors))
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
   

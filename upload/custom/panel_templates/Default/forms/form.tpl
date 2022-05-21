@@ -94,9 +94,11 @@
                                   </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="InputCaptcha">{$ENABLE_CAPTCHA}</label>
-                                        <input id="inputCaptcha" name="captcha" type="checkbox" class="js-switch"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
+                                    <div class="form-group custom-control custom-switch">
+                                        <input id="inputCaptcha" name="captcha" type="checkbox" class="custom-control-input"{if $ENABLE_CAPTCHA_VALUE eq 1} checked{/if} />
+                                        <label class="custom-control-label" for="inputCaptcha">
+                                            {$ENABLE_CAPTCHA}
+                                        </label>
                                     </div>
                                 </div>
                             </div>

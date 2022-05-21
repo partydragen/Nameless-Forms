@@ -42,7 +42,7 @@
                         <div class="row">
                             <div class="col-md-4"><h4>{$FORM_X}</h4></div>
                             <div class="col-md-4"><h4>{$CURRENT_STATUS_X}</h4></div>
-                            <div class="col-md-4"><h4>{$LAST_UPDATED} <span class="pull-right" data-toggle="tooltip" data-original-title="{$LAST_UPDATED_DATE}">{$LAST_UPDATED_FRIENDLY}</span></h4></div>
+                            <div class="col-md-4"><h4>{$LAST_UPDATED} <span data-toggle="tooltip" data-original-title="{$LAST_UPDATED_DATE}">{$LAST_UPDATED_FRIENDLY}</span></h4></div>
                         </div>
                         <hr>
                 
@@ -53,7 +53,7 @@
                             {else}
                               <i class="fa fa-user"></i> {$USER}:
                             {/if}
-                            <span class="pull-right" data-toggle="tooltip" data-original-title="{$CREATED_DATE}">{$CREATED_DATE_FRIENDLY}</span>
+                            <span data-toggle="tooltip" data-original-title="{$CREATED_DATE}">{$CREATED_DATE_FRIENDLY}</span>
                             {if $DELETE_LINK}
                                 <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteSubmissionModal('{$DELETE_LINK}')"><i class="fas fa-trash fa-fw"></i></button>
                             {/if}
@@ -76,7 +76,7 @@
                             <div class="card">
                               <div class="card-header">
                                 <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}{if $comment.anonymous} ({$ANONYMOUS}){/if}</a>:
-                                <span class="pull-right" data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
+                                <span data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
                                 {if $comment.delete_link}
                                     <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteCommentModal('{$comment.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
                                 {/if}
@@ -107,16 +107,18 @@
                           <div class="form-group">
                             <textarea class="form-control" name="content" rows="5" placeholder="{$NEW_COMMENT}"></textarea>
                           </div>
-                          <div class="form-group">
-                            {if $CAN_USE_ANONYMOUS}
-                            <label for="inputAnonymous">{$SUBMIT_AS_ANONYMOUS}</label>
-                            <input id="inputAnonymous" name="anonymous" type="checkbox" class="js-switch" />
-                            {/if}
-                            {if $CAN_SEND_EMAIL}
-                            <label for="InputNotifyEmail">{$SEND_NOTIFY_EMAIL}</label>
-                            <input id="inputNotifyEmail" name="notify_email" type="checkbox" class="js-switch" />
-                             {/if}
-                          </div>
+                          {if $CAN_USE_ANONYMOUS}
+                            <div class="form-group custom-control custom-switch">
+                              <input id="inputAnonymous" name="anonymous" type="checkbox" class="custom-control-input" />
+                              <label class="custom-control-label" for="inputAnonymous">{$SUBMIT_AS_ANONYMOUS}</label>
+                            </div>
+                          {/if}
+                          {if $CAN_SEND_EMAIL}
+                            <div class="form-group custom-control custom-switch">
+                              <input id="inputNotifyEmail" name="notify_email" type="checkbox" class="custom-control-input" />
+                              <label class="custom-control-label" for="inputNotifyEmail">{$SEND_NOTIFY_EMAIL}</label>
+                            </div>
+                          {/if}
                           <div class="form-group">
                             <input type="hidden" name="token" value="{$TOKEN}">
                             <input type="submit" value="{$SUBMIT}" class="btn btn-primary">

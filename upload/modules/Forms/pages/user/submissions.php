@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -13,7 +13,6 @@
 // Must be logged in
 if (!$user->isLoggedIn()) {
     Redirect::to(URL::build('/'));
-    die();
 }
 
 // Always define page name for navbar
@@ -27,7 +26,7 @@ $forms = new Forms();
 $user_groups = $user->getAllGroupIds();
 $group_ids = implode(',', $user_groups);
 
-$timeago = new Timeago(TIMEZONE);
+$timeago = new TimeAgo(TIMEZONE);
 
 if (!isset($_GET['view'])) {
     $submissions = [];
@@ -38,12 +37,10 @@ if (!isset($_GET['view'])) {
         if (isset($_GET['p'])) {
             if (!is_numeric($_GET['p'])) {
                 Redirect::to(URL::build('/user/submissions/'));
-                die();
             } else {
                 if ($_GET['p'] == 1) {
                     // Avoid bug in pagination class
                     Redirect::to(URL::build('/user/submissions/'));
-                    die();
                 }
                 $p = $_GET['p'];
             }
@@ -53,7 +50,7 @@ if (!isset($_GET['view'])) {
         
         $paginator = new Paginator((isset($template_pagination) ? $template_pagination : []));
         $results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
-        $pagination = $paginator->generate(7, URL::build('/user/submissions/', true));
+        $pagination = $paginator->generate(7, URL::build('/user/submissions/'));
         
         // Get all submissions
         foreach ($results->data as $submission) {
@@ -79,12 +76,12 @@ if (!isset($_GET['view'])) {
                 'id' => $submission->id,
                 'form_name' => $form->data()->title,
                 'status' => $status->data()->html,
-                'created_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
+                'created_at' => $timeago->inWords($submission->created, $language),
                 'updated_by_name' => $updated_by_name,
                 'updated_by_profile' => $updated_by_profile,
                 'updated_by_style' => $updated_by_style,
                 'updated_by_avatar' => $updated_by_avatar,
-                'updated_at' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
+                'updated_at' => $timeago->inWords($submission->updated, $language),
                 'link' => URL::build('/user/submissions/', 'view=' . $submission->id),
             ];
         }
@@ -110,7 +107,6 @@ if (!isset($_GET['view'])) {
     
     if (!count($submission)) {
         Redirect::to(URL::build('/user/submissions'));
-        die();
     }
     $submission = $submission[0];
 
@@ -125,9 +121,7 @@ if (!isset($_GET['view'])) {
         if (Token::check(Input::get('token'))) {
             if ($status->data()->open) {
                 // Valid token
-                $validate = new Validate();
-
-                $validation = $validate->check($_POST, [
+                $validation = Validate::check($_POST, [
                     'content' => [
                         Validate::REQUIRED => true,
                         Validate::MIN => 3,
@@ -161,10 +155,13 @@ if (!isset($_GET['view'])) {
                         'status_id' => $status_id
                     ]);
                     
-                    HookHandler::executeEvent('updatedFormSubmission', [
+                    EventHandler::executeEvent('updatedFormSubmission', [
                         'event' => 'updatedFormSubmission',
                         'username' => Output::getClean($form->data()->title),
-                        'content' => str_replace(['{x}', '{y}'], [$form->data()->title, Output::getClean($user->data()->nickname)], $forms_language->get('forms', 'updated_submission_text')),
+                        'content' => $forms_language->get('forms', 'updated_submission_text', [
+                            'form' => $form->data()->title,
+                            'user' => $user->getDisplayname()
+                        ]),
                         'content_full' => Output::getClean(Input::get('content')),
                         'avatar_url' => $user->getAvatar(128, true),
                         'title' => Output::getClean($form->data()->title),
@@ -175,7 +172,6 @@ if (!isset($_GET['view'])) {
                         
                     Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
                     Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id)));
-                    die();
                 } else {
                     // Validation errors
                     $errors = $validation->errors();
@@ -238,23 +234,23 @@ if (!isset($_GET['view'])) {
             'avatar' => $user_avatar,
             'content' => Output::getPurified(Output::getDecoded($comment->content)),
             'date' => date('d M Y, H:i', $comment->created),
-            'date_friendly' => $timeago->inWords(date('Y-m-d H:i:s', $comment->created), $language->getTimeLanguage())
+            'date_friendly' => $timeago->inWords($comment->created, $language)
         ];
     }
 
     $target_user = new User($submission->user_id);
     $smarty->assign([
-        'FORM_X' => str_replace('{x}', $form->data()->title, $forms_language->get('forms', 'form_x')),
-        'CURRENT_STATUS_X' => str_replace('{x}', $status->data()->html, $forms_language->get('forms', 'current_status_x')),
+        'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => $form->data()->title]),
+        'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => $status->data()->html]),
         'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
         'LAST_UPDATED_DATE' => date('d M Y, H:i', $submission->updated),
-        'LAST_UPDATED_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->updated), $language->getTimeLanguage()),
+        'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->updated, $language),
         'USER' => $target_user->getDisplayname(),
         'USER_PROFILE' => $target_user->getProfileURL(),
         'USER_STYLE' => $target_user->getGroupClass(),
         'USER_AVATAR' => $target_user->getAvatar(),
         'CREATED_DATE' => date('d M Y, H:i', $submission->created),
-        'CREATED_DATE_FRIENDLY' => $timeago->inWords(date('Y-m-d H:i:s', $submission->created), $language->getTimeLanguage()),
+        'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->created, $language),
         'COMMENTS' => $smarty_comments,
         'COMMENTS_TEXT' => $language->get('moderator', 'comments'),
         'CAN_COMMENT' => Output::getClean($status->data()->open),
@@ -277,7 +273,7 @@ $smarty->assign([
 
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 
 if (Session::exists('submission_success'))
     $success = Session::flash('submission_success');
@@ -295,9 +291,6 @@ if (isset($errors) && count($errors))
     ]);
 
 require(ROOT_PATH . '/core/templates/cc_navbar.php');
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
 

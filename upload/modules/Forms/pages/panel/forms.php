@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -83,8 +83,7 @@ if (!isset($_GET['action'])) {
                 $errors = [];
                 if (Token::check(Input::get('token'))) {
                     // Validate input
-                    $validate = new Validate();
-                    $validation = $validate->check($_POST, [
+                    $validation = Validate::check($_POST, [
                         'form_name' => [
                             Validate::REQUIRED => true,
                             Validate::MIN => 2,
@@ -146,10 +145,8 @@ if (!isset($_GET['action'])) {
                                     'captcha' => $captcha,
                                     'content' => Output::getClean(Input::get('content'))
                                 ]);
-                                            
                                 Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
                                 Redirect::to(URL::build('/panel/forms'));
-                                die();
                             } else {
                                 $errors[] = $forms_language->get('forms', 'form_url_slash');
                             }
@@ -188,33 +185,18 @@ if (!isset($_GET['action'])) {
                 'ENABLE_CAPTCHA_VALUE' => (isset($_POST['captcha']) && $_POST['captcha'] == 'on' ? 1 : 0),
             ]);
 
-            $template->addCSSFiles([
-                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => [],
-                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => []
+            $template->assets()->include([
+                AssetTree::TINYMCE,
             ]);
 
-            $template->addJSFiles([
-                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => [],
-                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => [],
-                (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => []
-            ]);
+            $template->addJSScript(Input::createTinyEditor($language, 'inputContent'));
 
-            $template->addJSScript(Input::createEditor('inputContent', true));
-            $template->addJSScript('
-                var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));
-
-                elems.forEach(function(html) {
-                    var switchery = new Switchery(html, {color: \'#23923d\', secondaryColor: \'#e56464\'});
-                });
-            ');
-            
             $template_file = 'forms/forms_new.tpl';
         break;
         case 'delete':
             // Delete Form
             if (!isset($_GET['form']) || !is_numeric($_GET['form'])) {
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             }
 
             $form = new Form($_GET['form']);
@@ -224,17 +206,15 @@ if (!isset($_GET['action'])) {
             }
 
             Redirect::to(URL::build('/panel/forms'));
-            die();
         break;
         default:
             Redirect::to(URL::build('/panel/forms'));
-            die();
         break;
     }
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 
 if (Session::exists('staff_forms'))
     $success = Session::flash('staff_forms');
@@ -260,9 +240,6 @@ $smarty->assign([
     'TOKEN' => Token::get(),
     'SUBMIT' => $language->get('general', 'submit')
 ]);
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
 $smarty->assign(Forms::pdp($cache));

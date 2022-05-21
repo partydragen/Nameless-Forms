@@ -2,7 +2,7 @@
 /*
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -22,14 +22,14 @@ class Forms_Module extends Module {
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
         $module_version = '1.8.4';
-        $nameless_version = '2.0.0-pr12';
+        $nameless_version = '2.0.0-pr13';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
         
         // Hooks
-        HookHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
-        HookHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
-        HookHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
+        EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
+        EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
+        EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
 
         // Define URLs which belong to this module
         $pages->add('Forms', '/panel/form', 'pages/panel/form.php');
@@ -193,10 +193,10 @@ class Forms_Module extends Module {
                 $update_check = json_decode($update_check);
                 if (!isset($update_check->error) && !isset($update_check->no_update) && isset($update_check->new_version)) {  
                     $smarty->assign(array(
-                        'NEW_UPDATE' => str_replace('{x}', $this->getName(), (isset($update_check->urgent) && $update_check->urgent == 'true') ? $this->_forms_language->get('forms', 'new_urgent_update_available_x') : $this->_forms_language->get('forms', 'new_update_available_x')),
+                        'NEW_UPDATE' => (isset($update_check->urgent) && $update_check->urgent == 'true') ? $this->_forms_language->get('forms', 'new_urgent_update_available_x', ['module' => $this->getName()]) : $this->_forms_language->get('forms', 'new_update_available_x', ['module' => $this->getName()]),
                         'NEW_UPDATE_URGENT' => (isset($update_check->urgent) && $update_check->urgent == 'true'),
-                        'CURRENT_VERSION' => str_replace('{x}', $this->getVersion(), $this->_forms_language->get('forms', 'current_version_x')),
-                        'NEW_VERSION' => str_replace('{x}', Output::getClean($update_check->new_version), $this->_forms_language->get('forms', 'new_version_x')),
+                        'CURRENT_VERSION' => $this->_forms_language->get('forms', 'current_version_x', ['version' => Output::getClean($this->getVersion())]),
+                        'NEW_VERSION' => $this->_forms_language->get('forms', 'new_version_x', ['new_version' => Output::getClean($update_check->new_version)]),
                         'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
                         'UPDATE_LINK' => Output::getClean($update_check->link)
                     ));
@@ -204,7 +204,10 @@ class Forms_Module extends Module {
             }
         }
     }
-    
+
+    public function getDebugInfo(): array {
+    }
+
     private function initialiseUpdate($old_version) {
         $old_version = str_replace(array(".", "-"), "", $old_version);
         $queries = new Queries();
@@ -232,7 +235,7 @@ class Forms_Module extends Module {
             }
             
             try {
-                $queries->alterTable('forms_fields', '`info`', "text NULL");
+                $queries->addColumn('forms_fields', '`info`', "text NULL");
             } catch (Exception $e) {
                 // Error
             }
@@ -240,11 +243,11 @@ class Forms_Module extends Module {
         
         if ($old_version < 170) {
             try {
-                $queries->alterTable('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $queries->alterTable('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
-                $queries->alterTable('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
-                $queries->alterTable('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
-                $queries->alterTable('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
+                $queries->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $queries->addColumn('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
+                $queries->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
+                $queries->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
+                $queries->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
                 
                 // Update main admin group permissions
                 $group = $queries->getWhere('groups', array('id', '=', 2));
@@ -313,8 +316,8 @@ class Forms_Module extends Module {
 
         if ($old_version < 134) {
             try {
-                $queries->alterTable('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $queries->alterTable('forms', '`content`', "mediumtext NULL DEFAULT NULL");
+                $queries->addColumn('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $queries->addColumn('forms', '`content`', "mediumtext NULL DEFAULT NULL");
             } catch (Exception $e) {
                 // Error
             }

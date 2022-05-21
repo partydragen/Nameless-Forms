@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -26,7 +26,6 @@ require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 if (!isset($_GET['action'])) {
     // incase if i want to split statuses later
     Redirect::to(URL::build('/panel/forms'));
-    die();
 } else {
     switch ($_GET['action']) {
         case 'new':
@@ -36,9 +35,7 @@ if (!isset($_GET['action'])) {
                 if (Token::check(Input::get('token'))) {
                     // Valid token
                     // Validate input
-                    $validate = new Validate();
-
-                    $validation = $validate->check($_POST, [
+                    $validation = Validate::check($_POST, [
                         'status_html' => [
                             Validate::REQUIRED => true,
                             Validate::MIN => 1,
@@ -87,7 +84,6 @@ if (!isset($_GET['action'])) {
 
                             Session::flash('staff_forms', $forms_language->get('forms', 'status_creation_success'));
                             Redirect::to(URL::build('/panel/forms'));
-                            die();
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
@@ -152,14 +148,12 @@ if (!isset($_GET['action'])) {
             if (!isset($_GET['status']) || !is_numeric($_GET['status'])) {
                 // Check the status ID is valid
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             }
 
             $status = new Status($_GET['status']);
             if (!$status->exists()) {
                 // No, it doesn't exist
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             }
 
             // Deal with input
@@ -168,9 +162,7 @@ if (!isset($_GET['action'])) {
                 if (Token::check(Input::get('token'))) {
                     // Valid token
                     // Validate input
-                    $validate = new Validate();
-
-                    $validation = $validate->check($_POST, [
+                    $validation = Validate::check($_POST, [
                         'status_html' => [
                             Validate::REQUIRED => true,
                             Validate::MIN => 1,
@@ -219,7 +211,6 @@ if (!isset($_GET['action'])) {
 
                             Session::flash('staff_forms', $forms_language->get('forms', 'status_edit_success'));
                             Redirect::to(URL::build('/panel/forms'));
-                            die();
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
@@ -294,7 +285,6 @@ if (!isset($_GET['action'])) {
             if (!isset($_GET['status']) || !is_numeric($_GET['status'])) {
                 // Check the status ID is valid
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             }
             
             $status = new Status($_GET['status']);
@@ -304,17 +294,15 @@ if (!isset($_GET['action'])) {
             }
 
             Redirect::to(URL::build('/panel/forms'));
-            die();
         break;
         default:
             Redirect::to(URL::build('/panel/forms'));
-            die();
         break;
     }
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 
 if (Session::exists('forms_statuses'))
     $success = Session::flash('forms_statuses');
@@ -340,25 +328,6 @@ $smarty->assign([
     'TOKEN' => Token::get(),
     'SUBMIT' => $language->get('general', 'submit')
 ]);
-
-$template->addCSSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => []
-]);
-
-$template->addJSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => []
-]);
-
-$template->addJSScript('
-    var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));
-
-    elems.forEach(function(html) {
-        var switchery = new Switchery(html, {color: \'#23923d\', secondaryColor: \'#e56464\'});
-    });
-');
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
 $smarty->assign(Forms::pdp($cache));

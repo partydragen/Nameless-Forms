@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  *
@@ -24,13 +24,11 @@ require_once(ROOT_PATH . '/core/templates/backend_init.php');
 
 if (!is_numeric($_GET['form'])) {
     Redirect::to(URL::build('/panel/forms'));
-    die();
 }
 
 $form = new Form($_GET['form']);
 if (!$form->exists()) {
     Redirect::to(URL::build('/panel/forms'));
-    die();
 }
 
 $field_types = [];
@@ -40,7 +38,7 @@ $field_types[3] = ['id' => 3, 'name' => $language->get('admin', 'textarea')];
 $field_types[4] = ['id' => 4, 'name' => $forms_language->get('forms', 'help_box')];
 $field_types[5] = ['id' => 5, 'name' => $forms_language->get('forms', 'barrier')];
 $field_types[6] = ['id' => 6, 'name' => $forms_language->get('forms', 'number')];
-$field_types[7] = ['id' => 7, 'name' => $language->get('general', 'email_address')];
+$field_types[7] = ['id' => 7, 'name' => $language->get('user', 'email_address')];
 $field_types[8] = ['id' => 8, 'name' => $forms_language->get('forms', 'radio')];
 $field_types[9] = ['id' => 9, 'name' => $forms_language->get('forms', 'checkbox')];
 $field_types[10] = ['id' => 10, 'name' => $forms_language->get('forms', 'file')];
@@ -52,8 +50,7 @@ if (!isset($_GET['action'])) {
 
         if (Token::check(Input::get('token'))) {
             // Validate input
-            $validate = new Validate();
-            $validation = $validate->check($_POST, [
+            $validation = Validate::check($_POST, [
                 'form_name' => [
                     Validate::REQUIRED => true,
                     Validate::MIN => 2,
@@ -117,7 +114,6 @@ if (!isset($_GET['action'])) {
                                         
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
                     Redirect::to(URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)));
-                    die();
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -143,7 +139,7 @@ if (!isset($_GET['action'])) {
     }
 
     $smarty->assign([
-        'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
+        'EDITING_FORM' => $forms_language->get('forms', 'editing_x', ['form' => Output::getClean($form->data()->title)]),
         'BACK' => $language->get('general', 'back'),
         'BACK_LINK' => URL::build('/panel/forms'),
         'FORM_NAME' => $forms_language->get('forms', 'form_name'),
@@ -171,17 +167,12 @@ if (!isset($_GET['action'])) {
         'YES' => $language->get('general', 'yes'),
         'NO' => $language->get('general', 'no')
     ]);
-    
-    $template->addCSSFiles([
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/css/spoiler.css' => []
+
+    $template->assets()->include([
+        AssetTree::TINYMCE,
     ]);
 
-    $template->addJSFiles([
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/plugins/spoiler/js/spoiler.js' => [],
-        (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/ckeditor/ckeditor.js' => []
-    ]);
-
-    $template->addJSScript(Input::createEditor('inputContent', true));
+    $template->addJSScript(Input::createTinyEditor($language, 'inputContent'));
     
     $template_file = 'forms/form.tpl';
 } else {
@@ -192,8 +183,7 @@ if (!isset($_GET['action'])) {
                 $errors = [];
                 if (Token::check(Input::get('token'))) {
                     // Validate input
-                    $validate = new Validate();
-                    $validation = $validate->check($_POST, [
+                    $validation = Validate::check($_POST, [
                         'field_name' => [
                             Validate::REQUIRED => true,
                             Validate::MIN => 2,
@@ -238,7 +228,6 @@ if (!isset($_GET['action'])) {
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_created_successfully'));
                             Redirect::to(URL::build('/panel/form/', 'form=' . $form->data()->id));
-                            die();
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
@@ -252,7 +241,7 @@ if (!isset($_GET['action'])) {
             }
         
             $smarty->assign([
-                'NEW_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'new_field_for_x')),
+                'NEW_FIELD_FOR_X' => $forms_language->get('forms', 'new_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -273,12 +262,10 @@ if (!isset($_GET['action'])) {
         case 'edit':
             if (!is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             } else {
                 $field = $queries->getWhere('forms_fields', ['id', '=', $_GET['id']]);
                 if (!count($field)) {
                     Redirect::to(URL::build('/panel/forms'));
-                    die();
                 }
             }
             $field = $field[0];
@@ -288,8 +275,7 @@ if (!isset($_GET['action'])) {
                 $errors = [];
                 if (Token::check(Input::get('token'))) {
                     // Validate input
-                    $validate = new Validate();
-                    $validation = $validate->check($_POST, [
+                    $validation = Validate::check($_POST, [
                         'field_name' => [
                             Validate::REQUIRED => true,
                             Validate::MIN => 2,
@@ -328,12 +314,11 @@ if (!isset($_GET['action'])) {
                                 'info' => Output::getClean(nl2br(Input::get('info'))),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
-                                '`order`' => Input::get('order')
+                                'order' => Input::get('order')
                             ]);
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_updated_successfully'));
                             Redirect::to(URL::build('/panel/form/', 'form=' . $form->data()->id));
-                            die();
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
@@ -354,7 +339,7 @@ if (!isset($_GET['action'])) {
             }
         
             $smarty->assign([
-                'EDITING_FIELD_FOR_X' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_field_for_x')),
+                'EDITING_FIELD_FOR_X' => $forms_language->get('forms', 'editing_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -384,7 +369,6 @@ if (!isset($_GET['action'])) {
             // Delete Field
             if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
-                die();
             }
             $queries->update('forms_fields', $_GET['id'], [
                 'deleted' => 1
@@ -392,7 +376,6 @@ if (!isset($_GET['action'])) {
                 
             Session::flash('staff_forms', $forms_language->get('forms', 'field_deleted_successfully'));
             Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id));
-            die();
         break;
         case 'fields':
             // Get form fields from database
@@ -409,7 +392,7 @@ if (!isset($_GET['action'])) {
             }
             
             $smarty->assign([
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
+                'EDITING_FORM' => $forms_language->get('forms', 'editing_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -537,7 +520,6 @@ if (!isset($_GET['action'])) {
                     
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
                     Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id.'&action=permissions'));
-                    die();
                 } else
                     $errors[] = $language->get('general', 'invalid_token');
             }
@@ -546,7 +528,7 @@ if (!isset($_GET['action'])) {
             $group_query = DB::getInstance()->query('SELECT id, name, can_post, can_view_own, can_view, can_delete FROM nl2_groups A LEFT JOIN (SELECT group_id, post AS can_post, `view_own` AS can_view_own, `view` AS can_view, can_delete FROM nl2_forms_permissions WHERE form_id = ?) B ON A.id = B.group_id ORDER BY `order` ASC', [$form->data()->id])->results();
         
             $smarty->assign([
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
+                'EDITING_FORM' => $forms_language->get('forms', 'editing_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'USER' => $language->get('admin', 'user'),
@@ -612,7 +594,6 @@ if (!isset($_GET['action'])) {
                     
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
                     Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id.'&action=statuses'));
-                    die();
                 } else
                     $errors[] = $language->get('general', 'invalid_token');
             }
@@ -633,7 +614,7 @@ if (!isset($_GET['action'])) {
             }
 
             $smarty->assign([
-                'EDITING_FORM' => str_replace('{x}', Output::getClean($form->data()->title), $forms_language->get('forms', 'editing_x')),
+                'EDITING_FORM' => $forms_language->get('forms', 'editing_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
                 'SELECT_STATUSES' => $forms_language->get('forms', 'select_statuses_to_form'),
@@ -647,13 +628,12 @@ if (!isset($_GET['action'])) {
         break;
         default:
             Redirect::to(URL::build('/panel/forms'));
-            die();
         break;
     }
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $mod_nav], $widgets, $template);
+Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 
 if (Session::exists('staff_forms'))
     $success = Session::flash('staff_forms');
@@ -688,25 +668,6 @@ $smarty->assign([
     'STATUSES_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=statuses'),
     'GUEST_VALUE' => $form->data()->guest
 ]);
-
-$template->addCSSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.css' => []
-]);
-
-$template->addJSFiles([
-    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/switchery/switchery.min.js' => []
-]);
-
-$template->addJSScript('
-    var elems = Array.prototype.slice.call(document.querySelectorAll(\'.js-switch\'));
-
-    elems.forEach(function(html) {
-        var switchery = new Switchery(html, {color: \'#23923d\', secondaryColor: \'#e56464\'});
-    });
-');
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
 $smarty->assign(Forms::pdp($cache));

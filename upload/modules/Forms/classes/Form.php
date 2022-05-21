@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  */
@@ -81,7 +81,6 @@ class Form {
      * @return Validate
      */
     public function validateFields(Language $forms_language, Language $language): Validate {
-        $validate = new Validate();
         $to_validate = [];
         $to_validate_messages = [];
 
@@ -91,17 +90,17 @@ class Form {
 
             if ($field->required == 1) {
                 $field_validation[Validate::REQUIRED] = true;
-                $field_validation_message[Validate::REQUIRED] = str_replace('{x}', Output::getClean($field->name), $language->get('user', 'field_is_required'));
+                $field_validation_message[Validate::REQUIRED] = $language->get('user', 'field_is_required', ['field' => Output::getClean($field->name)]);
             }
 
             if ($field->min != 0) {
                 $field_validation[Validate::MIN] = $field->min;
-                $field_validation_message[Validate::MIN] = str_replace(['{x}', '{y}'], [Output::getClean($field->name), $field->min], $forms_language->get('forms', 'x_field_minimum_y'));
+                $field_validation_message[Validate::MIN] = $forms_language->get('forms', 'x_field_minimum_y', ['field' => Output::getClean($field->name), 'min' => $field->min]);
             }
 
             if ($field->max != 0) {
                 $field_validation[Validate::MAX] = $field->max;
-                $field_validation_message[Validate::MAX] = str_replace(['{x}', '{y}'], [Output::getClean($field->name), $field->max], $forms_language->get('forms', 'x_field_maximum_y'));
+                $field_validation_message[Validate::MAX] = $forms_language->get('forms', 'x_field_maximum_y', ['field' => Output::getClean($field->name), 'max' => $field->max]);
             }
 
             if (count($field_validation)) {
@@ -120,7 +119,7 @@ class Form {
             $validate_post[$key] = $item['tmp_name'];
         }
         
-        return $validate->check($validate_post, $to_validate)->messages($to_validate_messages);
+        return Validate::check($validate_post, $to_validate)->messages($to_validate_messages);
     }
     
     /**

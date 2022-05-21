@@ -61,9 +61,9 @@
                         {include file='includes/alerts.tpl'}
                         
                         <form role="form" action="" method="post">
-                            <div class="form-group">
-                                <label for="InputGuest">{$SHOW_NAVIGATION_LINK_FOR_GUEST}</label>
-                                <input id="inputGuest" name="guest" type="checkbox" class="js-switch"{if $GUEST_VALUE eq 1} checked{/if} />
+                            <div class="form-group custom-control custom-switch">
+                                <input id="inputGuest" name="guest" type="checkbox" class="custom-control-input"{if $GUEST_VALUE eq 1} checked{/if} />
+                                <label class="custom-control-label" for="inputGuest">{$SHOW_NAVIGATION_LINK_FOR_GUEST}</label>
                             </div>
                                     
                             <script>
