@@ -136,7 +136,7 @@ if (!isset($_GET['view'])) {
                 ]);
 
                 if ($validation->passed()) {
-                    $queries->create('forms_comments', [
+                    DB::getInstance()->insert('forms_comments', [
                         'form_id' => $submission->id,
                         'user_id' => $user->data()->id,
                         'created' => date('U'),
@@ -149,7 +149,7 @@ if (!isset($_GET['view'])) {
                         $status_id = $form->data()->comment_status;
                     }
 
-                    $queries->update('forms_replies', $submission->id, [
+                    DB::getInstance()->update('forms_replies', $submission->id, [
                         'updated_by' => $user->data()->id,
                         'updated' => date('U'),
                         'status_id' => $status_id
@@ -199,7 +199,7 @@ if (!isset($_GET['view'])) {
         // Legacy fields generation
         $answers = json_decode($submission->content, true);
         foreach ($answers as $answer) {
-            $question = $queries->getWhere('forms_fields', ['id', '=', $answer[0]]);
+            $question = DB::getInstance()->get('forms_fields', ['id', '=', $answer[0]])->results();
             $answer_array[] = [
                 'question' => Output::getClean($question[0]->name),
                 'field_type' => 1,
@@ -209,7 +209,7 @@ if (!isset($_GET['view'])) {
     }
         
     // Get comments
-    $comments = $queries->getWhere('forms_comments', ['form_id', '=', $submission->id]);
+    $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->id])->results();
     $smarty_comments = [];
     foreach ($comments as $comment) {
         // Check if comment user is 

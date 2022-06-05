@@ -22,4 +22,4 @@ spl_autoload_register(function ($class) {
 
 // Initialise module
 require_once(ROOT_PATH . '/modules/Forms/module.php');
-$module = new Forms_Module($language, $forms_language, $pages, $user, $queries, $navigation, $cache);
+$module = new Forms_Module($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints);

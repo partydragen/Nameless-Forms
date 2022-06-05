@@ -80,7 +80,7 @@ class Form {
      *
      * @return Validate
      */
-    public function validateFields(Language $forms_language, Language $language): Validate {
+    public function validateFields(array $field_values, Language $forms_language, Language $language): Validate {
         $to_validate = [];
         $to_validate_messages = [];
 
@@ -111,7 +111,7 @@ class Form {
 
         // Modify post validation
         $validate_post = [];
-        foreach ($_POST as $key => $item) {
+        foreach ($field_values as $key => $item) {
             $validate_post[$key] = !is_array($item) ? $item : true;
         }
             

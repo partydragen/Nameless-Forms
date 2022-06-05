@@ -3,14 +3,19 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.0.0-pr13
  *
  *  License: MIT
  */
 
 class Forms {
     private DB $_db;
-    
+
+    /**
+     * @var Language Instance of Language class for translations
+     */
+    private static Language $_forms_language;
+
     // Constructor, connect to database
     public function __construct() {
         $this->_db = DB::getInstance();
@@ -51,23 +56,26 @@ class Forms {
         
         return $this->_db->query('SELECT `can_delete` FROM nl2_forms_permissions WHERE form_id = ? AND `can_delete` = 1 AND group_id IN (' . $group_ids . ')', array($form_id))->count() ? true : false;
     }
-    
+
+    /**
+     * @return Language The current language instance for translations
+     */
+    public static function getLanguage(): Language {
+        if (!isset(self::$_forms_language)) {
+            self::$_forms_language = new Language(ROOT_PATH . '/modules/Forms/language');
+        }
+
+        return self::$_forms_language;
+    }
+
     /*
      *  Check for Module updates
      *  Returns JSON object with information about any updates
      */
-    public static function updateCheck($current_version = null) {
-        $queries = new Queries();
+    public static function updateCheck() {
+        $current_version = Util::getSetting('nameless_version');
+        $uid = Util::getSetting('unique_id');
 
-        // Check for updates
-        if (!$current_version) {
-            $current_version = $queries->getWhere('settings', array('name', '=', 'nameless_version'));
-            $current_version = $current_version[0]->value;
-        }
-
-        $uid = $queries->getWhere('settings', array('name', '=', 'unique_id'));
-        $uid = $uid[0]->value;
-        
         $enabled_modules = Module::getModules();
         foreach ($enabled_modules as $enabled_item) {
             if ($enabled_item->getName() == 'Forms') {
@@ -75,7 +83,6 @@ class Forms {
                 break;
             }
         }
-        
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -89,56 +96,7 @@ class Forms {
         if (isset($info->message)) {
             die($info->message);
         }
-        
-        return $update_check;
-    }
-    
-    /*
-     *  Check for Module updates
-     *  Returns JSON object with information about any updates
-     */
-    public static function pdp($cache, $state = null) {
-        if ($state == null) {
-            $cache->setCache('pdp');
-            if ($cache->isCached('pdp')) {
-                return $cache->retrieve('pdp');
-            }
-            
-            return array();
-        } else {
-            $state = json_decode($state, true);
-            if (isset($state['pdp'])) {
-                $cache->setCache('pdp');
-                $cache->store('pdp', array($state['pdp']['key'] => $state['pdp']['value']));
-                return array($state['pdp']['key'] => $state['pdp']['value']);
-            } else if ($state != null) {
-                $cache->setCache('pdp');
-                $cache->store('pdp', array());
-                return array();
-            }
-            
-            return array();
-        }
-    }
-    
-    /*
-     *  Is user a supporter of Partydragen?
-     *  https://partydragen.com/patreon/
-     */
-    public static function premiumCheck($current_version = null) {
-        $queries = new Queries();
 
-        $uid = $queries->getWhere('settings', array('name', '=', 'unique_id'));
-        $uid = $uid[0]->value;
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_URL, 'https://api.partydragen.com/premium.php?uid=' . $uid);
-
-        $update_check = curl_exec($ch);
-        curl_close($ch);
-        
         return $update_check;
     }
 }

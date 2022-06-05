@@ -10,11 +10,13 @@
  */
 
 class Forms_Module extends Module {
+    private DB $_db;
     private $_language;
     private $_forms_language;
     private $_cache;
 
-    public function __construct($language, $forms_language, $pages, $user, $queries, $navigation, $cache) {
+    public function __construct($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints) {
+        $this->_db = DB::getInstance();
         $this->_language = $language;
         $this->_forms_language = $forms_language;
         $this->_cache = $cache;
@@ -38,6 +40,8 @@ class Forms_Module extends Module {
         $pages->add('Forms', '/panel/forms/submissions', 'pages/panel/submissions.php');
         $pages->add('Forms', '/user/submissions', 'pages/user/submissions.php');
         
+        $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
+        
         // Check if module version changed
         $cache->setCache('forms_module_cache');
         if (!$cache->isCached('module_version')) {
@@ -56,7 +60,7 @@ class Forms_Module extends Module {
         }
         
         try {
-            $forms = DB::getInstance()->query('SELECT id, link_location, url, icon, title, guest FROM nl2_forms')->results();
+            $forms = $this->_db->query('SELECT id, link_location, url, icon, title, guest FROM nl2_forms')->results();
             if (count($forms)) {
                 if ($user->isLoggedIn()) {
                     $group_ids = implode(',', $user->getAllGroupIds());
@@ -74,7 +78,7 @@ class Forms_Module extends Module {
                     }
                     
                     if (!$perm) {
-                        $hasperm = DB::getInstance()->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN('.$group_ids.')', array($form->id));
+                        $hasperm = $this->_db->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN('.$group_ids.')', array($form->id));
                         if ($hasperm->count()) {
                             $perm = true;
                         }
@@ -187,7 +191,6 @@ class Forms_Module extends Module {
                     require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
                     $update_check = Forms::updateCheck();
                     $cache->store('update_check', $update_check, 3600);
-                    Forms::pdp($cache, $update_check);
                 }
 
                 $update_check = json_decode($update_check);
@@ -206,36 +209,23 @@ class Forms_Module extends Module {
     }
 
     public function getDebugInfo(): array {
+        return [];
     }
 
     private function initialiseUpdate($old_version) {
         $old_version = str_replace(array(".", "-"), "", $old_version);
-        $queries = new Queries();
-        
+
         if ($old_version < 180) {
             try {
                 // Generate table
-                try {
-                    $engine = Config::get('mysql/engine');
-                    $charset = Config::get('mysql/charset');
-                } catch(Exception $e) {
-                    $engine = 'InnoDB';
-                    $charset = 'utf8mb4';
-                }
-                if (!$engine || is_array($engine))
-                    $engine = 'InnoDB';
-                if (!$charset || is_array($charset))
-                    $charset = 'latin1';
-                        
-                $queries->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
-                
-                DB::getInstance()->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
+                $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
+                $this->_db->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
             } catch (Exception $e) {
                 // Error
             }
             
             try {
-                $queries->addColumn('forms_fields', '`info`', "text NULL");
+                $this->_db->addColumn('forms_fields', '`info`', "text NULL");
             } catch (Exception $e) {
                 // Error
             }
@@ -243,21 +233,21 @@ class Forms_Module extends Module {
         
         if ($old_version < 170) {
             try {
-                $queries->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $queries->addColumn('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
-                $queries->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
-                $queries->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
-                $queries->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
+                $this->_db->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
                 
                 // Update main admin group permissions
-                $group = $queries->getWhere('groups', array('id', '=', 2));
+                $group = $this->_db->get('groups', array('id', '=', 2))->results();
                 $group = $group[0];
                 
                 $group_permissions = json_decode($group->permissions, TRUE);
                 $group_permissions['forms.anonymous'] = 1;
                 
                 $group_permissions = json_encode($group_permissions);
-                $queries->update('groups', 2, array('permissions' => $group_permissions));
+                $this->_db->update('groups', 2, array('permissions' => $group_permissions));
             } catch (Exception $e) {
                 // Error
             }
@@ -265,30 +255,17 @@ class Forms_Module extends Module {
         
         if ($old_version < 160) {
             try {
-                if (!$queries->tableExists('forms_permissions')) {
+                if (!$this->_db->showTables('forms_permissions')) {
                     try {
-                        // Generate table
-                        try {
-                            $engine = Config::get('mysql/engine');
-                            $charset = Config::get('mysql/charset');
-                        } catch (Exception $e) {
-                            $engine = 'InnoDB';
-                            $charset = 'utf8mb4';
-                        }
-                        if (!$engine || is_array($engine))
-                            $engine = 'InnoDB';
-                        if (!$charset || is_array($charset))
-                            $charset = 'latin1';
-                        
-                        $queries->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                        $this->_db->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
                     } catch(Exception $e) {
                         // Error
                     }
                     
-                    $groups = DB::getInstance()->query('SELECT id, staff FROM nl2_groups')->results();
-                    $forms = DB::getInstance()->query('SELECT * FROM nl2_forms')->results();
+                    $groups = $this->_db->query('SELECT id, staff FROM nl2_groups')->results();
+                    $forms = $this->_db->query('SELECT * FROM nl2_forms')->results();
                     foreach ($forms as $form) {
-                        $queries->create('forms_permissions', array(
+                        $this->_db->insert('forms_permissions', array(
                             'group_id' => 0,
                             'form_id' => $form->id,
                             'post' => $form->guest,
@@ -298,7 +275,7 @@ class Forms_Module extends Module {
                         ));
                             
                         foreach ($groups as $group) {
-                            $queries->create('forms_permissions', array(
+                            $this->_db->insert('forms_permissions', array(
                                 'group_id' => $group->id,
                                 'form_id' => $form->id,
                                 'post' => 1,
@@ -316,8 +293,8 @@ class Forms_Module extends Module {
 
         if ($old_version < 134) {
             try {
-                $queries->addColumn('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $queries->addColumn('forms', '`content`', "mediumtext NULL DEFAULT NULL");
+                $this->_db->addColumn('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms', '`content`', "mediumtext NULL DEFAULT NULL");
             } catch (Exception $e) {
                 // Error
             }
@@ -326,24 +303,11 @@ class Forms_Module extends Module {
     
     private function initialise() {
         // Generate tables
-        try {
-            $engine = Config::get('mysql/engine');
-            $charset = Config::get('mysql/charset');
-        } catch (Exception $e) {
-            $engine = 'InnoDB';
-            $charset = 'utf8mb4';
-        }
-        if (!$engine || is_array($engine))
-            $engine = 'InnoDB';
-        if (!$charset || is_array($charset))
-            $charset = 'latin1';
-        
-        $queries = new Queries();
-        if (!$queries->tableExists('forms')) {
+        if (!$this->_db->showTables('forms')) {
             try {
-                $queries->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
                 
-                $queries->create('forms', array(
+                $this->_db->insert('forms', array(
                     'url' => '/apply',
                     'title' => 'Staff Applications',
                     'guest' => 0,
@@ -355,12 +319,12 @@ class Forms_Module extends Module {
             }
         }
         
-        if (!$queries->tableExists('forms_permissions')) {
+        if (!$this->_db->showTables('forms_permissions')) {
             try {
-                $queries->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
                 
-                $groups = DB::getInstance()->query('SELECT id, staff FROM nl2_groups')->results();
-                $queries->create('forms_permissions', array(
+                $groups = $this->_db->query('SELECT id, staff FROM nl2_groups')->results();
+                $this->_db->insert('forms_permissions', array(
                     'group_id' => 0,
                     'form_id' => 1,
                     'post' => 0,
@@ -370,7 +334,7 @@ class Forms_Module extends Module {
                 ));
                     
                 foreach ($groups as $group) {
-                    $queries->create('forms_permissions', array(
+                    $this->_db->insert('forms_permissions', array(
                         'group_id' => $group->id,
                         'form_id' => 1,
                         'post' => 1,
@@ -384,26 +348,26 @@ class Forms_Module extends Module {
             }
         }  
         
-        if (!$queries->tableExists('forms_comments')) {
+        if (!$this->_db->showTables('forms_comments')) {
             try {
-                $queries->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, PRIMARY KEY (`id`)");
             } catch (Exception $e) {
                 // Error
             }
         }
         
-        if (!$queries->tableExists('forms_fields')) {
+        if (!$this->_db->showTables('forms_fields')) {
             try {
-                $queries->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `info` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `info` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
                 
-                $queries->create('forms_fields', array(
+                $this->_db->insert('forms_fields', array(
                     'form_id' => 1,
                     'name' => 'Minecraft Name',
                     'type' => 1,
                     'required' => 1,
                     'order' => 1
                 ));
-                $queries->create('forms_fields', array(
+                $this->_db->insert('forms_fields', array(
                     'form_id' => 1,
                     'name' => 'Why you want to become staff?',
                     'type' => 3,
@@ -415,41 +379,41 @@ class Forms_Module extends Module {
             }
         }
         
-        if (!$queries->tableExists('forms_replies')) {
+        if (!$this->_db->showTables('forms_replies')) {
             try {
-                $queries->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
             } catch (Exception $e) {
                 // Error
             }
         }
         
-        if (!$queries->tableExists('forms_replies_fields')) {
+        if (!$this->_db->showTables('forms_replies_fields')) {
             try {
-                $queries->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
                 
-                DB::getInstance()->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
+                $this->_db->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
             } catch (Exception $e) {
                 // Error
             }
         }
         
-        if (!$queries->tableExists('forms_statuses')) {
+        if (!$this->_db->showTables('forms_statuses')) {
             try {
-                $queries->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)", "ENGINE=$engine DEFAULT CHARSET=$charset");
+                $this->_db->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
                 
-                $queries->create('forms_statuses', array(
+                $this->_db->insert('forms_statuses', array(
                     'html' => '<span class="badge badge-success">Open</span>',
                     'open' => 1,
                     'fids' => '1',
                     'gids' => '2,3'
                 ));
-                $queries->create('forms_statuses', array(
+                $this->_db->insert('forms_statuses', array(
                     'html' => '<span class="badge badge-danger">Closed</span>',
                     'open' => 0,
                     'fids' => '1',
                     'gids' => '2,3'
                 ));
-                $queries->create('forms_statuses', array(
+                $this->_db->insert('forms_statuses', array(
                     'html' => '<span class="badge badge-warning">Under Considering</span>',
                     'open' => 1,
                     'fids' => '1',
@@ -462,7 +426,7 @@ class Forms_Module extends Module {
         
         try {
             // Update main admin group permissions
-            $group = $queries->getWhere('groups', array('id', '=', 2));
+            $group = $this->_db->get('groups', array('id', '=', 2))->results();
             $group = $group[0];
             
             $group_permissions = json_decode($group->permissions, TRUE);
@@ -472,7 +436,7 @@ class Forms_Module extends Module {
             $group_permissions['forms.anonymous'] = 1;
             
             $group_permissions = json_encode($group_permissions);
-            $queries->update('groups', 2, array('permissions' => $group_permissions));
+            $this->_db->update('groups', 2, array('permissions' => $group_permissions));
         } catch (Exception $e) {
             // Error
         }

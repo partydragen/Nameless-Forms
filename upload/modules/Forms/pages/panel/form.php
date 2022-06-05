@@ -214,7 +214,7 @@ if (!isset($_GET['action'])) {
                             $options = str_replace("\n", ',', Input::get('options'));
                                             
                             // Save to database
-                            $queries->create('forms_fields', [
+                            DB::getInstance()->insert('forms_fields', [
                                 'form_id' => $_GET['form'],
                                 'name' => Output::getClean(Input::get('field_name')),
                                 'type' => $type,
@@ -263,7 +263,7 @@ if (!isset($_GET['action'])) {
             if (!is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
             } else {
-                $field = $queries->getWhere('forms_fields', ['id', '=', $_GET['id']]);
+                $field = DB::getInstance()->get('forms_fields', ['id', '=', $_GET['id']])->results();
                 if (!count($field)) {
                     Redirect::to(URL::build('/panel/forms'));
                 }
@@ -306,7 +306,7 @@ if (!isset($_GET['action'])) {
                             $options = str_replace("\n", ',', Input::get('options'));
                                             
                             // Save to database
-                            $queries->update('forms_fields', $field->id, [
+                            DB::getInstance()->update('forms_fields', $field->id, [
                                 'name' => Output::getClean(Input::get('field_name')),
                                 'type' => $type,
                                 'required' => $required,
@@ -370,7 +370,7 @@ if (!isset($_GET['action'])) {
             if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
                 Redirect::to(URL::build('/panel/forms'));
             }
-            $queries->update('forms_fields', $_GET['id'], [
+            DB::getInstance()->update('forms_fields', $_GET['id'], [
                 'deleted' => 1
             ]);
                 
@@ -434,7 +434,7 @@ if (!isset($_GET['action'])) {
                     $delete_submissions = 0;
                     
                     $groups = DB::getInstance()->query('SELECT id FROM nl2_groups')->results();
-                    $form_perm_query = $queries->getWhere('forms_permissions', ['form_id', '=', $form->data()->id]);
+                    $form_perm_query = DB::getInstance()->get('forms_permissions', ['form_id', '=', $form->data()->id])->results();
                     
                     $cat_perm_exists = 0;
                     if (count($form_perm_query)) {
@@ -450,7 +450,7 @@ if (!isset($_GET['action'])) {
                     try {
                         if ($cat_perm_exists != 0) { // Permission already exists, update
                             // Update the category
-                            $queries->update('forms_permissions', $update_id, [
+                            DB::getInstance()->update('forms_permissions', $update_id, [
                                 'post' => $post,
                                 'view_own' => $view_own,
                                 'view' => $view_submissions,
@@ -458,7 +458,7 @@ if (!isset($_GET['action'])) {
                             ]);
                         } else {
                             // Permission doesn't exist, create
-                            $queries->create('forms_permissions', [
+                            DB::getInstance()->insert('forms_permissions', [
                                 'group_id' => 0,
                                 'form_id' => $form->data()->id,
                                 'post' => $post,
@@ -496,7 +496,7 @@ if (!isset($_GET['action'])) {
                         try {
                             if ($cat_perm_exists != 0) {
                                 // Permission already exists, update
-                                $queries->update('forms_permissions', $update_id, [
+                                DB::getInstance()->update('forms_permissions', $update_id, [
                                     'post' => $post,
                                     'view_own' => $view_own,
                                     'view' => $view_submissions,
@@ -504,7 +504,7 @@ if (!isset($_GET['action'])) {
                                 ]);
                             } else {
                                 // Permission doesn't exist, create
-                                $queries->create('forms_permissions', [
+                                DB::getInstance()->insert('forms_permissions', [
                                     'group_id' => $group->id,
                                     'form_id' => $form->data()->id,
                                     'post' => $post,
@@ -582,7 +582,7 @@ if (!isset($_GET['action'])) {
                         $forms_string = rtrim($forms_string, ',');
                         
                         // Update database
-                        $queries->update('forms_statuses', $status->id, [
+                        DB::getInstance()->update('forms_statuses', $status->id, [
                             'fids' => $forms_string,
                         ]);
                     }
@@ -670,7 +670,6 @@ $smarty->assign([
 ]);
 
 $template->onPageLoad();
-$smarty->assign(Forms::pdp($cache));
 
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 

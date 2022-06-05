@@ -75,7 +75,7 @@ if (!isset($_GET['action'])) {
                         else $open = 0;
 
                         try {
-                            $queries->create('forms_statuses', [
+                            DB::getInstance()->insert('forms_statuses', [
                                 'html' => Input::get('status_html'),
                                 'open' => $open,
                                 'fids' => $forms_string,
@@ -100,7 +100,7 @@ if (!isset($_GET['action'])) {
             }
         
             // Get a list of forms
-            $forms_list = $queries->getWhere('forms', ['id', '<>', 0]);
+            $forms_list = DB::getInstance()->get('forms', ['id', '<>', 0])->results();
             $template_forms = [];
 
             if (count($forms_list)) {
@@ -113,7 +113,7 @@ if (!isset($_GET['action'])) {
             }
 
             // Get a list of all groups
-            $group_list = $queries->getWhere('groups', ['id', '<>', 0]);
+            $group_list = DB::getInstance()->get('groups', ['id', '<>', 0])->results();
             $template_groups = [];
 
             if (count($group_list)) {
@@ -227,7 +227,7 @@ if (!isset($_GET['action'])) {
             }
 
             // Get a list of forms
-            $forms_list = $queries->getWhere('forms', ['id', '<>', 0]);
+            $forms_list = DB::getInstance()->get('forms', ['id', '<>', 0])->results();
             $template_forms = [];
 
             // Get a list of forms in which the status is enabled
@@ -244,7 +244,7 @@ if (!isset($_GET['action'])) {
             }
 
             // Get a list of all groups
-            $group_list = $queries->getWhere('groups', ['id', '<>', 0]);
+            $group_list = DB::getInstance()->get('groups', ['id', '<>', 0])->results();
             $template_groups = [];
 
             // Get a list of groups which have access to the status
@@ -330,7 +330,6 @@ $smarty->assign([
 ]);
 
 $template->onPageLoad();
-$smarty->assign(Forms::pdp($cache));
 
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 

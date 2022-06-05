@@ -122,11 +122,11 @@ if (!isset($_GET['view'])) {
         
         // Get all submissions
         foreach ($results->data as $submission) {
-            $form = $queries->getWhere('forms', ['id', '=', $submission->form_id]);
+            $form = DB::getInstance()->get('forms', ['id', '=', $submission->form_id])->results();
             $form = $form[0];
             
             // get current status from id
-            $status = $queries->getWhere('forms_statuses', ['id', '=', $submission->status_id]);
+            $status = DB::getInstance()->get('forms_statuses', ['id', '=', $submission->status_id])->results();
             $status = $status[0];
             
             // Is user a guest or a user
@@ -182,7 +182,7 @@ if (!isset($_GET['view'])) {
     }
     
     // Get forms from database
-    $forms_query = $queries->orderAll('forms', 'id', 'ASC');
+    $forms_query = DB::getInstance()->orderAll('forms', 'id', 'ASC')->results();
     $forms_array = [];
     if (count($forms_query)) {
         $forms_array[] = [
@@ -304,7 +304,7 @@ if (!isset($_GET['view'])) {
                     
                     if (!empty(Input::get('content'))) {
                         $any_changes = true;
-                        $queries->create('forms_comments', [
+                        DB::getInstance()->insert('forms_comments', [
                             'form_id' => $submission->data()->id,
                             'user_id' => $user->data()->id,
                             'created' => date('U'),
@@ -400,7 +400,7 @@ if (!isset($_GET['view'])) {
                                     );
 
                                     if (isset($sent['error'])) {
-                                        $queries->create('email_errors', [
+                                        DB::getInstance()->insert('email_errors', [
                                             'type' => 7,
                                             'content' => $sent['error'],
                                             'at' => date('U'),
@@ -441,7 +441,7 @@ if (!isset($_GET['view'])) {
             // Legacy fields generation
             $answers = json_decode($submission->data()->content, true);
             foreach ($answers as $answer) {
-                $question = $queries->getWhere('forms_fields', ['id', '=', $answer[0]]);
+                $question = DB::getInstance()->get('forms_fields', ['id', '=', $answer[0]])->results();
                 $answer_array[] = [
                     'question' => Output::getClean($question[0]->name),
                     'field_type' => 1,
@@ -451,7 +451,7 @@ if (!isset($_GET['view'])) {
         }
         
         // Get comments
-        $comments = $queries->getWhere('forms_comments', ['form_id', '=', $submission->data()->id]);
+        $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->data()->id])->results();
         $smarty_comments = [];
         foreach ($comments as $comment) {
             $comment_user = new User($comment->user_id);
@@ -577,7 +577,7 @@ if (!isset($_GET['view'])) {
                 $submission = new Submission($comment->submission_id);
                 if ($submission->exists() && $forms->canDeleteSubmission($group_ids, $submission->data()->form_id)) {
                     try {
-                        $queries->delete('forms_comments', ['id', '=', $_GET['comment']]);
+                        DB::getInstance()->delete('forms_comments', ['id', '=', $_GET['comment']]);
                     } catch (Exception $e) {
                         die($e->getMessage());
                     }
@@ -621,7 +621,6 @@ $smarty->assign([
 ]);
 
 $template->onPageLoad();
-$smarty->assign(Forms::pdp($cache));
 
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 

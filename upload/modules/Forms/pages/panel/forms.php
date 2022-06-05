@@ -26,7 +26,7 @@ require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 if (!isset($_GET['action'])) {
 
     // Get forms from database
-    $forms = $queries->orderAll('forms', 'id', 'ASC');
+    $forms = DB::getInstance()->orderAll('forms', 'id', 'ASC')->results();
     $forms_array = [];
     if (count($forms)) {
         foreach ($forms as $form) {
@@ -137,7 +137,7 @@ if (!isset($_GET['action'])) {
                                 else $captcha = 0;
                                         
                                 // Save to database
-                                $queries->create('forms', [
+                                DB::getInstance()->insert('forms', [
                                     'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
                                     'title' => Output::getClean(Input::get('form_name')),
                                     'link_location' => $location,
@@ -242,7 +242,6 @@ $smarty->assign([
 ]);
 
 $template->onPageLoad();
-$smarty->assign(Forms::pdp($cache));
 
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 

@@ -54,7 +54,7 @@ if ($captcha) {
 if (Input::exists()) {
     if (Token::check(Input::get('token'))) {
         $errors = [];
-        
+
         if ($captcha) {
             $captcha_passed = CaptchaBase::getActiveProvider()->validateToken($_POST);
         } else {
@@ -64,104 +64,24 @@ if (Input::exists()) {
         // Check if CAPCTHA was success
         if ($captcha_passed) {
             // Validation
-            $validation = $form->validateFields($forms_language, $language);
+            $validation = $form->validateFields($_POST, $forms_language, $language);
+
             if ($validation->passed()) {
                 // Validation passed
-                try {
-                    // Get user id if logged in
-                    $user_id = $user->isLoggedIn() ? $user->data()->id : null;
+                $submission = new Submission();
 
-                    // Save to database
-                    $queries->create('forms_replies', [
-                        'form_id' => $form->data()->id,
-                        'user_id' => $user_id,
-                        'updated_by' => $user_id,
-                        'created' => date('U'),
-                        'updated' => date('U'),
-                        'content' =>  '',
-                        'status_id' => 1
-                    ]);
-                    $submission_id = $queries->getLastId();
-                    
-                    if(!is_dir(ROOT_PATH . '/uploads/forms_submissions'))
-                        mkdir(ROOT_PATH . '/uploads/forms_submissions');
+                if ($submission->create($form, $user, $_POST)) {
+                    // Redirect to submission view if user have view access, if not redirect back 
+                    if ($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->data()->id)) {
+                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                        Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->data()->id)));
 
-                    try {
-                        // Save field values to database
-                        $inserts = [];
-                        $field_values = [];
-                        foreach ($form->getFields() as $field) {
-                            if ($field->type != 10) {
-                                // Normal POST value
-                                if (isset($_POST[$field->id])) {
-                                    $item = $_POST[$field->id];
-                                    $inserts[] = '(?,?,?),';
-                                    
-                                    $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
-                                    
-                                    $field_values[] = Output::getClean($submission_id);
-                                    $field_values[] = Output::getClean($field->id);
-                                    $field_values[] = Output::getClean($value);
-                                }
-                            } else {
-                                // File Uploading
-                                if (isset($_FILES[$field->id])) {
-                                    $image = new Bulletproof\Image($_FILES[$field->id]);
-                                    $image->setSize(1, 2097152); // between 1b and 4mb
-                                    $image->setDimension(2000, 2000); // 2k x 2k pixel maximum
-                                    $image->setMime(['jpg', 'png', 'jpeg']);
-                                    $image->setLocation(join(DIRECTORY_SEPARATOR, [ROOT_PATH, 'uploads', 'forms_submissions']));
-
-                                    if ($image->getSize() != 0) {
-                                        $upload = $image->upload();
-                                        if ($upload) {
-                                            $inserts[] = '(?,?,?),';
-
-                                            $field_values[] = Output::getClean($submission_id);
-                                            $field_values[] = Output::getClean($field->id);
-                                            $field_values[] = Output::getClean($upload->getName() . '.' . $upload->getMime());
-                                        } else {
-                                            $errors[] = Output::getClean($field->name) . ': ' . $image["error"];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        $query = 'INSERT INTO nl2_forms_replies_fields (submission_id, field_id, value) VALUES ';
-                        $query .= implode('', $inserts);
-                        DB::getInstance()->createQuery(rtrim($query, ','), $field_values);
-                    } catch (Exception $e) {
-                        $errors[] = $e->getMessage();
-                        $queries->delete('forms_replies', ['id', '=', $submission_id]);
+                    } else {
+                        Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
+                        Redirect::to(URL::build($form->data()->url));
                     }
-                    
-                    if (!count($errors)) {
-                        // Trigger new submission event
-                        EventHandler::executeEvent('newFormSubmission', [
-                            'event' => 'newFormSubmission',
-                            'username' => Output::getClean($form->data()->title),
-                            'content' => $forms_language->get('forms', 'new_submission_text', [
-                                'form' => $form->data()->title,
-                                'user' => Output::getClean(($user->isLoggedIn() ? $user->getDisplayname() : $forms_language->get('forms', 'guest')))
-                            ]),
-                            'content_full' => '',
-                            'avatar_url' => ($user->isLoggedIn() ? $user->getAvatar(128, true) : null),
-                            'title' => Output::getClean($form->data()->title),
-                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission_id)
-                        ]);
-
-                        // Redirect to submission view if user have view access, if not redirect back 
-                        if ($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->data()->id)) {
-                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                            Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission_id)));
-                        } else {
-                            Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
-                            Redirect::to(URL::build($form->data()->url));
-                        }
-                    }
-                } catch (Exception $e) {
-                    $errors[] = $e->getMessage();
+                } else {
+                    $errors = $submission->getErrors();
                 }
             } else {
                 // Validation errors
