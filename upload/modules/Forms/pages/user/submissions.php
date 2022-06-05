@@ -31,7 +31,7 @@ $timeago = new TimeAgo(TIMEZONE);
 if (!isset($_GET['view'])) {
     $submissions = [];
     $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$user->data()->id])->results();
-    
+
     if (count($submissions_query)) {
         // Get page
         if (isset($_GET['p'])) {
@@ -47,20 +47,20 @@ if (!isset($_GET['view'])) {
         } else {
             $p = 1;
         }
-        
+
         $paginator = new Paginator((isset($template_pagination) ? $template_pagination : []));
         $results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
         $pagination = $paginator->generate(7, URL::build('/user/submissions/'));
-        
+
         // Get all submissions
         foreach ($results->data as $submission) {
             $form = new Form($submission->form_id);
             $status = new Status($submission->status_id);
-            
+
             // Check if last updater is anonymous
             if ($submission->updated_by != 0) {
                 $updated_by_user = new User($submission->updated_by);
-                
+
                 $updated_by_name = $updated_by_user->getDisplayname();
                 $updated_by_profile = $updated_by_user->getProfileURL();
                 $updated_by_style = $updated_by_user->getGroupClass();
@@ -71,7 +71,7 @@ if (!isset($_GET['view'])) {
                 $updated_by_style = null;
                 $updated_by_avatar = null;
             }
-            
+
             $submissions[] = [
                 'id' => $submission->id,
                 'form_name' => $form->data()->title,
@@ -85,11 +85,10 @@ if (!isset($_GET['view'])) {
                 'link' => URL::build('/user/submissions/', 'view=' . $submission->id),
             ];
         }
-        
+
         $smarty->assign('PAGINATION', $pagination);
-        
     }
-    
+
     $smarty->assign([
         'SUBMISSIONS_LIST' => $submissions,
         'VIEW' => $language->get('general', 'view'),
@@ -99,24 +98,23 @@ if (!isset($_GET['view'])) {
         'UPDATED_BY' => $forms_language->get('forms', 'updated_by'),
         'STATUS' => $forms_language->get('forms', 'status')
     ]);
-    
+
     $template_file = 'forms/submissions.tpl';
 } else {
     // Get submission by id
-    $submission = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE id = ? AND user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$_GET['view'], $user->data()->id])->results();
-    
-    if (!count($submission)) {
+    $submission = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE id = ? AND user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$_GET['view'], $user->data()->id]);
+    if (!$submission->count()) {
         Redirect::to(URL::build('/user/submissions'));
     }
-    $submission = $submission[0];
+    $submission = new Submission(null, null, $submission->first());
 
-    $form = new Form($submission->form_id);
-    $status = new Status($submission->status_id);
-    
+    $form = new Form($submission->data()->form_id);
+    $status = new Status($submission->data()->status_id);
+
     // Check input
     if (Input::exists()) {
         $errors = [];
-        
+
         // Check token
         if (Token::check(Input::get('token'))) {
             if ($status->data()->open) {
@@ -137,24 +135,24 @@ if (!isset($_GET['view'])) {
 
                 if ($validation->passed()) {
                     DB::getInstance()->insert('forms_comments', [
-                        'form_id' => $submission->id,
+                        'form_id' => $submission->data()->id,
                         'user_id' => $user->data()->id,
                         'created' => date('U'),
                         'content' => Output::getClean(nl2br(Input::get('content')))
                     ]);
-                    
+
                     // Update status on comment?
-                    $status_id = $submission->status_id;
+                    $status_id = $submission->data()->status_id;
                     if ($form->data()->comment_status != 0) {
                         $status_id = $form->data()->comment_status;
                     }
 
-                    DB::getInstance()->update('forms_replies', $submission->id, [
+                    DB::getInstance()->update('forms_replies', $submission->data()->id, [
                         'updated_by' => $user->data()->id,
                         'updated' => date('U'),
                         'status_id' => $status_id
                     ]);
-                    
+
                     EventHandler::executeEvent('updatedFormSubmission', [
                         'event' => 'updatedFormSubmission',
                         'username' => Output::getClean($form->data()->title),
@@ -165,13 +163,13 @@ if (!isset($_GET['view'])) {
                         'content_full' => Output::getClean(Input::get('content')),
                         'avatar_url' => $user->getAvatar(128, true),
                         'title' => Output::getClean($form->data()->title),
-                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->id)
+                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id)
                     ]);
 
                     $success = $language->get('moderator', 'comment_created');
-                        
+
                     Session::flash('submission_success', $forms_language->get('forms', 'submission_updated'));
-                    Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->id)));
+                    Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->data()->id)));
                 } else {
                     // Validation errors
                     $errors = $validation->errors();
@@ -182,40 +180,15 @@ if (!isset($_GET['view'])) {
             $errors[] = $language->get('general', 'invalid_token');
         }
     }
-        
-    // Get answers and questions
-    $answer_array = [];
-    if (empty($submission->content)) {
-        // New fields generation
-        $fields = DB::getInstance()->query('SELECT name, value, type FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', [$submission->id])->results();
-        foreach ($fields as $field) {
-            $answer_array[] = [
-                'question' => Output::getClean($field->name),
-                'field_type' => Output::getClean($field->type),
-                'answer' => Output::getPurified(Output::getDecoded($field->value))
-            ];
-        }
-    } else {
-        // Legacy fields generation
-        $answers = json_decode($submission->content, true);
-        foreach ($answers as $answer) {
-            $question = DB::getInstance()->get('forms_fields', ['id', '=', $answer[0]])->results();
-            $answer_array[] = [
-                'question' => Output::getClean($question[0]->name),
-                'field_type' => 1,
-                'answer' => Output::getPurified(Output::getDecoded($answer[1]))
-            ];
-        }
-    }
-        
+
     // Get comments
-    $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->id])->results();
+    $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->data()->id])->results();
     $smarty_comments = [];
     foreach ($comments as $comment) {
         // Check if comment user is 
         if ($comment->anonymous != 1) {
             $comment_user = new User($comment->user_id);
-                
+
             $user_name = $comment_user->getDisplayname();
             $user_profile = $comment_user->getProfileURL();
             $user_style = $comment_user->getGroupClass();
@@ -226,42 +199,42 @@ if (!isset($_GET['view'])) {
             $user_style = null;
             $user_avatar = null;
         }
-        
+
         $smarty_comments[] = [
             'username' => $user_name,
             'profile' => $user_profile,
             'style' => $user_style,
             'avatar' => $user_avatar,
             'content' => Output::getPurified(Output::getDecoded($comment->content)),
-            'date' => date('d M Y, H:i', $comment->created),
+            'date' => date(DATE_FORMAT, $comment->created),
             'date_friendly' => $timeago->inWords($comment->created, $language)
         ];
     }
 
-    $target_user = new User($submission->user_id);
+    $target_user = new User($submission->data()->user_id);
     $smarty->assign([
         'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => $form->data()->title]),
         'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => $status->data()->html]),
         'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
-        'LAST_UPDATED_DATE' => date('d M Y, H:i', $submission->updated),
-        'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->updated, $language),
+        'LAST_UPDATED_DATE' => date(DATE_FORMAT, $submission->data()->updated),
+        'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->data()->updated, $language),
         'USER' => $target_user->getDisplayname(),
         'USER_PROFILE' => $target_user->getProfileURL(),
         'USER_STYLE' => $target_user->getGroupClass(),
         'USER_AVATAR' => $target_user->getAvatar(),
-        'CREATED_DATE' => date('d M Y, H:i', $submission->created),
-        'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->created, $language),
+        'CREATED_DATE' => date(DATE_FORMAT, $submission->data()->created),
+        'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->data()->created, $language),
         'COMMENTS' => $smarty_comments,
         'COMMENTS_TEXT' => $language->get('moderator', 'comments'),
         'CAN_COMMENT' => Output::getClean($status->data()->open),
         'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
         'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
-        'ANSWERS' => $answer_array,
+        'ANSWERS' => $submission->getFieldsAnswers(),
         'TOKEN' => Token::get(),
         'SUBMIT' => $language->get('general', 'submit'),
         'PATH_TO_UPLOADS' => ((defined('CONFIG_PATH')) ? CONFIG_PATH . '/' : '/') . 'uploads/forms_submissions/'
     ]);
-    
+
     $template_file = 'forms/submissions_view.tpl';
 }
 

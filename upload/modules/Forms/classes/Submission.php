@@ -11,17 +11,21 @@
 class Submission {
 
     private DB $_db;
+    private $_data;
     private array $_errors = [];
 
     // Constructor, connect to database
-    public function __construct(string $value = null, string $field = 'id') {
+    public function __construct(?string $value = null, ?string $field = 'id', $query_data = null) {
         $this->_db = DB::getInstance();
         
-        if ($value != null) {
+        if (!$query_data && $value) {
             $data = $this->_db->get('forms_replies', [$field, '=', $value]);
             if ($data->count()) {
                 $this->_data = $data->first();
             }
+        } else if ($query_data) {
+            // Load data from existing query.
+            $this->_data = $query_data;
         }
     }
 
@@ -148,6 +152,40 @@ class Submission {
         if (!$this->_db->update('forms_replies', $this->data()->id, $fields)) {
             throw new Exception('There was a problem updating submission');
         }
+    }
+
+    /**
+     * Get the fields answers for this submission
+     *
+     * @return array The fields answers for this submission
+     */
+    public function getFieldsAnswers(): array {
+        $answer_array = [];
+        if (empty($this->data()->content)) {
+            // New fields generation
+            $fields = $this->_db->query('SELECT name, value, type FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', [$this->data()->id])->results();
+            foreach ($fields as $field) {
+                $answer_array[] = [
+                    'question' => Output::getClean($field->name),
+                    'field_type' => Output::getClean($field->type),
+                    'answer' => Output::getPurified(Output::getDecoded($field->value))
+                ];
+            }
+
+        } else {
+            // Legacy fields generation
+            $answers = json_decode($this->data()->content, true);
+            foreach ($answers as $answer) {
+                $question = $this->_db->get('forms_fields', ['id', '=', $answer[0]])->results();
+                $answer_array[] = [
+                    'question' => Output::getClean($question[0]->name),
+                    'field_type' => 1,
+                    'answer' => Output::getPurified(Output::getDecoded($answer[1]))
+                ];
+            }
+        }
+
+        return $answer_array;
     }
 
     /**

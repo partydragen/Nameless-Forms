@@ -11,6 +11,7 @@
 class Form {
 
     private $_db,
+            $_data,
             $_fields;
 
     // Constructor, connect to database

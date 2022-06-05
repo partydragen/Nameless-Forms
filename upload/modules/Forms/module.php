@@ -27,7 +27,7 @@ class Forms_Module extends Module {
         $nameless_version = '2.0.0-pr13';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
-        
+
         // Hooks
         EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
         EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
@@ -39,9 +39,9 @@ class Forms_Module extends Module {
         $pages->add('Forms', '/panel/forms/statuses', 'pages/panel/statuses.php');
         $pages->add('Forms', '/panel/forms/submissions', 'pages/panel/submissions.php');
         $pages->add('Forms', '/user/submissions', 'pages/user/submissions.php');
-        
+
         $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
-        
+
         // Check if module version changed
         $cache->setCache('forms_module_cache');
         if (!$cache->isCached('module_version')) {
@@ -50,15 +50,15 @@ class Forms_Module extends Module {
             if ($module_version != $cache->retrieve('module_version')) {
                 // Version have changed, Perform actions
                 $this->initialiseUpdate($cache->retrieve('module_version'));
-        
+
                 $cache->store('module_version', $module_version);
-                
+
                 if ($cache->isCached('update_check')) {
                     $cache->erase('update_check');
                 }
             }
         }
-        
+
         try {
             $forms = $this->_db->query('SELECT id, link_location, url, icon, title, guest FROM nl2_forms')->results();
             if (count($forms)) {
@@ -67,7 +67,7 @@ class Forms_Module extends Module {
                 } else {
                     $group_ids = implode(',', array(0));
                 }
-                
+
                 foreach ($forms as $form) {
                     // Register form page
                     $pages->add('Forms', $form->url, 'pages/form.php', 'form-' . $form->id, true);
@@ -76,14 +76,14 @@ class Forms_Module extends Module {
                     if (!$user->isLoggedIn() && $form->guest == 1) {
                         $perm = true;
                     }
-                    
+
                     if (!$perm) {
                         $hasperm = $this->_db->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN('.$group_ids.')', array($form->id));
                         if ($hasperm->count()) {
                             $perm = true;
                         }
                     }
-                    
+
                     // Add link location to navigation if user have permission
                     if ($perm) {
                         switch ($form->link_location) {
@@ -142,9 +142,9 @@ class Forms_Module extends Module {
             'forms.manage' => $this->_forms_language->get('forms', 'forms_manage'),
             'forms.anonymous' => $this->_language->get('moderator', 'staff_cp')  . ' &raquo; ' .  $this->_forms_language->get('forms', 'forms')  . ' &raquo; ' . $this->_forms_language->get('forms', 'submit_as_anonymous')
         ));
-        
+
         $navs[1]->add('cc_submissions', $this->_forms_language->get('forms', 'submissions'), URL::build('/user/submissions'));
-        
+
         if (defined('BACK_END')) {
             if ($user->hasPermission('forms.manage') || $user->hasPermission('forms.view-submissions')) {
                 $cache->setCache('panel_sidebar');
@@ -155,7 +155,7 @@ class Forms_Module extends Module {
                     $order = $cache->retrieve('forms_order');
                 }
                 $navs[2]->add('forms_divider', mb_strtoupper($this->_forms_language->get('forms', 'forms'), 'UTF-8'), 'divider', 'top', null, $order, '');
-                
+
                 if ($user->hasPermission('forms.manage')) {
                     if (!$cache->isCached('forms_icon')) {
                         $icon = '<i class="nav-icon fas fa-cogs"></i>';
@@ -165,7 +165,7 @@ class Forms_Module extends Module {
                     }
                     $navs[2]->add('forms', $this->_forms_language->get('forms', 'forms'), URL::build('/panel/forms'), 'top', null, $order + 0.1, $icon);
                 }
-                
+
                 if ($user->hasPermission('forms.view-submissions')) {
                     if (!$cache->isCached('forms_submissions_icon')) {
                         $icon = '<i class="nav-icon fas fa-user-circle"></i>';
@@ -177,7 +177,7 @@ class Forms_Module extends Module {
                 }
             }
         }
-        
+
         // Check for module updates
         if (isset($_GET['route']) && $user->isLoggedIn() && $user->hasPermission('admincp.update')) {
             // Page belong to this module?
@@ -223,14 +223,14 @@ class Forms_Module extends Module {
             } catch (Exception $e) {
                 // Error
             }
-            
+
             try {
                 $this->_db->addColumn('forms_fields', '`info`', "text NULL");
             } catch (Exception $e) {
                 // Error
             }
         }
-        
+
         if ($old_version < 170) {
             try {
                 $this->_db->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
@@ -238,7 +238,7 @@ class Forms_Module extends Module {
                 $this->_db->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
                 $this->_db->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
                 $this->_db->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
-                
+
                 // Update main admin group permissions
                 $group = $this->_db->get('groups', array('id', '=', 2))->results();
                 $group = $group[0];
@@ -252,7 +252,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if ($old_version < 160) {
             try {
                 if (!$this->_db->showTables('forms_permissions')) {
@@ -261,7 +261,7 @@ class Forms_Module extends Module {
                     } catch(Exception $e) {
                         // Error
                     }
-                    
+
                     $groups = $this->_db->query('SELECT id, staff FROM nl2_groups')->results();
                     $forms = $this->_db->query('SELECT * FROM nl2_forms')->results();
                     foreach ($forms as $form) {
@@ -273,7 +273,7 @@ class Forms_Module extends Module {
                             'view' => 0,
                             'can_delete' => 0
                         ));
-                            
+
                         foreach ($groups as $group) {
                             $this->_db->insert('forms_permissions', array(
                                 'group_id' => $group->id,
@@ -300,13 +300,13 @@ class Forms_Module extends Module {
             }
         }
     }
-    
+
     private function initialise() {
         // Generate tables
         if (!$this->_db->showTables('forms')) {
             try {
                 $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
-                
+
                 $this->_db->insert('forms', array(
                     'url' => '/apply',
                     'title' => 'Staff Applications',
@@ -318,7 +318,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if (!$this->_db->showTables('forms_permissions')) {
             try {
                 $this->_db->createTable("forms_permissions", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `group_id` int(11) NOT NULL, `post` tinyint(1) NOT NULL DEFAULT '1', `view_own` tinyint(1) NOT NULL DEFAULT '1', `view` tinyint(1) NOT NULL DEFAULT '0', `can_delete` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
@@ -332,7 +332,7 @@ class Forms_Module extends Module {
                     'view' => 0,
                     'can_delete' => 0
                 ));
-                    
+
                 foreach ($groups as $group) {
                     $this->_db->insert('forms_permissions', array(
                         'group_id' => $group->id,
@@ -347,7 +347,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }  
-        
+
         if (!$this->_db->showTables('forms_comments')) {
             try {
                 $this->_db->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, PRIMARY KEY (`id`)");
@@ -355,7 +355,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if (!$this->_db->showTables('forms_fields')) {
             try {
                 $this->_db->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `info` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
@@ -378,7 +378,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if (!$this->_db->showTables('forms_replies')) {
             try {
                 $this->_db->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
@@ -386,7 +386,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if (!$this->_db->showTables('forms_replies_fields')) {
             try {
                 $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
@@ -396,7 +396,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         if (!$this->_db->showTables('forms_statuses')) {
             try {
                 $this->_db->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
@@ -423,7 +423,7 @@ class Forms_Module extends Module {
                 // Error
             }
         }
-        
+
         try {
             // Update main admin group permissions
             $group = $this->_db->get('groups', array('id', '=', 2))->results();
