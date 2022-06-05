@@ -10,6 +10,7 @@
  */
 class FormsApiErrors {
     public const ERROR_FORM_NOT_FOUND = 'forms:form_not_found';
+    public const ERROR_SUBMISSION_NOT_FOUND = 'forms:submission_not_found';
     public const ERROR_VALIDATION_ERRORS = 'forms:validation_errors';
     public const ERROR_UNKNOWN_ERROR = 'forms:unknown_error';
 }

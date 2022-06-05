@@ -40,8 +40,6 @@ class Forms_Module extends Module {
         $pages->add('Forms', '/panel/forms/submissions', 'pages/panel/submissions.php');
         $pages->add('Forms', '/user/submissions', 'pages/user/submissions.php');
 
-        $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
-
         // Check if module version changed
         $cache->setCache('forms_module_cache');
         if (!$cache->isCached('module_version')) {
@@ -115,6 +113,33 @@ class Forms_Module extends Module {
         } catch (Exception $e) {
             // Database tables don't exist yet
         }
+
+        $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
+
+        Endpoints::registerTransformer('form', 'Forms', static function (Nameless2API $api, string $value) {
+            if (is_numeric($value)) {
+                // Get form by id
+                $form = new Form($value);
+            } else {
+                // Get form by url
+                $form = new Form('/' . $value, 'url');
+            }
+
+            if ($form->exists()) {
+                return $form;
+            }
+
+            $api->throwError(FormsApiErrors::ERROR_FORM_NOT_FOUND);
+        });
+
+        Endpoints::registerTransformer('submission', 'Forms', static function (Nameless2API $api, string $value) {
+            $submission = new Submission($value);
+            if ($submission->exists()) {
+                return $submission;
+            }
+
+            $api->throwError(FormsApiErrors::ERROR_SUBMISSION_NOT_FOUND);
+        });
     }
 
     public function onInstall() {

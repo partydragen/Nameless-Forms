@@ -2,33 +2,18 @@
 class FormInfoEndpoint extends KeyAuthEndpoint {
 
     public function __construct() {
-        $this->_route = 'forms/form';
+        $this->_route = 'forms/{form}';
         $this->_module = 'Forms';
         $this->_description = 'Get form details';
         $this->_method = 'GET';
     }
 
-    public function execute(Nameless2API $api): void {
-        $api->validateParams($_GET, ['form']);
-
-        if (is_numeric($_GET['form'])) {
-            // Get form by id
-            $form = new Form($_GET['form']);
-        } else {
-            // Get form by url
-            $form = new Form('/' . $_GET['form'], 'url');
-        }
-
-        if (!$form->exists()) {
-            $api->throwError(FormsApiErrors::ERROR_FORM_NOT_FOUND);
-        }
-
+    public function execute(Nameless2API $api, Form $form): void {
         $return = [
             'id' => $form->data()->id,
             'url' => Output::getClean($form->data()->url),
+            'url_full' => rtrim(Util::getSelfURL(), '/') . URL::build($form->data()->url),
             'title' => Output::getClean($form->data()->title),
-            'guest' => (bool) $form->data()->guest,
-            'can_view' => (bool) $form->data()->can_view,
             'captcha' => (bool) $form->data()->captcha,
             'comment_status' => $form->data()->comment_status,
         ];

@@ -2,26 +2,14 @@
 class CreateSubmissionEndpoint extends KeyAuthEndpoint {
 
     public function __construct() {
-    $this->_route = 'forms/submissions/create';
+        $this->_route = 'forms/{form}/submissions/create';
         $this->_module = 'Forms';
         $this->_description = 'Create a new form submission';
         $this->_method = 'POST';
     }
 
-    public function execute(Nameless2API $api): void {
-        $api->validateParams($_POST, ['form',  'field_values']);
-
-        if (is_numeric($_POST['form'])) {
-            // Get form by id
-            $form = new Form($_POST['form']);
-        } else {
-            // Get form by url
-            $form = new Form('/' . $_POST['form'], 'url');
-        }
-
-        if (!$form->exists()) {
-            $api->throwError(FormsApiErrors::ERROR_FORM_NOT_FOUND);
-        }
+    public function execute(Nameless2API $api, Form $form): void {
+        $api->validateParams($_POST, ['field_values']);
 
         $user != null;
         if (isset($_POST['user'])) {
