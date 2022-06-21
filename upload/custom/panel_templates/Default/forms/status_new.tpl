@@ -51,7 +51,7 @@
                           </div>
                           <div class="form-group">
                             <label for="status_forms">{$STATUS_FORMS}</label>
-                            <select name="status_forms[]" id="status_forms" size="5" class="form-control" multiple style="overflow:auto;">
+                            <select name="status_forms[]" id="inputForms" class="form-control" multiple>
                               {if count($ALL_FORMS)}
                                 {foreach from=$ALL_FORMS item=item}
                                   <option value="{$item.id}"{if $item.selected} selected{/if}>{$item.name}</option>
@@ -61,7 +61,7 @@
                           </div>
                           <div class="form-group">
                             <label for="status_groups">{$STATUS_GROUPS}</label>
-                            <select name="status_groups[]" id="status_groups" size="5" class="form-control" multiple style="overflow:auto;">
+                            <select name="status_groups[]" id="inputGroups" class="form-control" multiple>
                               {if count($ALL_GROUPS)}
                                 {foreach from=$ALL_GROUPS item=item}
                                   <option value="{$item.id}"{if $item.selected} selected{/if}>{$item.name}</option>
@@ -127,6 +127,16 @@
     function showCancelModal(){
         $('#cancelModal').modal().show();
     }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(() => {
+        $('#inputForms').select2({ placeholder: "No forms selected" });
+    })
+    
+    $(document).ready(() => {
+        $('#inputGroups').select2({ placeholder: "No groups selected" });
+    })
 </script>
 
 </body>
