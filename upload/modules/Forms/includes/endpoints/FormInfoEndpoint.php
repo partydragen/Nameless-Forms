@@ -11,9 +11,9 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
     public function execute(Nameless2API $api, Form $form): void {
         $return = [
             'id' => $form->data()->id,
-            'url' => Output::getClean($form->data()->url),
+            'url' => $form->data()->url,
             'url_full' => rtrim(Util::getSelfURL(), '/') . URL::build($form->data()->url),
-            'title' => Output::getClean($form->data()->title),
+            'title' => $form->data()->title,
             'captcha' => (bool) $form->data()->captcha,
             'comment_status' => $form->data()->comment_status,
         ];
@@ -22,14 +22,14 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
         foreach ($form->getFields() as $field) {
             $fields[] = [
                 'id' => $field->id,
-                'name' => Output::getClean($field->name),
+                'name' => $field->name,
                 'type' => $field->type,
                 'required' => (bool) $field->required,
                 'min' => $field->min,
                 'max' => $field->max,
-                'placeholder' => Output::getClean($field->placeholder),
-                'options' => $field->options,
-                'info' => Output::getClean($field->info)
+                'placeholder' => $field->placeholder,
+                'options' => !empty($field->options) ? explode(',', str_replace("\r", "", $field->options)) : [],
+                'info' => $field->info
             ];
         }
         $return['fields'] = $fields;
