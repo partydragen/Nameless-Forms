@@ -223,10 +223,16 @@ class Forms_Module extends Module {
                     $smarty->assign(array(
                         'NEW_UPDATE' => (isset($update_check->urgent) && $update_check->urgent == 'true') ? $this->_forms_language->get('forms', 'new_urgent_update_available_x', ['module' => $this->getName()]) : $this->_forms_language->get('forms', 'new_update_available_x', ['module' => $this->getName()]),
                         'NEW_UPDATE_URGENT' => (isset($update_check->urgent) && $update_check->urgent == 'true'),
-                        'CURRENT_VERSION' => $this->_forms_language->get('forms', 'current_version_x', ['version' => Output::getClean($this->getVersion())]),
-                        'NEW_VERSION' => $this->_forms_language->get('forms', 'new_version_x', ['new_version' => Output::getClean($update_check->new_version)]),
+                        'CURRENT_VERSION' => $this->_forms_language->get('forms', 'current_version_x', [
+                            'version' => Output::getClean($this->getVersion())
+                        ]),
+                        'NEW_VERSION' => $this->_forms_language->get('forms', 'new_version_x', [
+                            'new_version' => Output::getClean($update_check->new_version)
+                        ]),
                         'UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
-                        'UPDATE_LINK' => Output::getClean($update_check->link)
+                        'UPDATE_LINK' => Output::getClean($update_check->link),
+                        'NAMELESS_UPDATE' => $this->_forms_language->get('forms', 'view_resource'),
+                        'NAMELESS_UPDATE_LINK' => Output::getClean($update_check->link)
                     ));
                 }
             }
