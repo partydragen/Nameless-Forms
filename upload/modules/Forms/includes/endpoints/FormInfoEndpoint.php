@@ -33,6 +33,18 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
             ];
         }
         $return['fields'] = $fields;
+        
+        $permissions = [];
+        $permissions_query = $api->getDb()->query('SELECT * FROM nl2_forms_permissions WHERE form_id = ?', [$form->data()->id])->results();
+        foreach ($permissions_query as $permission) {
+            $permissions[] = [
+                'group_id' => $permission->group_id,
+                'post' => (bool) $permission->post,
+                'view_own' => (bool) $permission->view_own,
+                'delete' => (bool) $permission->can_delete
+            ];
+        }
+        $return['permissions'] = $permissions;
 
         $api->returnArray($return);
     }
