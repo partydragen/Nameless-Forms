@@ -23,7 +23,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.9.0';
+        $module_version = '1.9.1';
         $nameless_version = '2.0.0-pr13';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
