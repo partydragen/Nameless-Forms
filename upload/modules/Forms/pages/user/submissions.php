@@ -58,18 +58,21 @@ if (!isset($_GET['view'])) {
             $status = new Status($submission->status_id);
 
             // Check if last updater is anonymous
+            $updated_by_profile = null;
+            $updated_by_style = null;
+            $updated_by_avatar = null;
             if ($submission->updated_by != 0) {
                 $updated_by_user = new User($submission->updated_by);
-
-                $updated_by_name = $updated_by_user->getDisplayname();
-                $updated_by_profile = $updated_by_user->getProfileURL();
-                $updated_by_style = $updated_by_user->getGroupClass();
-                $updated_by_avatar = $updated_by_user->getAvatar();
+                if ($updated_by_user->exists()) {
+                    $updated_by_name = $updated_by_user->getDisplayname();
+                    $updated_by_profile = $updated_by_user->getProfileURL();
+                    $updated_by_style = $updated_by_user->getGroupStyle();
+                    $updated_by_avatar = $updated_by_user->getAvatar();
+                } else {
+                    $updated_by_name = $language->get('general', 'deleted_user');
+                }
             } else {
                 $updated_by_name = $forms_language->get('forms', 'anonymous');
-                $updated_by_profile = null;
-                $updated_by_style = null;
-                $updated_by_avatar = null;
             }
 
             $submissions[] = [
@@ -186,18 +189,21 @@ if (!isset($_GET['view'])) {
     $smarty_comments = [];
     foreach ($comments as $comment) {
         // Check if comment user is 
+        $user_profile = null;
+        $user_style = null;
+        $user_avatar = null;
         if ($comment->anonymous != 1) {
             $comment_user = new User($comment->user_id);
-
-            $user_name = $comment_user->getDisplayname();
-            $user_profile = $comment_user->getProfileURL();
-            $user_style = $comment_user->getGroupClass();
-            $user_avatar = $comment_user->getAvatar();
+            if ($comment_user->exists()) {
+                $user_name = $comment_user->getDisplayname();
+                $user_profile = $comment_user->getProfileURL();
+                $user_style = $comment_user->getGroupStyle();
+                $user_avatar = $comment_user->getAvatar();
+            } else {
+                $user_name = $language->get('general', 'deleted_user');
+            }
         } else {
             $user_name = $forms_language->get('forms', 'anonymous');
-            $user_profile = null;
-            $user_style = null;
-            $user_avatar = null;
         }
 
         $smarty_comments[] = [
@@ -220,7 +226,7 @@ if (!isset($_GET['view'])) {
         'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->data()->updated, $language),
         'USER' => $target_user->getDisplayname(),
         'USER_PROFILE' => $target_user->getProfileURL(),
-        'USER_STYLE' => $target_user->getGroupClass(),
+        'USER_STYLE' => $target_user->getGroupStyle(),
         'USER_AVATAR' => $target_user->getAvatar(),
         'CREATED_DATE' => date(DATE_FORMAT, $submission->data()->created),
         'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->data()->created, $language),

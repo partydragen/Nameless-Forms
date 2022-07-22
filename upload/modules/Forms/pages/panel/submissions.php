@@ -132,33 +132,39 @@ if (!isset($_GET['view'])) {
             $status = $status[0];
 
             // Is user a guest or a user
+            $user_profile = null;
+            $user_style = null;
+            $user_avatar = null;
             if ($submission->user_id == null) {
                 $user_name = $forms_language->get('forms', 'guest');
-                $user_profile = null;
-                $user_style = null;
-                $user_avatar = null;
             } else {
                 $target_user = new User($submission->user_id);
-                
-                $user_name = $target_user->getDisplayname();
-                $user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $target_user->getDisplayname(true)));
-                $user_style = $target_user->getGroupClass();
-                $user_avatar = $target_user->getAvatar();
+                if ($target_user->exists()) {
+                    $user_name = $target_user->getDisplayname();
+                    $user_profile = URL::build('/panel/user/' . Output::getClean($submission->user_id . '-' . $target_user->getDisplayname(true)));
+                    $user_style = $target_user->getGroupStyle();
+                    $user_avatar = $target_user->getAvatar();
+                } else {
+                    $user_name = $language->get('general', 'deleted_user');
+                }
             }
 
             // Is user a guest or a user
+            $updated_by_profile = null;
+            $updated_by_style = null;
+            $updated_by_avatar = null;
             if ($submission->updated_by == null || $submission->updated_by == 0) {
                 $updated_by_name = ($submission->updated_by == null ? $forms_language->get('forms', 'guest') : $forms_language->get('forms', 'anonymous'));
-                $updated_by_profile = null;
-                $updated_by_style = null;
-                $updated_by_avatar = null;
             } else {
                 $updated_by_user = new User($submission->updated_by);
-                
-                $updated_by_name = $updated_by_user->getDisplayname();
-                $updated_by_profile = URL::build('/panel/user/' . Output::getClean($submission->updated_by . '-' . $updated_by_user->getDisplayname(true)));
-                $updated_by_style = $updated_by_user->getGroupClass();
-                $updated_by_avatar = $updated_by_user->getAvatar();
+                if ($updated_by_user->exists()) {
+                    $updated_by_name = $updated_by_user->getDisplayname();
+                    $updated_by_profile = URL::build('/panel/user/' . Output::getClean($submission->updated_by . '-' . $updated_by_user->getDisplayname(true)));
+                    $updated_by_style = $updated_by_user->getGroupStyle();
+                    $updated_by_avatar = $updated_by_user->getAvatar();
+                } else {
+                    $updated_by_name = $language->get('general', 'deleted_user');
+                }
             }
 
             $submissions[] = [
@@ -432,12 +438,23 @@ if (!isset($_GET['view'])) {
         $smarty_comments = [];
         foreach ($comments as $comment) {
             $comment_user = new User($comment->user_id);
+            if ($comment_user->exists()) {
+                $comment_user_name = $comment_user->getDisplayname();
+                $comment_user_profile = URL::build('/panel/user/' . Output::getClean($comment->user_id . '-' . $comment_user->getDisplayname(true)));
+                $comment_user_style = $comment_user->getGroupStyle();
+                $comment_user_avatar = $comment_user->getAvatar();
+            } else {
+                $comment_user_name = $language->get('general', 'deleted_user');
+                $comment_user_profile = null;
+                $comment_user_style = null;
+                $comment_user_avatar = 'https://avatars.dicebear.com/api/initials/'.$language->get('general', 'deleted_user').'.png?size=64';
+            }
 
             $smarty_comments[] = [
-                'username' => $comment_user->getDisplayname(),
-                'profile' => URL::build('/panel/user/' . Output::getClean($comment->user_id . '-' . $comment_user->getDisplayname(true))),
-                'style' => $comment_user->getGroupClass(),
-                'avatar' => $comment_user->getAvatar(),
+                'username' => $comment_user_name,
+                'profile' => $comment_user_profile,
+                'style' => $comment_user_style,
+                'avatar' => $comment_user_avatar,
                 'anonymous' => $comment->anonymous,
                 'content' => Output::getPurified(Output::getDecoded($comment->content)),
                 'date' => date(DATE_FORMAT, $comment->created),
@@ -447,18 +464,21 @@ if (!isset($_GET['view'])) {
         }
 
         // Is user a guest or a user
+        $user_profile = null;
+        $user_style = null;
+        $user_avatar = null;
         if ($submission->data()->user_id == null) {
             $user_name = $forms_language->get('forms', 'guest');
-            $user_profile = null;
-            $user_style = null;
-            $user_avatar = null;
         } else {
             $target_user = new User($submission->data()->user_id);
-
-            $user_name = $target_user->getDisplayname();
-            $user_profile = URL::build('/panel/user/' . Output::getClean($submission->data()->user_id . '-' . $target_user->getDisplayname(true)));
-            $user_style = $target_user->getGroupClass();
-            $user_avatar = $target_user->getAvatar();
+            if ($target_user->exists()) {
+                $user_name = $target_user->getDisplayname();
+                $user_profile = URL::build('/panel/user/' . Output::getClean($submission->data()->user_id . '-' . $target_user->getDisplayname(true)));
+                $user_style = $target_user->getGroupStyle();
+                $user_avatar = $target_user->getAvatar();
+            } else {
+                $user_name = $language->get('general', 'deleted_user');
+            }
         }
 
         // Form statuses
@@ -498,7 +518,7 @@ if (!isset($_GET['view'])) {
 
         $smarty->assign([
             'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => Output::getClean($form->data()->title)]),
-            'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => $status->data()->html]),
+            'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => Output::getPurified($status->data()->html)]),
             'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
             'LAST_UPDATED_DATE' => date(DATE_FORMAT, $submission->data()->updated),
             'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->data()->updated, $language),
