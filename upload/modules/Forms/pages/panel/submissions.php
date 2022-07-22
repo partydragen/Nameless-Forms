@@ -164,7 +164,7 @@ if (!isset($_GET['view'])) {
             $submissions[] = [
                 'id' => $submission->id,
                 'form_name' => $form->title,
-                'status' => $status->html,
+                'status' => Output::getPurified($status->html),
                 'user_name' => $user_name,
                 'user_profile' => $user_profile,
                 'user_style' => $user_style,
@@ -210,7 +210,7 @@ if (!isset($_GET['view'])) {
         foreach ($statuses as $status) {
             $status_array[] = [
                 'id' => $status->id,
-                'html' => $status->html
+                'html' => Output::getPurified($status->html)
             ];
         }
     }
@@ -383,7 +383,7 @@ if (!isset($_GET['view'])) {
                                             $language->get('emails', 'greeting'),
                                             $forms_language->get('forms', 'submission_updated_message', ['form' => Output::getClean($form->data()->title)]),
                                             $forms_language->get('forms', 'current_status'),
-                                            $status_html,
+                                            Output::getPurified($status_html),
                                             $forms_language->get('forms', 'updated_by'),
                                             ($anonymous == 0 ? $user->getDisplayname() : $forms_language->get('forms', 'anonymous')),
                                             $forms_language->get('forms', 'comment'),
@@ -483,7 +483,7 @@ if (!isset($_GET['view'])) {
                     $statuses[] = [
                         'id' => $status_query->id,
                         'active' => (($submission->data()->status_id == $status_query->id) ? true : false),
-                        'html' => $status_query->html,
+                        'html' => Output::getPurified($status_query->html),
                         'permission' => $perms
                     ];
                 }

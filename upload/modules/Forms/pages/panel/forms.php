@@ -45,7 +45,7 @@ if (!isset($_GET['action'])) {
         foreach ($statuses as $status) {
             $status_array[] = [
                 'id' => $status->id,
-                'html' => $status->html,
+                'html' => Output::getPurified($status->html),
                 'open' => $status->open,
                 'edit_link' => URL::build('/panel/forms/statuses', 'action=edit&status=' . Output::getClean($status->id)),
                 'delete_link' => URL::build('/panel/forms/statuses', 'action=delete&status=' . Output::getClean($status->id))

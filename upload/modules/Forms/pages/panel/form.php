@@ -607,7 +607,7 @@ if (!isset($_GET['action'])) {
                     
                     $status_array[] = [
                         'id' => $status->id,
-                        'html' => $status->html,
+                        'html' => Output::getPurified($status->html),
                         'selected' => in_array($form->data()->id, $forms)
                     ];
                 }

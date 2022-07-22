@@ -75,7 +75,7 @@ if (!isset($_GET['view'])) {
             $submissions[] = [
                 'id' => $submission->id,
                 'form_name' => $form->data()->title,
-                'status' => $status->data()->html,
+                'status' => Output::getPurified($status->data()->html),
                 'created_at' => $timeago->inWords($submission->created, $language),
                 'updated_by_name' => $updated_by_name,
                 'updated_by_profile' => $updated_by_profile,
@@ -214,7 +214,7 @@ if (!isset($_GET['view'])) {
     $target_user = new User($submission->data()->user_id);
     $smarty->assign([
         'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => $form->data()->title]),
-        'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => $status->data()->html]),
+        'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => Output::getPurified($status->data()->html)]),
         'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
         'LAST_UPDATED_DATE' => date(DATE_FORMAT, $submission->data()->updated),
         'LAST_UPDATED_FRIENDLY' => $timeago->inWords($submission->data()->updated, $language),
