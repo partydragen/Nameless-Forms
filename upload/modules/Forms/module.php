@@ -246,6 +246,16 @@ class Forms_Module extends Module {
     private function initialiseUpdate($old_version) {
         $old_version = str_replace(array(".", "-"), "", $old_version);
 
+        if ($old_version < 192) {
+            try {
+                $this->_db->addColumn('forms', '`source`', "varchar(32) NOT NULL DEFAULT 'forms'");
+                $this->_db->addColumn('forms', '`forum_id`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_statuses', '`color`', "varchar(32) NULL DEFAULT NULL");
+            } catch (Exception $e) {
+                // Error
+            }
+        }
+
         if ($old_version < 180) {
             try {
                 // Generate table
@@ -336,7 +346,7 @@ class Forms_Module extends Module {
         // Generate tables
         if (!$this->_db->showTables('forms')) {
             try {
-                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', `source` varchar(32) NOT NULL DEFAULT 'forms', `forum_id` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
 
                 $this->_db->insert('forms', array(
                     'url' => '/apply',
@@ -430,7 +440,7 @@ class Forms_Module extends Module {
 
         if (!$this->_db->showTables('forms_statuses')) {
             try {
-                $this->_db->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms_statuses", " `id` int(11) NOT NULL AUTO_INCREMENT, `html` varchar(1024) NOT NULL, `open` tinyint(1) NOT NULL, `fids` varchar(128) NULL, `gids` varchar(128) NULL, `color` varchar(32) NULL DEFAULT NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
                 
                 $this->_db->insert('forms_statuses', array(
                     'html' => '<span class="badge badge-success">Open</span>',

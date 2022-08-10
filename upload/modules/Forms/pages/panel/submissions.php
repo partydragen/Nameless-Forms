@@ -290,6 +290,7 @@ if (!isset($_GET['view'])) {
                     // Check if status have changed
                     $status_id = $submission->data()->status_id;
                     $status_html = $status->data()->html;
+                    $status_color = $status->data()->color;
                     if ($submission->data()->status_id != $_POST['status']) {
                         $new_status = new Status($_POST['status']);
                         if ($new_status->exists()) {
@@ -304,6 +305,7 @@ if (!isset($_GET['view'])) {
 
                             if ($hasperm) {
                                 $status_html = $new_status->data()->html;
+                                $status_color = $new_status->data()->color;
                                 $status_id = $_POST['status'];
                                 $any_changes = true;
                             }
@@ -349,7 +351,8 @@ if (!isset($_GET['view'])) {
                             'content_full' => $content,
                             'avatar_url' => $user->getAvatar(128, true),
                             'title' => Output::getClean('[#' . $submission->data()->id . '] ' . $form->data()->title),
-                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id)
+                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
+                            'color' => $status_color
                         ]);
 
                         // Alert user?

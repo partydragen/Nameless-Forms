@@ -124,6 +124,8 @@ class Submission {
         if ($data->count()) {
             $this->_data = $data->first();
 
+            $status = new Status(1);
+            $status_color = $status->data()->color;
             EventHandler::executeEvent('newFormSubmission', [
                 'event' => 'newFormSubmission',
                 'username' => Output::getClean($form->data()->title),
@@ -134,7 +136,8 @@ class Submission {
                 'content_full' => '',
                 'avatar_url' => ($user != null && $user->exists() ? $user->getAvatar(128, true) : null),
                 'title' => Output::getClean($form->data()->title),
-                'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id)
+                'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id),
+                'color' => $status_color
             ]);
 
             return true;

@@ -50,6 +50,16 @@
                             <input type="text" name="status_html" placeholder="{$STATUS_HTML}" id="status_html" class="form-control">
                           </div>
                           <div class="form-group">
+                            <label for="InputColour">{$STATUS_COLOUR}</label>
+                            <div class="input-group">
+                              <input type="text" name="color" class="form-control" id="InputColour"
+                                value="{$STATUS_COLOUR_VALUE}">
+                              <span class="input-group-append statusColour">
+                                <span class="input-group-text colorpicker-input-addon"><i></i></span>
+                              </span>
+                            </div>
+                          </div>
+                          <div class="form-group">
                             <label for="status_forms">{$STATUS_FORMS}</label>
                             <select name="status_forms[]" id="inputForms" class="form-control" multiple>
                               {if count($ALL_FORMS)}
@@ -133,10 +143,25 @@
     $(document).ready(() => {
         $('#inputForms').select2({ placeholder: "No forms selected" });
     })
-    
+
     $(document).ready(() => {
         $('#inputGroups').select2({ placeholder: "No groups selected" });
     })
+
+    $(function () {
+        $('.statusColour').colorpicker({
+            format: 'hex',
+            'color': '{$STATUS_COLOUR_VALUE}'
+        });
+
+        $('.statusColour').on('colorpickerChange', function (event) {
+            $('#InputColour').val(event.color.toString());
+        });
+
+        $('#InputColour').change(function () {
+            $('.statusColour').colorpicker('setValue', $(this).val());
+        });
+    });
 </script>
 
 </body>

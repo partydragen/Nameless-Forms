@@ -53,6 +53,9 @@
                           <li class="nav-item">
                             <a class="nav-link" href="{$STATUSES_LINK}">{$STATUSES}</a>
                           </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{$ADVANCED_LINK}">{$ADVANCED}</a>
+                          </li>
                         </ul>
                         
                         </br>

@@ -77,6 +77,7 @@ if (!isset($_GET['action'])) {
                         try {
                             DB::getInstance()->insert('forms_statuses', [
                                 'html' => Input::get('status_html'),
+                                'color' => ($_POST['color'] ? Input::get('color') : null),
                                 'open' => $open,
                                 'fids' => $forms_string,
                                 'gids' => $group_string
@@ -135,6 +136,8 @@ if (!isset($_GET['action'])) {
                 'NO' => $language->get('general', 'no'),
                 'STATUS_HTML' => $forms_language->get('forms', 'status_html'),
                 'STATUS_FORMS' => $forms_language->get('forms', 'status_forms'),
+                'STATUS_COLOUR' => $forms_language->get('forms', 'status_colour'),
+                'STATUS_COLOUR_VALUE' => '',
                 'ALL_FORMS' => $template_forms,
                 'STATUS_GROUPS' => $forms_language->get('forms', 'status_groups'),
                 'ALL_GROUPS' => $template_groups,
@@ -204,6 +207,7 @@ if (!isset($_GET['action'])) {
                         try {
                             $status->update([
                                 'html' => Input::get('status_html'),
+                                'color' => ($_POST['color'] ? Input::get('color') : null),
                                 'open' => $open,
                                 'fids' => $forms_string,
                                 'gids' => $group_string
@@ -270,6 +274,8 @@ if (!isset($_GET['action'])) {
                 'NO' => $language->get('general', 'no'),
                 'STATUS_HTML' => $forms_language->get('forms', 'status_html'),
                 'STATUS_HTML_VALUE' => Output::getClean($status->data()->html),
+                'STATUS_COLOUR' => $forms_language->get('forms', 'status_color'),
+                'STATUS_COLOUR_VALUE' => Output::getClean($status->data()->color),
                 'STATUS_FORMS' => $forms_language->get('forms', 'status_forms'),
                 'ALL_FORMS' => $template_forms,
                 'STATUS_GROUPS' => $forms_language->get('forms', 'status_groups'),
@@ -300,6 +306,10 @@ if (!isset($_GET['action'])) {
         break;
     }
 }
+
+$template->assets()->include([
+    AssetTree::BOOTSTRAP_COLORPICKER
+]);
 
 // Load modules + template
 Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);

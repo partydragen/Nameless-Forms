@@ -98,6 +98,7 @@
     "forms\/status_forms": "Select forms where this status will be displayed on.",
     "forms\/status_groups": "Select groups who are allowed to select this status.",
     "forms\/status_html": "Status HTML",
+    "forms\/status_color": "Status Colour",
     "forms\/status_name": "Status Name",
     "forms\/statuses": "Statuses",
     "forms\/submission_updated": "Submission updated successfully",
@@ -114,5 +115,8 @@
     "forms\/view_resource": "View Resource",
     "forms\/x_field_maximum_y": "{{field}} must be a maximum of {{max}} characters.",
     "forms\/x_field_minimum_y": "{{field}} must be a minimum of {{min}} characters.",
-    "forms\/your_submission_updated": "Your submission has been updated"
+    "forms\/your_submission_updated": "Your submission has been updated",
+    "forms\/advanced": "Advanced",
+    "forms\/submission_source": "Submit submission to source",
+    "forms\/submit_to_submission_forum": "Submit submission to forum?"
 }

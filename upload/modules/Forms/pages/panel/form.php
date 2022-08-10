@@ -547,7 +547,7 @@ if (!isset($_GET['action'])) {
             $template_file = 'forms/form_permissions.tpl';
         break;
         case 'statuses':
-            // Form permissions
+            // Form statuses
             if (Input::exists()) {
                 $errors = [];
                 
@@ -626,6 +626,65 @@ if (!isset($_GET['action'])) {
             
             $template_file = 'forms/form_statuses.tpl';
         break;
+        case 'advanced':
+            // Form advanced
+            if (Input::exists()) {
+                $errors = [];
+
+                if (Token::check(Input::get('token'))) {
+                    $form->update([
+                        'source' => Input::get('submission_source'),
+                        'forum_id' => isset($_POST['forum']) ? Input::get('forum') : $form->data()->forum_id
+                    ]);
+
+                    Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
+                    Redirect::to(URL::build('/panel/form/', 'form='.$form->data()->id.'&action=advanced'));
+                } else
+                    $errors[] = $language->get('general', 'invalid_token');
+            }
+
+            // Submission sources
+            $submission_sources = [];
+            $submission_sources[] = [
+                'value' => 'forms',
+                'name' => 'Forms (Default)'
+            ];
+
+            // Forum enabled?
+            $forum_enabled = Util::isModuleEnabled('Forum');
+            if ($forum_enabled) {
+                $submission_sources[] = [
+                    'value' => 'forum',
+                    'name' => 'Forum'
+                ];
+
+                $forum_list = [];
+                $forums = DB::getInstance()->orderAll('forums', 'forum_order', 'ASC')->results();
+                foreach ($forums as $forum) {
+                    $forum_list[] = [
+                        'id' => $forum->id,
+                        'title' => Output::getClean($forum->forum_title)
+                    ];
+                }
+
+                $smarty->assign([
+                    'SUBMIT_TO_FORUM' => 'Submit submission to forum?',
+                    'SUBMIT_TO_FORUM_VALUE' => Output::getClean($form->data()->forum_id),
+                    'SUBMIT_TO_FORUM_LIST' => $forum_list,
+                ]);
+            }
+
+            $smarty->assign([
+                'EDITING_FORM' => $forms_language->get('forms', 'editing_x', ['form' => Output::getClean($form->data()->title)]),
+                'BACK' => $language->get('general', 'back'),
+                'BACK_LINK' => URL::build('/panel/forms'),
+                'SUBMISSION_SOURCE' => 'Submit submission to source',
+                'SUBMISSION_SOURCE_LIST' => $submission_sources,
+                'SUBMISSION_SOURCE_VALUE' => Output::getClean($form->data()->source)
+            ]);
+
+            $template_file = 'forms/form_advanced.tpl';
+        break;
         default:
             Redirect::to(URL::build('/panel/forms'));
         break;
@@ -666,6 +725,8 @@ $smarty->assign([
     'PERMISSIONS_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=permissions'),
     'STATUSES' => $forms_language->get('forms', 'statuses'),
     'STATUSES_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=statuses'),
+    'ADVANCED' => $forms_language->get('forms', 'advanced'),
+    'ADVANCED_LINK' => URL::build('/panel/form/', 'form='.$form->data()->id.'&amp;action=advanced'),
     'GUEST_VALUE' => $form->data()->guest
 ]);
 

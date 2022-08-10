@@ -29,6 +29,11 @@ if ($user->isLoggedIn()) {
 }
 $group_ids = implode(',', $group_ids);
 
+// Forum require user to be logged in
+if ($form->data()->source == 'forum' && !$user->isLoggedIn()) {
+    Redirect::to(URL::build('/login/'));
+}
+
 // Can guests view?
 if (!$forms->canPostSubmission($group_ids, $form->data()->id)) {
     if (!$user->isLoggedIn()) {
@@ -99,11 +104,11 @@ if (Input::exists()) {
 
 $fields_array = [];
 foreach ($form->getFields() as $field) {
-    $options = explode(',', Output::getClean($field->options));
+    $options = explode(',', Output::getClean(str_replace("\r" , "", $field->options)));
     $fields_array[] = [
         'id' => Output::getClean($field->id),
         'name' => Output::getClean($field->name),
-        'value' => (isset($_POST[$field->id]) && !is_array($_POST[$field->id]) ? Output::getClean(Input::get($field->id)) : ''),
+        'value' => is_array(Input::get($field->id)) ? Input::get($field->id) : Output::getClean(Input::get($field->id)),
         'type' => Output::getClean($field->type),
         'required' => Output::getClean($field->required),
         'options' => $options,

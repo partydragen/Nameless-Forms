@@ -39,7 +39,7 @@
                             <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
                         <hr>
-                        
+
                         <ul class="nav nav-tabs">
                           <li class="nav-item">
                             <a class="nav-link" href="{$GENERAL_SETTINGS_LINK}">{$GENERAL_SETTINGS}</a>
@@ -51,10 +51,10 @@
                             <a class="nav-link" href="{$PERMISSIONS_LINK}">{$PERMISSIONS}</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link active">{$STATUSES}</a>
+                            <a class="nav-link" href="{$STATUSES_LINK}">{$STATUSES}</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="{$ADVANCED_LINK}">{$ADVANCED}</a>
+                            <a class="nav-link active" href="{$ADVANCED_LINK}">{$ADVANCED}</a>
                           </li>
                         </ul>
                         
@@ -62,31 +62,36 @@
                         
                         <!-- Success and Error Alerts -->
                         {include file='includes/alerts.tpl'}
-                        
+
+                        <div class="alert alert-warning" role="alert">
+                          These features is currently for patreon supporters, it will be available for everyone in the future with means this wont function for you
+                          </br></br>
+                          <a href="https://partydragen.com/patreon/" target="_blank" class="btn btn-primary">Patreon</a>
+                        </div>
+
                         <form role="form" action="" method="post">
                             <div class="form-group">
-                                <label for="status_forms">{$SELECT_STATUSES}</label></br>
-                                {foreach from=$ALL_STATUSES item=status}
-                                <div class="form-check-inline">
-                                    <input type="checkbox" class="form-check-input" name="status[]" id="{$status.id}" value="{$status.id}"{if $status.selected} checked="checked"{/if}>
-                                    <label class="form-check-label" for="{$status.id}">{$status.html} </label>
-                                </div>
-                                {/foreach}
-                            </div>
-
-                            <div class="form-group">
-                                <label for="status_forms">{$CHANGE_STATUS_ON_COMMENT}</label>
-                                <select class="form-control" id="comment_status" name="comment_status">
-                                  <option value="0"{if $COMMENT_STATUS_VALUE eq 0} selected{/if}>{$DISABLED}</option>
-                                  {foreach from=$ALL_STATUSES item=status}
-                                    <option value="{$status.id}"{if $COMMENT_STATUS_VALUE eq {$status.id}} selected{/if}>{$status.html}</option>
-                                  {/foreach}
+                                <label for="inputSubmissionSource">{$SUBMISSION_SOURCE}</label>
+                                <select class="form-control" id="inputSubmissionSource" name="submission_source">
+                                    {foreach from=$SUBMISSION_SOURCE_LIST item=source}
+                                        <option value="{$source.value}"{if $SUBMISSION_SOURCE_VALUE eq {$source.value}} selected{/if}>{$source.name}</option>
+                                    {/foreach}
                                 </select>
                             </div>
-                          
+                            {if isset($SUBMIT_TO_FORUM)}
+                            <div class="form-group">
+                                <label for="inputForum">Submit submission to forum?</label>
+                                <select class="form-control" id="inputForum" name="forum">
+                                    {foreach from=$SUBMIT_TO_FORUM_LIST item=forum}
+                                        <option value="{$forum.id}"{if $SUBMIT_TO_FORUM_VALUE eq {$forum.id}} selected{/if}>{$forum.id} - {$forum.title}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            {/if}
                             <div class="form-group">
                                 <input type="hidden" name="token" value="{$TOKEN}">
-                                <input type="submit" class="btn btn-primary" value="{$SUBMIT}">
+                                <!--<input type="submit" class="btn btn-primary" value="{$SUBMIT}" disabled>-->
+                                <span data-toggle="popover" data-title="Early access for patreons" data-content="This feature is currently in early access for patreon supporters" data-placement="right"><a href="#" class="btn btn-primary disabled">{$SUBMIT}</a></span>
                             </div>
                         </form>
                         
