@@ -15,7 +15,7 @@ class ListFormsEndpoint extends KeyAuthEndpoint {
             $forms_list[] = [
                 'id' => $form->id,
                 'url' => $form->url,
-                'url_full' => rtrim(Util::getSelfURL(), '/') . URL::build($form->url),
+                'url_full' => rtrim(URL::getSelfURL(), '/') . URL::build($form->url),
                 'title' => $form->title,
                 'captcha' => (bool) $form->captcha,
                 'comment_status' => $form->comment_status,

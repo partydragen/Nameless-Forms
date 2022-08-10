@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -79,7 +79,7 @@ if (!isset($_GET['action'])) {
                     Validate::MAX => $forms_language->get('forms', 'form_icon_maximum')
                 ]
             ]);
-                                
+
             if ($validation->passed()) {
                 // Update form
                 try {
@@ -101,17 +101,17 @@ if (!isset($_GET['action'])) {
                     // Enable captcha?
                     if (isset($_POST['captcha']) && $_POST['captcha'] == 'on') $captcha = 1;
                     else $captcha = 0;
-                                    
+
                     // Save to database
                     $form->update([
-                        'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
-                        'title' => Output::getClean(Input::get('form_name')),
+                        'url' => rtrim(Input::get('form_url'), '/'),
+                        'title' => Input::get('form_name'),
                         'link_location' => $location,
                         'icon' => Input::get('form_icon'),
                         'captcha' => $captcha,
-                        'content' => Output::getClean(Input::get('content'))
+                        'content' => Input::get('content')
                     ]);
-                                        
+
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
                     Redirect::to(URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)));
                 } catch (Exception $e) {
@@ -126,7 +126,7 @@ if (!isset($_GET['action'])) {
             $errors[] = $language->get('general', 'invalid_token');
         }
     }
-    
+
     // Get form fields from database
     $fields_array = [];
     foreach ($form->getFields() as $field) {
@@ -172,7 +172,7 @@ if (!isset($_GET['action'])) {
         AssetTree::TINYMCE,
     ]);
 
-    $template->addJSScript(Input::createTinyEditor($language, 'inputContent'));
+    $template->addJSScript(Input::createTinyEditor($language, 'inputContent', null, false, true));
     
     $template_file = 'forms/form.tpl';
 } else {
@@ -196,7 +196,7 @@ if (!isset($_GET['action'])) {
                             Validate::MAX => $forms_language->get('forms', 'field_name_maximum')
                         ]
                     ]);
-                                        
+
                     if ($validation->passed()) {
                         // Create field
                         try {
@@ -205,14 +205,14 @@ if (!isset($_GET['action'])) {
                             if (array_key_exists($_POST['type'], $field_types)) {
                                 $type = $_POST['type'];
                             }
-                                                
+
                             // Is this field required
                             if (isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
                             else $required = 0;
-                                                
+
                             // Get options into a string
                             $options = str_replace("\n", ',', Input::get('options'));
-                                            
+
                             // Save to database
                             DB::getInstance()->insert('forms_fields', [
                                 'form_id' => $_GET['form'],
@@ -288,7 +288,7 @@ if (!isset($_GET['action'])) {
                             Validate::MAX => $forms_language->get('forms', 'field_name_maximum')
                         ]
                     ]);
-                                        
+
                     if ($validation->passed()) {
                         // Create field
                         try {
@@ -297,21 +297,21 @@ if (!isset($_GET['action'])) {
                             if (array_key_exists($_POST['type'], $field_types)) {
                                 $type = $_POST['type'];
                             }
-                                                
+
                             // Is this field required
                             if (isset($_POST['required']) && $_POST['required'] == 'on') $required = 1;
                             else $required = 0;
-                                                
+
                             // Get options into a string
                             $options = str_replace("\n", ',', Input::get('options'));
-                                            
+
                             // Save to database
                             DB::getInstance()->update('forms_fields', $field->id, [
-                                'name' => Output::getClean(Input::get('field_name')),
+                                'name' => Input::get('field_name'),
                                 'type' => $type,
                                 'required' => $required,
                                 'options' => htmlspecialchars($options),
-                                'info' => Output::getClean(nl2br(Input::get('info'))),
+                                'info' => nl2br(Input::get('info')),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
                                 'order' => Input::get('order')

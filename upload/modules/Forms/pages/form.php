@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -135,7 +135,7 @@ if ($captcha) {
 if (!empty($form->data()->content)) {
     $smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->data()->content)));
 }
-    
+
 $smarty->assign([
     'TITLE' => Output::getClean($form->data()->title),
     'FIELDS' => $fields_array,

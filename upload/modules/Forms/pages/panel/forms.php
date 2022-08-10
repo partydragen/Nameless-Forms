@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -138,12 +138,12 @@ if (!isset($_GET['action'])) {
                                         
                                 // Save to database
                                 DB::getInstance()->insert('forms', [
-                                    'url' => Output::getClean(rtrim(Input::get('form_url'), '/')),
-                                    'title' => Output::getClean(Input::get('form_name')),
+                                    'url' => rtrim(Input::get('form_url'), '/'),
+                                    'title' => Input::get('form_name'),
                                     'link_location' => $location,
                                     'icon' => Input::get('form_icon'),
                                     'captcha' => $captcha,
-                                    'content' => Output::getClean(Input::get('content'))
+                                    'content' => Input::get('content')
                                 ]);
                                 Session::flash('staff_forms', $forms_language->get('forms', 'form_created_successfully'));
                                 Redirect::to(URL::build('/panel/forms'));
@@ -189,7 +189,7 @@ if (!isset($_GET['action'])) {
                 AssetTree::TINYMCE,
             ]);
 
-            $template->addJSScript(Input::createTinyEditor($language, 'inputContent'));
+            $template->addJSScript(Input::createTinyEditor($language, 'inputContent', null, false, true));
 
             $template_file = 'forms/forms_new.tpl';
         break;

@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  */
@@ -82,9 +82,9 @@ class Submission {
 
                         $value = (!is_array($item) ? nl2br($item) : implode(', ', $item));
 
-                        $insert_values[] = Output::getClean($submission_id);
-                        $insert_values[] = Output::getClean($field->id);
-                        $insert_values[] = Output::getClean($value);
+                        $insert_values[] = $submission_id;
+                        $insert_values[] = $field->id;
+                        $insert_values[] = $value;
                     }
                 } else {
                     // File Uploading
@@ -100,9 +100,9 @@ class Submission {
                             if ($upload) {
                                 $inserts[] = '(?,?,?),';
 
-                                $insert_values[] = Output::getClean($submission_id);
-                                $insert_values[] = Output::getClean($field->id);
-                                $insert_values[] = Output::getClean($upload->getName() . '.' . $upload->getMime());
+                                $insert_values[] = $submission_id;
+                                $insert_values[] = $field->id;
+                                $insert_values[] = $upload->getName() . '.' . $upload->getMime();
                             } else {
                                 $this->addError(Output::getClean($field->name) . ': ' . $image["error"]);
                             }
@@ -128,15 +128,15 @@ class Submission {
             $status_color = $status->data()->color;
             EventHandler::executeEvent('newFormSubmission', [
                 'event' => 'newFormSubmission',
-                'username' => Output::getClean($form->data()->title),
+                'username' => $form->data()->title,
                 'content' => Forms::getLanguage()->get('forms', 'new_submission_text', [
                     'form' => $form->data()->title,
-                    'user' => Output::getClean(($user != null && $user->exists() ? $user->getDisplayname() : Forms::getLanguage()->get('forms', 'guest')))
+                    'user' => ($user != null && $user->exists() ? $user->getDisplayname() : Forms::getLanguage()->get('forms', 'guest'))
                 ]),
                 'content_full' => '',
                 'avatar_url' => ($user != null && $user->exists() ? $user->getAvatar(128, true) : null),
-                'title' => Output::getClean($form->data()->title),
-                'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id),
+                'title' => $form->data()->title,
+                'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id),
                 'color' => $status_color
             ]);
 

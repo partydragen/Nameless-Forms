@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -117,8 +117,12 @@ if (!isset($_GET['view'])) {
         } else {
             $p = 1;
         }
-        
-        $paginator = new Paginator((isset($template_pagination) ? $template_pagination : []));
+
+        $paginator = new Paginator(
+            $template_pagination ?? null,
+            $template_pagination_left ?? null,
+            $template_pagination_right ?? null
+        );
         $results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
         $pagination = $paginator->generate(7, URL::build('/panel/forms/submissions/', implode('&', $url_parameters)));
 
@@ -184,9 +188,8 @@ if (!isset($_GET['view'])) {
                 'link' => URL::build('/panel/forms/submissions/', 'view=' . $submission->id),
             ];
         }
-        
+
         $smarty->assign('PAGINATION', $pagination);
-        
     }
 
     // Get forms from database
@@ -319,7 +322,7 @@ if (!isset($_GET['view'])) {
                             'user_id' => $user->data()->id,
                             'created' => date('U'),
                             'anonymous' => $anonymous,
-                            'content' => Output::getClean(nl2br(Input::get('content')))
+                            'content' => nl2br(Input::get('content'))
                         ]);
                     }
 
@@ -350,8 +353,8 @@ if (!isset($_GET['view'])) {
                             'content' => $forms_language->get('forms', 'updated_submission_text', ['form' => $form->data()->title, 'user' => $user->getDisplayname()]),
                             'content_full' => $content,
                             'avatar_url' => $user->getAvatar(128, true),
-                            'title' => Output::getClean('[#' . $submission->data()->id . '] ' . $form->data()->title),
-                            'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
+                            'title' => '[#' . $submission->data()->id . '] ' . $form->data()->title,
+                            'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
                             'color' => $status_color
                         ]);
 
@@ -370,7 +373,7 @@ if (!isset($_GET['view'])) {
 
                                 // Send email to user of new changes to submission
                                 if ($sendEmail == 1) {
-                                    $link = rtrim(Util::getSelfURL(), '/') . URL::build('/user/submissions/', 'view=' . $submission->data()->id);
+                                    $link = rtrim(URL::getSelfURL(), '/') . URL::build('/user/submissions/', 'view=' . $submission->data()->id);
                                     $comment = (!empty(Input::get('content')) ? Input::get('content') : $forms_language->get('forms', 'no_comment'));
 
                                     $message = str_replace(
@@ -418,7 +421,6 @@ if (!isset($_GET['view'])) {
                                             'user_id' => $target_user->data()->id
                                         ]);
                                     }
-
                                 }
                             }
                         }

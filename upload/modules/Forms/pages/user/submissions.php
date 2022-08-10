@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -48,7 +48,11 @@ if (!isset($_GET['view'])) {
             $p = 1;
         }
 
-        $paginator = new Paginator((isset($template_pagination) ? $template_pagination : []));
+        $paginator = new Paginator(
+            $template_pagination ?? null,
+            $template_pagination_left ?? null,
+            $template_pagination_right ?? null
+        );
         $results = $paginator->getLimited($submissions_query, 10, $p, count($submissions_query));
         $pagination = $paginator->generate(7, URL::build('/user/submissions/'));
 
@@ -141,7 +145,7 @@ if (!isset($_GET['view'])) {
                         'form_id' => $submission->data()->id,
                         'user_id' => $user->data()->id,
                         'created' => date('U'),
-                        'content' => Output::getClean(nl2br(Input::get('content')))
+                        'content' => nl2br(Input::get('content'))
                     ]);
 
                     // Update status on comment?
@@ -161,15 +165,15 @@ if (!isset($_GET['view'])) {
             
                     EventHandler::executeEvent('updatedFormSubmission', [
                         'event' => 'updatedFormSubmission',
-                        'username' => Output::getClean($form->data()->title),
+                        'username' => $form->data()->title,
                         'content' => $forms_language->get('forms', 'updated_submission_text', [
                             'form' => $form->data()->title,
                             'user' => $user->getDisplayname()
                         ]),
-                        'content_full' => Output::getClean(Input::get('content')),
+                        'content_full' => Input::get('content'),
                         'avatar_url' => $user->getAvatar(128, true),
-                        'title' => Output::getClean($form->data()->title),
-                        'url' => rtrim(Util::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
+                        'title' => $form->data()->title,
+                        'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
                         'color' => $status_color
                     ]);
 

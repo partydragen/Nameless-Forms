@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.0.1
  *
  *  License: MIT
  *
@@ -99,7 +99,7 @@ if (!isset($_GET['action'])) {
                     $errors[] = $language->get('general', 'invalid_token');
                 }
             }
-        
+
             // Get a list of forms
             $forms_list = DB::getInstance()->get('forms', ['id', '<>', 0])->results();
             $template_forms = [];
@@ -125,7 +125,7 @@ if (!isset($_GET['action'])) {
                     ];
                 }
             }
-        
+
             $smarty->assign([
                 'CREATING_STATUS' => $forms_language->get('forms', 'creating_status'),
                 'CANCEL' => $language->get('general', 'cancel'),
@@ -199,7 +199,7 @@ if (!isset($_GET['action'])) {
                         }
 
                         $group_string = rtrim($group_string, ',');
-                        
+
                         // is status marked as open
                         if (isset($_POST['open']) && $_POST['open'] == 'on') $open = 1;
                         else $open = 0;
@@ -263,7 +263,7 @@ if (!isset($_GET['action'])) {
                     ];
                 }
             }
-            
+
             $smarty->assign([
                 'EDITING_STATUS' => $forms_language->get('forms', 'editing_status'),
                 'CANCEL' => $language->get('general', 'cancel'),
@@ -283,7 +283,7 @@ if (!isset($_GET['action'])) {
                 'MARKED_AS_OPEN' => $forms_language->get('forms', 'marked_as_open'),
                 'MARKED_AS_OPEN_VALUE' => Output::getClean($status->data()->open),
             ]);
-        
+
             $template_file = 'forms/status_edit.tpl';
         break;
         case 'delete':
@@ -292,7 +292,7 @@ if (!isset($_GET['action'])) {
                 // Check the status ID is valid
                 Redirect::to(URL::build('/panel/forms'));
             }
-            
+
             $status = new Status($_GET['status']);
             if ($status->exists() && $status->data()->id != 1 && $status->data()->id != 2) {
                 $status->delete();
