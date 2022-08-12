@@ -28,11 +28,6 @@ class Forms_Module extends Module {
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
-        // Hooks
-        EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
-        EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
-        EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
-
         // Define URLs which belong to this module
         $pages->add('Forms', '/panel/form', 'pages/panel/form.php');
         $pages->add('Forms', '/panel/forms', 'pages/panel/forms.php');
@@ -114,8 +109,16 @@ class Forms_Module extends Module {
             // Database tables don't exist yet
         }
 
+        // Hooks
+        EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
+        EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
+        EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
+
         require_once ROOT_PATH . '/modules/Forms/hooks/CloneGroupFormsHook.php';
         EventHandler::registerListener('cloneGroup', 'CloneGroupFormsHook::execute');
+
+        require_once ROOT_PATH . '/modules/Forms/hooks/DeleteUserFormsHook.php';
+        EventHandler::registerListener('deleteUser', 'DeleteUserFormsHook::execute');
 
         $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
 
