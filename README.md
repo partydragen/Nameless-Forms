@@ -2,7 +2,7 @@
 The Forms module allow you to create multiple forms for users to do, Like Applications, Tickets, Contact Us and much more
 
 ## Requirements
-- NamelessMC version 2 pre-release 13
+- NamelessMC version 2.0.x
 
 ## Installation
 - Upload the contents of the **upload** directory straight into your NamelessMC installation's directory
