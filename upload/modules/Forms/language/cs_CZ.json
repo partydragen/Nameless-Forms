@@ -114,5 +114,9 @@
     "forms/view_resource": "Zobrazit stránku doplňku",
     "forms/x_field_maximum_y": "{{field}} musí mít maximálně {{max}} znaků.",
     "forms/x_field_minimum_y": "{{field}} musí mít minimálně {{min}} znaků.",
-    "forms/your_submission_updated": "Vaše odpověď byla upravena"
+    "forms/your_submission_updated": "Vaše odpověď byla upravena",
+    "forms/status_color": "Barva stavu",
+    "forms/advanced": "Pokročilé",
+    "forms/submission_source": "Poslat odpověď do zdroje",
+    "forms/submit_to_submission_forum": "Poslat odpověď na fórum?"
 }
