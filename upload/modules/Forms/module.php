@@ -114,6 +114,9 @@ class Forms_Module extends Module {
             // Database tables don't exist yet
         }
 
+        require_once ROOT_PATH . '/modules/Forms/hooks/CloneGroupFormsHook.php';
+        EventHandler::registerListener('cloneGroup', 'CloneGroupFormsHook::execute');
+
         $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
 
         Endpoints::registerTransformer('form', 'Forms', static function (Nameless2API $api, string $value) {
