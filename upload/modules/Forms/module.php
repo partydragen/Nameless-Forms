@@ -244,7 +244,72 @@ class Forms_Module extends Module {
     }
 
     public function getDebugInfo(): array {
-        return [];
+        // Forms
+        $forms_list = [];
+        $forms_query = $this->_db->query('SELECT * FROM nl2_forms')->results();
+        foreach ($forms_query as $data) {
+            $form = new Form($data->id);
+            
+            // Form fields
+            $fields = [];
+            foreach ($form->getFields() as $field) {
+                $fields[] = [
+                    'id' => (int)$field->id,
+                    'name' => $field->name,
+                    'type' => (int)$field->type,
+                    'required' => (bool)$field->required,
+                    'min' => (int)$field->min,
+                    'max' => (int)$field->max,
+                    'placeholder' => $field->placeholder,
+                    'options' => $field->options,
+                    'info' => $field->info
+                ];
+            }
+
+            // Form permissions
+            $permissions = [];
+            $permissions_query = $this->_db->query('SELECT * FROM nl2_forms_permissions WHERE form_id = ?', [$form->data()->id])->results();
+            foreach ($permissions_query as $permission) {
+               $permissions[] = [
+                    'group_id' => (int)$permission->group_id,
+                    'post' => (bool)$permission->post,
+                    'view_own' => (bool)$permission->view_own,
+                    'view' => (bool)$permission->view,
+                    'can_delete' => (bool)$permission->can_delete,
+                ]; 
+            }
+
+            $forms_list[] = [
+                'id' => (int)$form->data()->id,
+                'title' => $form->data()->title,
+                'url' => $form->data()->url,
+                'guest' => (bool)$form->data()->guest,
+                'link_location' => (int)$form->data()->link_location,
+                'icon' => $form->data()->icon,
+                'captcha' => (bool)$form->data()->captcha,
+                'comment_status' => (int)$form->data()->comment_status,
+                'source' => $form->data()->source,
+                'forum_id' => (int)$form->data()->forum_id,
+                'fields' => $fields,
+                'permissions' => $permissions
+            ];
+        }
+        
+        // Statuses
+        $statuses_list = [];
+        $statuses_query = $this->_db->query('SELECT * FROM nl2_forms_statuses')->results();
+        foreach ($statuses_query as $data) {
+            $statuses_list[] = [
+                'id' => (int)$data->id,
+                'html' => $data->html,
+                'open' => (bool)$data->open,
+                'fids' => $data->fids,
+                'gids' => $data->gids,
+                'color' => $data->color
+            ];
+        }
+        
+        return ['forms' => $forms_list, 'statuses' => $statuses_list];
     }
 
     private function initialiseUpdate($old_version) {
