@@ -91,21 +91,21 @@
                         {/if}
 
                         <hr />
-                        
+
                         <form action="" method="post">
                           {if count($STATUSES)}
                           <div class="form-group">
                             {foreach from=$STATUSES item=status}
                             <div class="form-check-inline">
-                            <input type="radio" class="form-check-input" name="status" id="{$status.id}" value="{$status.id}"{if $status.active} checked="checked"{/if} {if !$status.permission}disabled{/if}>
-                            <label class="form-check-label" for="{$status.id}">{$status.html} </label>
+                                <input type="radio" class="form-check-input" name="status" id="{$status.id}" value="{$status.id}"{if $status.active} checked="checked"{/if} {if !$status.permission}disabled{/if}>
+                                <label class="form-check-label" for="{$status.id}">{$status.html} </label>
                             </div>
                             {/foreach}
                           </div>
                           {/if}
                         
                           <div class="form-group">
-                            <textarea class="form-control" name="content" rows="5" placeholder="{$NEW_COMMENT}"></textarea>
+                            <textarea class="form-control" name="content" rows="5" placeholder="{$NEW_COMMENT}">{$COMMENT_VALUE}</textarea>
                           </div>
                           {if $CAN_USE_ANONYMOUS}
                             <div class="form-group custom-control custom-switch">

@@ -118,5 +118,6 @@
     "forms\/your_submission_updated": "Your submission has been updated",
     "forms\/advanced": "Advanced",
     "forms\/submission_source": "Submit submission to source",
-    "forms\/submit_to_submission_forum": "Submit submission to forum?"
+    "forms\/submit_to_submission_forum": "Submit submission to forum?",
+    "forms/no_permission_to_select_status": "You don't have permission to select this status!"
 }

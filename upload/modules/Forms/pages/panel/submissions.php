@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.1
+ *  NamelessMC version 2.0.2
  *
  *  License: MIT
  *
@@ -297,7 +297,7 @@ if (!isset($_GET['view'])) {
                     if ($submission->data()->status_id != $_POST['status']) {
                         $new_status = new Status($_POST['status']);
                         if ($new_status->exists()) {
-                            $groups = explode(',', $status->data()->gids);
+                            $groups = explode(',', $new_status->data()->gids);
                             $hasperm = false;
                             foreach ($user_groups as $group_id) {
                                 if (in_array($group_id, $groups)) {
@@ -311,23 +311,19 @@ if (!isset($_GET['view'])) {
                                 $status_color = $new_status->data()->color;
                                 $status_id = $_POST['status'];
                                 $any_changes = true;
+                            } else {
+                                // No permission to use this status
+                                $errors[] = $forms_language->get('forms', 'no_permission_to_select_status');
                             }
                         }
                     }
 
                     if (!empty(Input::get('content'))) {
                         $any_changes = true;
-                        DB::getInstance()->insert('forms_comments', [
-                            'form_id' => $submission->data()->id,
-                            'user_id' => $user->data()->id,
-                            'created' => date('U'),
-                            'anonymous' => $anonymous,
-                            'content' => nl2br(Input::get('content'))
-                        ]);
                     }
 
                     // Was there any changes?
-                    if ($any_changes == true) {
+                    if ($any_changes == true && !count($errors)) {
                         $submission->update([
                             'updated_by' => ($anonymous != 1 ? $user->data()->id : 0),
                             'updated' => date('U'),
@@ -337,6 +333,14 @@ if (!isset($_GET['view'])) {
                         $content = '';
                         if (!empty(Input::get('content'))) {
                             // New comment
+                            DB::getInstance()->insert('forms_comments', [
+                                'form_id' => $submission->data()->id,
+                                'user_id' => $user->data()->id,
+                                'created' => date('U'),
+                                'anonymous' => $anonymous,
+                                'content' => nl2br(Input::get('content'))
+                            ]);
+                            
                             $content = Output::getClean(Input::get('content'));
                             if (isset($new_status)&& $new_status->exists()) {
                                 $content .= "\n\n" . $forms_language->get('forms', 'updated_submission_status', ['status' => strip_tags($status->data()->html), 'new_status' => strip_tags($new_status->data()->html)]);
@@ -551,7 +555,9 @@ if (!isset($_GET['view'])) {
             'SEND_NOTIFY_EMAIL' => $forms_language->get('forms', 'send_notify_email'),
             'CAN_SEND_EMAIL' => $can_view_own,
             'TOKEN' => Token::get(),
-            'PATH_TO_UPLOADS' => ((defined('CONFIG_PATH')) ? CONFIG_PATH . '/' : '/') . 'uploads/forms_submissions/'
+            'PATH_TO_UPLOADS' => ((defined('CONFIG_PATH')) ? CONFIG_PATH . '/' : '/') . 'uploads/forms_submissions/',
+            'COMMENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : ''),
+            'NO_PERMISSION_TO_SELECT_STATUS' => $forms_language->get('forms', 'no_permission_to_select_status')
         ]);
 
         $template_file = 'forms/submissions_view.tpl';
