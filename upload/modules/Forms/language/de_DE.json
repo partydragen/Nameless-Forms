@@ -118,5 +118,6 @@
     "forms/status_color": "Status Farbe",
     "forms/submission_source": "Formular an die Quelle senden",
     "forms/submit_to_submission_forum": "Formular im Forum einreichen?",
-    "forms/advanced": "Erweitert"
+    "forms/advanced": "Erweitert",
+    "forms/no_permission_to_select_status": "Du hast nicht die Erlaubnis, diesen Status auszuwählen!"
 }
