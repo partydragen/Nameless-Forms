@@ -118,5 +118,6 @@
     "forms/status_color": "Barva stavu",
     "forms/advanced": "Pokročilé",
     "forms/submission_source": "Poslat odpověď do zdroje",
-    "forms/submit_to_submission_forum": "Poslat odpověď na fórum?"
+    "forms/submit_to_submission_forum": "Poslat odpověď na fórum?",
+    "forms/no_permission_to_select_status": "Nemáte oprávnění na výběr tohoto stavu!"
 }
