@@ -118,5 +118,6 @@
     "forms/status_color": "Farba stavu",
     "forms/submit_to_submission_forum": "Odoslať príspevok do fóra?",
     "forms/submission_source": "Odoslať príspevok zdroju",
-    "forms/advanced": "Pokročilé"
+    "forms/advanced": "Pokročilé",
+    "forms/no_permission_to_select_status": "Na výber tohto stavu nemáte povolenie!"
 }
