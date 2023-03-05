@@ -118,5 +118,10 @@
     "forms/your_submission_updated": "La tua richiesta ha ricevuto degli aggiornamenti",
     "forms/advanced": "Avanzate",
     "forms/submission_source": "Invia moduli alla sorgente",
-    "forms/submit_to_submission_forum": "Inviare moduli al forum?"
+    "forms/submit_to_submission_forum": "Inviare moduli al forum?",
+    "forms/limits_and_requirements": "Limiti e Requisiti",
+    "forms/form_user_limit_reached": "Hai raggiunto il limite di risponde a questo modulo!",
+    "forms/form_global_limit_reached": "Troppi utenti hanno inviato questo modulo di recente, riprova più tardi",
+    "forms/form_requires_integration": "Questo modulo richiede che tu collega il tuo account di {{integration}}. Puoi farlo nelle {{linkStart}}impostazioni dell'account{{linkEnd}}",
+    "forms/no_permission_to_select_status": "Non hai il permesso di selezionare questo stato!"
 }
