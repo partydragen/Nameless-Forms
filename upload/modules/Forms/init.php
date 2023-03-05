@@ -20,6 +20,14 @@ spl_autoload_register(function ($class) {
     }
 });
 
+// Load classes
+spl_autoload_register(function ($class) {
+    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'hooks', $class . '.php'));
+    if (file_exists($path)) {
+        require_once($path);
+    }
+});
+
 // Initialise module
 require_once(ROOT_PATH . '/modules/Forms/module.php');
 $module = new Forms_Module($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints);

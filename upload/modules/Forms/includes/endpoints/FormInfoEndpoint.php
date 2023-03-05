@@ -12,7 +12,7 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
         $return = [
             'id' => $form->data()->id,
             'url' => $form->data()->url,
-            'url_full' => rtrim(Util::getSelfURL(), '/') . URL::build($form->data()->url),
+            'url_full' => rtrim(URL::getSelfURL(), '/') . URL::build($form->data()->url),
             'title' => $form->data()->title,
             'captcha' => (bool) $form->data()->captcha,
             'comment_status' => $form->data()->comment_status,

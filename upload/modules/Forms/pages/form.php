@@ -49,6 +49,20 @@ define('PAGE', 'form-' . $form->data()->id);
 $page_title = $forms_language->get('forms', 'forms');
 require_once(ROOT_PATH . '/core/templates/frontend_init.php');
 
+// Execute event with allow modules to interact with it
+$renderFormEvent = EventHandler::executeEvent('renderForm', [
+    'user' => $user,
+    'form' => $form,
+    'content' => $form->data()->content,
+    'fields' => $form->getFields()
+]);
+
+// Check if the event returned any errors
+if (isset($renderFormEvent['errors']) && count($renderFormEvent['errors'])) {
+    Session::flash('home_error', $renderFormEvent['errors'][0]);
+    Redirect::to(URL::build('/'));
+}
+
 // Check if captcha is enabled
 $captcha = $form->data()->captcha ? true : false;
 if ($captcha) {
@@ -103,7 +117,7 @@ if (Input::exists()) {
 }
 
 $fields_array = [];
-foreach ($form->getFields() as $field) {
+foreach ($renderFormEvent['fields'] as $field) {
     $options = explode(',', Output::getClean(str_replace("\r" , "", $field->options)));
     $fields_array[] = [
         'id' => Output::getClean($field->id),
@@ -132,8 +146,8 @@ if ($captcha) {
     }
 }
 
-if (!empty($form->data()->content)) {
-    $smarty->assign('CONTENT', Output::getPurified(Output::getDecoded($form->data()->content)));
+if (!empty($renderFormEvent['content'])) {
+    $smarty->assign('CONTENT', $renderFormEvent['content']);
 }
 
 $smarty->assign([
@@ -147,7 +161,7 @@ $smarty->assign([
 $template->assets()->include([
     AssetTree::TINYMCE,
 ]);
-    
+
 // Load modules + template
 Module::loadPage($user, $pages, $cache, $smarty, [$navigation, $cc_nav, $staffcp_nav], $widgets, $template);
 

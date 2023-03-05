@@ -113,11 +113,14 @@ class Forms_Module extends Module {
         EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
         EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
         EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
+        EventHandler::registerEvent('renderForm', 'renderForm', [], true, true);
 
-        require_once ROOT_PATH . '/modules/Forms/hooks/CloneGroupFormsHook.php';
+        EventHandler::registerListener('renderForm', 'ContentHook::purify');
+        EventHandler::registerListener('renderForm', 'ContentHook::codeTransform', 15);
+        EventHandler::registerListener('renderForm', 'ContentHook::decode', 20);
+        EventHandler::registerListener('renderForm', 'ContentHook::renderEmojis', 10);
+        EventHandler::registerListener('renderForm', 'ContentHook::replaceAnchors', 15);
         EventHandler::registerListener('cloneGroup', 'CloneGroupFormsHook::execute');
-
-        require_once ROOT_PATH . '/modules/Forms/hooks/DeleteUserFormsHook.php';
         EventHandler::registerListener('deleteUser', 'DeleteUserFormsHook::execute');
 
         $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
@@ -315,49 +318,10 @@ class Forms_Module extends Module {
     private function initialiseUpdate($old_version) {
         $old_version = str_replace(array(".", "-"), "", $old_version);
 
-        if ($old_version < 192) {
+        if ($old_version < 134) {
             try {
-                $this->_db->addColumn('forms', '`source`', "varchar(32) NOT NULL DEFAULT 'forms'");
-                $this->_db->addColumn('forms', '`forum_id`', "int(11) NOT NULL DEFAULT '0'");
-                $this->_db->addColumn('forms_statuses', '`color`', "varchar(32) NULL DEFAULT NULL");
-            } catch (Exception $e) {
-                // Error
-            }
-        }
-
-        if ($old_version < 180) {
-            try {
-                // Generate table
-                $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
-                $this->_db->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
-            } catch (Exception $e) {
-                // Error
-            }
-
-            try {
-                $this->_db->addColumn('forms_fields', '`info`', "text NULL");
-            } catch (Exception $e) {
-                // Error
-            }
-        }
-
-        if ($old_version < 170) {
-            try {
-                $this->_db->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $this->_db->addColumn('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
-                $this->_db->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
-                $this->_db->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
-                $this->_db->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
-
-                // Update main admin group permissions
-                $group = $this->_db->get('groups', array('id', '=', 2))->results();
-                $group = $group[0];
-                
-                $group_permissions = json_decode($group->permissions, TRUE);
-                $group_permissions['forms.anonymous'] = 1;
-                
-                $group_permissions = json_encode($group_permissions);
-                $this->_db->update('groups', 2, array('permissions' => $group_permissions));
+                $this->_db->addColumn('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms', '`content`', "mediumtext NULL DEFAULT NULL");
             } catch (Exception $e) {
                 // Error
             }
@@ -395,18 +359,70 @@ class Forms_Module extends Module {
                             ));
                         }
                     }
-                } 
+                }
             } catch (Exception $e) {
                 // Error
             }
         }
 
-        if ($old_version < 134) {
+        if ($old_version < 170) {
             try {
-                $this->_db->addColumn('forms', '`captcha`', "tinyint(1) NOT NULL DEFAULT '0'");
-                $this->_db->addColumn('forms', '`content`', "mediumtext NULL DEFAULT NULL");
+                $this->_db->addColumn('forms_comments', '`anonymous`', "tinyint(1) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`min`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`max`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_fields', '`placeholder`', "varchar(255) NULL DEFAULT NULL");
+                $this->_db->addColumn('forms', '`comment_status`', "int(11) NOT NULL DEFAULT '0'");
+
+                // Update main admin group permissions
+                $group = $this->_db->get('groups', array('id', '=', 2))->results();
+                $group = $group[0];
+
+                $group_permissions = json_decode($group->permissions, TRUE);
+                $group_permissions['forms.anonymous'] = 1;
+
+                $group_permissions = json_encode($group_permissions);
+                $this->_db->update('groups', 2, array('permissions' => $group_permissions));
             } catch (Exception $e) {
                 // Error
+            }
+        }
+
+        if ($old_version < 180) {
+            try {
+                // Generate table
+                $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
+                $this->_db->query('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
+            } catch (Exception $e) {
+                // Error
+            }
+
+            try {
+                $this->_db->addColumn('forms_fields', '`info`', "text NULL");
+            } catch (Exception $e) {
+                // Error
+            }
+        }
+
+        if ($old_version < 192) {
+            try {
+                $this->_db->addColumn('forms', '`source`', "varchar(32) NOT NULL DEFAULT 'forms'");
+                $this->_db->addColumn('forms', '`forum_id`', "int(11) NOT NULL DEFAULT '0'");
+                $this->_db->addColumn('forms_statuses', '`color`', "varchar(32) NULL DEFAULT NULL");
+            } catch (Exception $e) {
+                // Error
+            }
+        }
+
+        if ($old_version < 1102) {
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms ADD `user_limit` varchar(128) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms ADD `global_limit` varchar(128) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms ADD `required_integrations` varchar(128) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms ADD `min_player_age` varchar(128) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms ADD `min_player_playtime` varchar(128) DEFAULT NULL');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
             }
         }
     }
@@ -415,7 +431,7 @@ class Forms_Module extends Module {
         // Generate tables
         if (!$this->_db->showTables('forms')) {
             try {
-                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', `source` varchar(32) NOT NULL DEFAULT 'forms', `forum_id` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', `source` varchar(32) NOT NULL DEFAULT 'forms', `forum_id` int(11) NOT NULL DEFAULT '0', `global_limit` varchar(128) DEFAULT NULL, `user_limit` varchar(128) DEFAULT NULL, `required_integrations` varchar(128) DEFAULT NULL, `min_player_age` varchar(128) DEFAULT NULL, `min_player_playtime` varchar(128) DEFAULT NULL, PRIMARY KEY (`id`)");
 
                 $this->_db->insert('forms', array(
                     'url' => '/apply',
@@ -501,7 +517,7 @@ class Forms_Module extends Module {
             try {
                 $this->_db->createTable("forms_replies_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `submission_id` int(11) NOT NULL, `field_id` int(11) NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY (`id`)");
                 
-                $this->_db->createQuery('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
+                $this->_db->query('ALTER TABLE `nl2_forms_replies_fields` ADD INDEX `nl2_forms_replies_fields_idx_submission_id` (`submission_id`)');
             } catch (Exception $e) {
                 // Error
             }

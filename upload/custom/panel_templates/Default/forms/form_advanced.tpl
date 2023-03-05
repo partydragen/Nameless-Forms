@@ -54,6 +54,9 @@
                             <a class="nav-link" href="{$STATUSES_LINK}">{$STATUSES}</a>
                           </li>
                           <li class="nav-item">
+                            <a class="nav-link" href="{$LIMITS_AND_REQUIREMENTS_LINK}">{$LIMITS_AND_REQUIREMENTS}</a>
+                          </li>
+                          <li class="nav-item">
                             <a class="nav-link active" href="{$ADVANCED_LINK}">{$ADVANCED}</a>
                           </li>
                         </ul>
@@ -64,9 +67,9 @@
                         {include file='includes/alerts.tpl'}
 
                         <div class="alert alert-warning" role="alert">
-                          These features is currently for patreon supporters, it will be available for everyone in the future with means this wont function for you
-                          </br></br>
-                          <a href="https://partydragen.com/patreon/" target="_blank" class="btn btn-primary">Patreon</a>
+                            These features is currently for patreon supporters, it will be available for everyone in the future with means this wont function for you
+                            </br></br>
+                            <a href="https://partydragen.com/patreon/" target="_blank" class="btn btn-primary">Patreon</a>
                         </div>
 
                         <form role="form" action="" method="post">
@@ -90,13 +93,23 @@
                             {/if}
                             <div class="form-group">
                                 <input type="hidden" name="token" value="{$TOKEN}">
-                                <!--<input type="submit" class="btn btn-primary" value="{$SUBMIT}" disabled>-->
                                 <span data-toggle="popover" data-title="Early access for patreons" data-content="This feature is currently in early access for patreon supporters" data-placement="right"><a href="#" class="btn btn-primary disabled">{$SUBMIT}</a></span>
                             </div>
                         </form>
-                        
-                        {if !isset($PARTYDRAGEN_PREMIUM)}
-                        <center><p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></br>Support on <a href="https://discord.gg/TtH6tpp" target="_blank">Discord</a></p></center>
+
+                        {if !isset($PDS)}
+                            <center>
+                                <p>Forms Module by <a href="https://partydragen.com/" target="_blank">Partydragen</a></br>Support on <a href="https://discord.gg/TtH6tpp" target="_blank">Discord</a></br>
+                                    <a class="ml-1" href="https://partydragen.com/suggestions/" target="_blank" data-toggle="tooltip"
+                                       data-placement="top" title="You can submit suggestions here"><i class="fa-solid fa-thumbs-up text-warning"></i></a>
+                                    <a class="ml-1" href="https://discord.gg/TtH6tpp" target="_blank" data-toggle="tooltip"
+                                       data-placement="top" title="Discord"><i class="fab fa-discord fa-fw text-discord"></i></a>
+                                    <a class="ml-1" href="https://partydragen.com/" target="_blank" data-toggle="tooltip"
+                                       data-placement="top" title="Website"><i class="fas fa-globe fa-fw text-primary"></i></a>
+                                    <a class="ml-1" href="https://www.patreon.com/partydragen" target="_blank" data-toggle="tooltip"
+                                       data-placement="top" title="Support the development on Patreon"><i class="fas fa-heart fa-fw text-danger"></i></a>
+                                </p>
+                            </center>
                         {/if}
                     </div>
                 </div>
