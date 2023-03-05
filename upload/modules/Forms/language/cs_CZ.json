@@ -119,5 +119,9 @@
     "forms/advanced": "Pokročilé",
     "forms/submission_source": "Poslat odpověď do zdroje",
     "forms/submit_to_submission_forum": "Poslat odpověď na fórum?",
-    "forms/no_permission_to_select_status": "Nemáte oprávnění na výběr tohoto stavu!"
+    "forms/no_permission_to_select_status": "Nemáte oprávnění na výběr tohoto stavu!",
+    "forms/limits_and_requirements": "Omezení a požadavky",
+    "forms/form_global_limit_reached": "Tento formulář byl v nedávné době odeslán příliš velkým počtem uživatelů, zkuste to prosím znovu za chvíli",
+    "forms/form_user_limit_reached": "Dosáhli jste limitu počtu odeslání tohoto formuláře!",
+    "forms/form_requires_integration": "Tento formulář vyžaduje, abyste propojili svůj účet s účtem {{integration}}. Můžete tak provést v {{linkStart}}propojeních účtu{{linkEnd}}"
 }
