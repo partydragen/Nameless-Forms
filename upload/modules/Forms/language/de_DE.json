@@ -119,5 +119,9 @@
     "forms/submission_source": "Formular an die Quelle senden",
     "forms/submit_to_submission_forum": "Formular im Forum einreichen?",
     "forms/advanced": "Erweitert",
-    "forms/no_permission_to_select_status": "Du hast nicht die Erlaubnis, diesen Status auszuwählen!"
+    "forms/no_permission_to_select_status": "Du hast nicht die Erlaubnis, diesen Status auszuwählen!",
+    "forms/form_user_limit_reached": "Du hast die maximale Anzahl an Einsendungen in diesem Formular erreicht!",
+    "forms/limits_and_requirements": "Limits & Anforderungen",
+    "forms/form_global_limit_reached": "Es haben zu viele Benutzer dieses Formular ausgefüllt. Bitte versuch es später noch einmal.",
+    "forms/form_requires_integration": "Für dieses Formular musst du dein {{integration}}-Konto verknüpfen. Du kannst dies unter {{linkStart}}Kontoverbindungen{{linkEnd}} tun."
 }
