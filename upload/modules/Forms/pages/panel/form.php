@@ -220,7 +220,9 @@ if (!isset($_GET['action'])) {
                                 'info' => Output::getClean(nl2br(Input::get('info'))),
                                 'order' => Input::get('order'),
                                 'min' => Input::get('minimum'),
-                                'max' => Input::get('maximum')
+                                'max' => Input::get('maximum'),
+                                'default_value' => Input::get('default'),
+                                'regex' => !empty(Input::get('regex')) ? Input::get('regex') : null
                             ]);
                                     
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_created_successfully'));
@@ -238,7 +240,7 @@ if (!isset($_GET['action'])) {
             }
         
             $smarty->assign([
-                'NEW_FIELD_FOR_X' => $forms_language->get('forms', 'new_field_for_x', ['form' => Output::getClean($form->data()->title)]),
+                'FIELD_TITLE_FOR_X' => $forms_language->get('forms', 'new_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -249,12 +251,17 @@ if (!isset($_GET['action'])) {
                 'CHECKBOX' => $forms_language->get('forms', 'checkbox'),
                 'RADIO' => $forms_language->get('forms', 'radio'),
                 'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
+                'ORDER_VALUE' => ((isset($_POST['order']) && $_POST['order']) ? Output::getClean(Input::get('order')) : '1'),
+                'DEFAULT_VALUE' => ((isset($_POST['default']) && $_POST['default']) ? Output::getClean(Input::get('default')) : ''),
                 'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),
+                'MINIMUM_CHARACTERS_VALUE' => ((isset($_POST['minimum']) && $_POST['minimum']) ? Output::getClean(Input::get('minimum')) : '0'),
                 'MAXIMUM_CHARACTERS' => $forms_language->get('forms', 'maximum_characters'),
+                'MAXIMUM_CHARACTERS_VALUE' => ((isset($_POST['maximum']) && $_POST['maximum']) ? Output::getClean(Input::get('maximum')) : '0'),
+                'REGEX_VALUE' => ((isset($_POST['regex']) && $_POST['regex']) ? Output::getClean(Input::get('regex')) : ''),
                 'REQUIRED' => $language->get('admin', 'required'),
             ]);
         
-            $template_file = 'forms/field_new.tpl';
+            $template_file = 'forms/field.tpl';
         break;
         case 'edit':
             if (!is_numeric($_GET['id'])) {
@@ -311,9 +318,11 @@ if (!isset($_GET['action'])) {
                                 'info' => nl2br(Input::get('info')),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
-                                'order' => Input::get('order')
+                                'order' => Input::get('order'),
+                                'default_value' => Input::get('default'),
+                                'regex' => !empty(Input::get('regex')) ? Input::get('regex') : null
                             ]);
-                                    
+
                             Session::flash('staff_forms', $forms_language->get('forms', 'field_updated_successfully'));
                             Redirect::to(URL::build('/panel/form/', 'form=' . $form->data()->id));
                         } catch (Exception $e) {
@@ -336,7 +345,7 @@ if (!isset($_GET['action'])) {
             }
         
             $smarty->assign([
-                'EDITING_FIELD_FOR_X' => $forms_language->get('forms', 'editing_field_for_x', ['form' => Output::getClean($form->data()->title)]),
+                'FIELD_TITLE_FOR_X' => $forms_language->get('forms', 'editing_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
@@ -352,10 +361,12 @@ if (!isset($_GET['action'])) {
                 'INFO_VALUE' => Output::getClean($field->info),
                 'FIELD_ORDER' => $forms_language->get('forms', 'field_order'),
                 'ORDER_VALUE' => $field->order,
+                'DEFAULT_VALUE' => Output::getClean($field->default_value),
                 'MINIMUM_CHARACTERS' => $forms_language->get('forms', 'minimum_characters'),
                 'MINIMUM_CHARACTERS_VALUE' => $field->min,
                 'MAXIMUM_CHARACTERS' => $forms_language->get('forms', 'maximum_characters'),
                 'MAXIMUM_CHARACTERS_VALUE' => $field->max,
+                'REGEX_VALUE' => Output::getClean($field->regex ?? ''),
                 'REQUIRED' => $language->get('admin', 'required'),
                 'REQUIRED_VALUE' => $field->required,
             ]);

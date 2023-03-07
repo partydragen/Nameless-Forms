@@ -122,7 +122,7 @@ foreach ($renderFormEvent['fields'] as $field) {
     $fields_array[] = [
         'id' => Output::getClean($field->id),
         'name' => Output::getClean($field->name),
-        'value' => is_array(Input::get($field->id)) ? Input::get($field->id) : Output::getClean(Input::get($field->id)),
+        'value' =>  isset($_POST[$field->id]) ? is_array(Input::get($field->id)) ? Input::get($field->id) : Output::getClean(Input::get($field->id)) : Output::getClean($field->default_value),
         'type' => Output::getClean($field->type),
         'required' => Output::getClean($field->required),
         'options' => $options,

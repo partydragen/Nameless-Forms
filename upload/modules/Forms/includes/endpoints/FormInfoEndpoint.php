@@ -29,7 +29,9 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
                 'max' => $field->max,
                 'placeholder' => $field->placeholder,
                 'options' => !empty($field->options) ? explode(',', str_replace("\r", "", $field->options)) : [],
-                'info' => $field->info
+                'info' => $field->info,
+                'regex' => $field->regex,
+                'default_value' => $field->default_value,
             ];
         }
         $return['fields'] = $fields;

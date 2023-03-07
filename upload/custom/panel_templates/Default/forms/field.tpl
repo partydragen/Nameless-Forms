@@ -34,7 +34,7 @@
 
                 <div class="card shadow mb-4">
                     <div class="card-body">
-                        <h5 style="display:inline">{$EDITING_FIELD_FOR_X}</h5>
+                        <h5 style="display:inline">{$FIELD_TITLE_FOR_X}</h5>
                         <div class="float-md-right">
                             <a href="{$BACK_LINK}" class="btn btn-warning">{$BACK}</a>
                         </div>
@@ -55,6 +55,10 @@
                                     <option value="{$type.id}"{if $TYPE_VALUE eq {$type.id}} selected{/if}>{$type.name}</option>
                                   {/foreach}
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="InputDefault">Default Value</label>
+                                <input type="text" name="default" class="form-control" id="InputDefault" value="{$DEFAULT_VALUE}" placeholder="Default field value">
                             </div>
                             <div class="form-group">
                                 <label for="InputOptions">{$OPTIONS} / {$CHECKBOX} / {$RADIO} - {$OPTIONS_HELP}</label>
@@ -83,6 +87,10 @@
                                     <input type="number" min="0" class="form-control" id="InputMaximum" name="maximum" value="{$MAXIMUM_CHARACTERS_VALUE}">
                                 </div>
                               </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="InputRegex">Regex</label>
+                                <input type="text" name="regex" class="form-control" id="InputRegex" value="{$REGEX_VALUE}" placeholder="Regex validation">
                             </div>
                             <div class="form-group custom-control custom-switch">
                                 <input id="inputRequired" name="required" type="checkbox" class="custom-control-input"{if $REQUIRED_VALUE eq 1} checked{/if} />

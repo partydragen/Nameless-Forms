@@ -265,7 +265,9 @@ class Forms_Module extends Module {
                     'max' => (int)$field->max,
                     'placeholder' => $field->placeholder,
                     'options' => $field->options,
-                    'info' => $field->info
+                    'info' => $field->info,
+                    'regex' => $field->regex,
+                    'default_value' => $field->default_value,
                 ];
             }
 
@@ -427,6 +429,14 @@ class Forms_Module extends Module {
 
             try {
                 $this->_db->query('ALTER TABLE nl2_forms ADD `hooks` varchar(512) DEFAULT NULL');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
+            }
+
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms_fields ADD `regex` varchar(64) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms_fields ADD `default_value` varchar(64) NOT NULL DEFAULT \'\'');
             } catch (Exception $e) {
                 // unable to retrieve from config
                 echo $e->getMessage() . '<br />';

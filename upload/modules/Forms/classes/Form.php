@@ -104,6 +104,11 @@ class Form {
                 $field_validation_message[Validate::MAX] = $forms_language->get('forms', 'x_field_maximum_y', ['field' => Output::getClean($field->name), 'max' => $field->max]);
             }
 
+            if ($field->regex != null) {
+                $field_validation[Validate::REGEX] = $field->regex;
+                $field_validation_message[Validate::REGEX] = $forms_language->get('forms', 'x_field_regex', ['field' => Output::getClean($field->name)]);
+            }
+
             if (count($field_validation)) {
                 $to_validate[$field->id] = $field_validation;
                 $to_validate_messages[$field->id] = $field_validation_message;
