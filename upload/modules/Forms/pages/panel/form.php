@@ -715,9 +715,16 @@ if (!isset($_GET['action'])) {
                 $errors = [];
 
                 if (Token::check(Input::get('token'))) {
+                    if (isset($_POST['hooks']) && count($_POST['hooks'])) {
+                        $hooks = json_encode($_POST['hooks']);
+                    } else {
+                        $hooks = null;
+                    }
+
                     $form->update([
                         'source' => Input::get('submission_source'),
-                        'forum_id' => isset($_POST['forum']) ? Input::get('forum') : $form->data()->forum_id
+                        'forum_id' => isset($_POST['forum']) ? Input::get('forum') : $form->data()->forum_id,
+                        'hooks' => $hooks,
                     ]);
 
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
@@ -757,10 +764,34 @@ if (!isset($_GET['action'])) {
                 ]);
             }
 
+            // Hookd
+            $hooks_query = DB::getInstance()->orderAll('hooks', 'id', 'ASC')->results();
+            $hooks_array = [];
+            if (count($hooks_query)) {
+                foreach ($hooks_query as $hook) {
+                    $events = json_decode($hook->events);
+
+                    if (in_array('newFormSubmission', $events) || in_array('updatedFormSubmission', $events) || in_array('updatedFormSubmissionStaff', $events)) {
+                        $hooks_array[] = [
+                            'id' => $hook->id,
+                            'name' => Output::getClean($hook->name),
+                        ];
+                    }
+                }
+            }
+
+            $form_hooks = $form->data()->hooks ?: '[]';
+
             $smarty->assign([
                 'SUBMISSION_SOURCE' => 'Submit submission to source',
                 'SUBMISSION_SOURCE_LIST' => $submission_sources,
-                'SUBMISSION_SOURCE_VALUE' => Output::getClean($form->data()->source)
+                'SUBMISSION_SOURCE_VALUE' => Output::getClean($form->data()->source),
+                'INCLUDE_IN_HOOK' => 'Limit forms events to certain webhooks? (None selected will use all webhooks) ',
+                'INFO' => $language->get('general', 'info'),
+                'HOOK_SELECT_INFO' => 'Only webhooks with \'New form submission\' or \'New form submission comment\' or \'New form submission comment from staff\' selected as events are shown.',
+                'HOOKS_ARRAY' => $hooks_array,
+                'FORM_HOOKS' => json_decode($form_hooks),
+                'NO_ITEM_SELECTED' => $language->get('admin', 'no_item_selected'),
             ]);
 
             $template_file = 'forms/form_advanced.tpl';

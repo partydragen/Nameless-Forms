@@ -81,6 +81,7 @@
                                     {/foreach}
                                 </select>
                             </div>
+
                             {if isset($SUBMIT_TO_FORUM)}
                             <div class="form-group">
                                 <label for="inputForum">Submit submission to forum?</label>
@@ -91,6 +92,18 @@
                                 </select>
                             </div>
                             {/if}
+
+                            <div class="form-group">
+                                <label for="InputHooks">{$INCLUDE_IN_HOOK} <span class="badge badge-info" data-toggle="popover" data-title="{$INFO}" data-content="{$HOOK_SELECT_INFO}"><i class="fa fa-question"></i></label>
+                                <select name="hooks[]" id="InputHooks" class="form-control" multiple>
+                                    {foreach from=$HOOKS_ARRAY item=hook}
+                                        <option value="{$hook.id}" {if in_array($hook.id, $FORM_HOOKS)} selected {/if}>
+                                            {$hook.name|ucfirst}
+                                        </option>
+                                    {/foreach}
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <input type="hidden" name="token" value="{$TOKEN}">
                                 <span data-toggle="popover" data-title="Early access for patreons" data-content="This feature is currently in early access for patreon supporters" data-placement="right"><a href="#" class="btn btn-primary disabled">{$SUBMIT}</a></span>
@@ -132,6 +145,10 @@
 </div>
 
 {include file='scripts.tpl'}
+
+<script type="text/javascript">
+    $("#InputHooks").select2({ placeholder: "{$NO_ITEM_SELECTED}" });
+</script>
 
 </body>
 </html>

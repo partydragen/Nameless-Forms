@@ -41,7 +41,7 @@ class Submission {
     /**
      * Get the submission data.
      *
-     * @return object This submission data.
+     * @return object|null This submission data.
      */
     public function data(): ?object {
         return $this->_data;
@@ -113,7 +113,7 @@ class Submission {
 
             $query = 'INSERT INTO nl2_forms_replies_fields (submission_id, field_id, value) VALUES ';
             $query .= implode('', $inserts);
-            DB::getInstance()->createQuery(rtrim($query, ','), $insert_values);
+            DB::getInstance()->query(rtrim($query, ','), $insert_values);
         } catch (Exception $e) {
             $this->addError($e->getMessage());
             DB::getInstance()->delete('forms_replies', ['id', '=', $submission_id]);
@@ -124,9 +124,12 @@ class Submission {
         if ($data->count()) {
             $this->_data = $data->first();
 
+
+
             $status = new Status(1);
             $status_color = $status->data()->color;
-            EventHandler::executeEvent('newFormSubmission', [
+
+            $event_data = [
                 'event' => 'newFormSubmission',
                 'username' => $form->data()->title,
                 'content' => Forms::getLanguage()->get('forms', 'new_submission_text', [
@@ -138,7 +141,14 @@ class Submission {
                 'title' => $form->data()->title,
                 'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id),
                 'color' => $status_color
-            ]);
+            ];
+
+            $hooks = json_decode($form->data()->hooks);
+            if ($hooks != null && count($hooks)) {
+                $event_data['available_hooks'] = $hooks;
+            }
+
+            EventHandler::executeEvent('newFormSubmission', $event_data);
 
             return true;
         }
