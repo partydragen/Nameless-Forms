@@ -1,1 +1,14 @@
-{}
+{
+    "forms/action": "Action",
+    "forms/barrier": "Dividing Line",
+    "forms/can_post_submission": "Can post submission",
+    "forms/can_view_submissions": "Can view submissions",
+    "forms/checkbox": "Checkbox",
+    "forms/comment": "Comment",
+    "forms/comment_maximum": "The comment must be a maximum of 10000 characters.",
+    "forms/actions": "Actions",
+    "forms/anonymous": "Anonymous",
+    "forms/can_delete_submissions": "Can delete submissions",
+    "forms/can_view_own_submission": "Can view own submission",
+    "forms/change_status_on_comment": "Change status when user is commenting?"
+}
