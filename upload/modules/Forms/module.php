@@ -23,7 +23,7 @@ class Forms_Module extends Module {
 
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
-        $module_version = '1.10.2';
+        $module_version = '1.10.3';
         $nameless_version = '2.0.1';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
@@ -442,6 +442,16 @@ class Forms_Module extends Module {
                 echo $e->getMessage() . '<br />';
             }
         }
+
+        if ($old_version < 1103) {
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms_fields ADD `regex` varchar(64) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms_fields ADD `default_value` varchar(64) NOT NULL DEFAULT \'\'');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
+            }
+        }
     }
 
     private function initialise() {
@@ -501,7 +511,7 @@ class Forms_Module extends Module {
 
         if (!$this->_db->showTables('forms_fields')) {
             try {
-                $this->_db->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `info` text NULL, `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms_fields", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `name` varchar(255) NOT NULL, `type` int(11) NOT NULL, `required` tinyint(1) NOT NULL DEFAULT '0', `min` int(11) NOT NULL DEFAULT '0', `max` int(11) NOT NULL DEFAULT '0', `placeholder` varchar(255) NULL DEFAULT NULL, `options` text NULL, `info` text NULL, `regex` varchar(64) DEFAULT NULL, `default_value` varchar(64) NOT NULL DEFAULT '', `deleted` tinyint(1) NOT NULL DEFAULT '0', `order` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
                 
                 $this->_db->insert('forms_fields', array(
                     'form_id' => 1,
