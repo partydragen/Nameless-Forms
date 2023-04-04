@@ -41,7 +41,7 @@ class ListSubmissionsEndpoint extends KeyAuthEndpoint {
 
         $submissions_list = [];
         $submissions_query = $api->getDb()->query($query . $where . $order . $limit, $params)->results();
-        foreach($submissions_query as $submission) {
+        foreach ($submissions_query as $submission) {
             $submissions_list[] = [
                 'id' => $submission->id,
                 'form_id' => $submission->form_id,

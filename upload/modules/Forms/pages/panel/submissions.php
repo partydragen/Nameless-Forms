@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.2
+ *  NamelessMC version 2.1.0
  *
  *  License: MIT
  *
@@ -193,14 +193,15 @@ if (!isset($_GET['view'])) {
     }
 
     // Get forms from database
-    $forms_query = DB::getInstance()->orderAll('forms', 'id', 'ASC')->results();
+    $forms_query = DB::getInstance()->orderAll('forms', 'id', 'ASC');
     $forms_array = [];
-    if (count($forms_query)) {
+    if ($forms_query->count()) {
         $forms_array[] = [
             'id' => 0,
             'name' => 'All',
         ];
-        foreach ($forms_query as $form) {
+
+        foreach ($forms_query->results() as $form) {
             $forms_array[] = [
                 'id' => $form->id,
                 'name' => Output::getClean($form->title),
@@ -209,14 +210,15 @@ if (!isset($_GET['view'])) {
     }
 
     // Get statuses from database
-    $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
+    $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0');
     $status_array = [];
-    if (count($statuses)) {
-            $status_array[] = [
-                'id' => 0,
-                'html' => 'All open'
-            ];
-        foreach ($statuses as $status) {
+    if ($statuses->count()) {
+        $status_array[] = [
+            'id' => 0,
+            'html' => 'All open'
+        ];
+
+        foreach ($statuses->results() as $status) {
             $status_array[] = [
                 'id' => $status->id,
                 'html' => Output::getPurified($status->html)
@@ -323,7 +325,7 @@ if (!isset($_GET['view'])) {
                     }
 
                     // Was there any changes?
-                    if ($any_changes == true && !count($errors)) {
+                    if ($any_changes && !count($errors)) {
                         $submission->update([
                             'updated_by' => ($anonymous != 1 ? $user->data()->id : 0),
                             'updated' => date('U'),
@@ -340,14 +342,20 @@ if (!isset($_GET['view'])) {
                                 'anonymous' => $anonymous,
                                 'content' => nl2br(Input::get('content'))
                             ]);
-                            
+
                             $content = Output::getClean(Input::get('content'));
-                            if (isset($new_status)&& $new_status->exists()) {
-                                $content .= "\n\n" . $forms_language->get('forms', 'updated_submission_status', ['status' => strip_tags($status->data()->html), 'new_status' => strip_tags($new_status->data()->html)]);
+                            if (isset($new_status) && $new_status->exists()) {
+                                $content .= "\n\n" . $forms_language->get('forms', 'updated_submission_status', [
+                                    'status' => strip_tags($status->data()->html),
+                                    'new_status' => strip_tags($new_status->data()->html)
+                                ]);
                             }
                         } else {
                             // No comment, just status change
-                            $content = $forms_language->get('forms', 'updated_submission_status', ['status' => strip_tags($status->data()->html), 'new_status' => strip_tags($new_status->data()->html)]);
+                            $content = $forms_language->get('forms', 'updated_submission_status', [
+                                'status' => strip_tags($status->data()->html),
+                                'new_status' => strip_tags($new_status->data()->html)
+                            ]);
                         }
 
                         EventHandler::executeEvent('updatedFormSubmissionStaff', [
@@ -365,7 +373,7 @@ if (!isset($_GET['view'])) {
                         // Alert user?
                         if ($submission->data()->user_id != null) {
                             $target_user = new User($submission->data()->user_id);
-                            if ($target_user && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds(false)), $submission->data()->form_id)) {
+                            if ($target_user->exists() && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds(false)), $submission->data()->form_id)) {
                                 // Send alert to user
                                 Alert::create(
                                     $submission->data()->user_id,
@@ -492,10 +500,9 @@ if (!isset($_GET['view'])) {
 
         // Form statuses
         $statuses = [];
-
-        $form_statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
-        if (count($form_statuses)) {
-            foreach($form_statuses as $status_query) {
+        $form_statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0');
+        if ($form_statuses->count())) {
+            foreach ($form_statuses->results() as $status_query) {
                 $form_ids = explode(',', $status_query->fids);
 
                 if (in_array($submission->data()->form_id, $form_ids) || $status_query->id == 1) {

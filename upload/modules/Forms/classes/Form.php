@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.1.0
  *
  *  License: MIT
  */
@@ -26,7 +26,7 @@ class Form {
         }
     }
 
-    /**
+    /*
      * Does this form exist?
      *
      * @return bool Whether the order exists (has data) or not.
@@ -35,16 +35,16 @@ class Form {
         return (!empty($this->_data));
     }
 
-    /**
+    /*
      * Get the form data.
      *
-     * @return object This form data.
+     * @return object|null This form data.
      */
     public function data(): ?object {
         return $this->_data;
     }
 
-    /**
+    /*
      * Update a form data in the database.
      *
      * @param array $fields Column names and values to update.
@@ -55,7 +55,7 @@ class Form {
         }
     }
 
-    /**
+    /*
      * Get the form fields.
      *
      * @return array Their fields.
@@ -76,7 +76,7 @@ class Form {
         return $this->_fields;
     }
 
-    /**
+    /*
      * Validate all fields values
      *
      * @return Validate
@@ -128,8 +128,8 @@ class Form {
         return Validate::check($validate_post, $to_validate)->messages($to_validate_messages);
     }
     
-    /**
-     * Delete everything releated to this form
+    /*
+     * Delete everything related to this form.
      */
     public function delete(): void {
         $this->_db->delete('forms', ['id', '=', $this->data()->id]);

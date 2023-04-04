@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.0-pr12
+ *  NamelessMC version 2.1.0
  *
  *  License: MIT
  */
@@ -24,7 +24,7 @@ class Status {
         }
     }
 
-    /**
+    /*
      * Does this status exist?
      *
      * @return bool Whether the status exists (has data) or not.
@@ -33,16 +33,16 @@ class Status {
         return (!empty($this->_data));
     }
 
-    /**
+    /*
      * Get the status data.
      *
-     * @return object This status data.
+     * @return object|null This status data.
      */
     public function data(): ?object {
         return $this->_data;
     }
 
-    /**
+    /*
      * Update a status data in the database.
      *
      * @param array $fields Column names and values to update.
@@ -53,7 +53,7 @@ class Status {
         }
     }
 
-    /**
+    /*
      * Mark this status as deleted
      */
     public function delete(): void {

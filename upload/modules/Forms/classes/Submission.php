@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.1
+ *  NamelessMC version 2.1.0
  *
  *  License: MIT
  */
@@ -29,7 +29,7 @@ class Submission {
         }
     }
 
-    /**
+    /*
      * Does this submission exist?
      *
      * @return bool Whether the submission exists (has data) or not.
@@ -38,7 +38,7 @@ class Submission {
         return (!empty($this->_data));
     }
 
-    /**
+    /*
      * Get the submission data.
      *
      * @return object|null This submission data.
@@ -47,7 +47,7 @@ class Submission {
         return $this->_data;
     }
 
-    /**
+    /*
      * Create a new submission.
      *
      * @param Form $form The form this submission was submitted for.
@@ -124,31 +124,12 @@ class Submission {
         if ($data->count()) {
             $this->_data = $data->first();
 
-
-
-            $status = new Status(1);
-            $status_color = $status->data()->color;
-
-            $event_data = [
-                'event' => 'newFormSubmission',
-                'username' => $form->data()->title,
-                'content' => Forms::getLanguage()->get('forms', 'new_submission_text', [
-                    'form' => $form->data()->title,
-                    'user' => ($user != null && $user->exists() ? $user->getDisplayname() : Forms::getLanguage()->get('forms', 'guest'))
-                ]),
-                'content_full' => '',
-                'avatar_url' => ($user != null && $user->exists() ? $user->getAvatar(128, true) : null),
-                'title' => $form->data()->title,
-                'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $this->data()->id),
-                'color' => $status_color
-            ];
-
-            $hooks = json_decode($form->data()->hooks);
-            if ($hooks != null && count($hooks)) {
-                $event_data['available_hooks'] = $hooks;
-            }
-
-            EventHandler::executeEvent('newFormSubmission', $event_data);
+            EventHandler::executeEvent(new SubmissionCreatedEvent(
+                $user,
+                $form,
+                $this,
+                json_decode($form->data()->hooks)
+            ));
 
             return true;
         }
@@ -156,7 +137,7 @@ class Submission {
         return false;
     }
 
-    /**
+    /*
      * Update a submission data in the database.
      *
      * @param array $fields Column names and values to update.
@@ -167,7 +148,7 @@ class Submission {
         }
     }
 
-    /**
+    /*
      * Get the fields answers for this submission
      *
      * @return array The fields answers for this submission
@@ -176,11 +157,12 @@ class Submission {
         $answer_array = [];
         if (empty($this->data()->content)) {
             // New fields generation
-            $fields = $this->_db->query('SELECT name, value, type FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', [$this->data()->id])->results();
+            $fields = $this->_db->query('SELECT name, value, type, field_id FROM nl2_forms_replies_fields LEFT JOIN nl2_forms_fields ON field_id=nl2_forms_fields.id WHERE submission_id = ?', [$this->data()->id])->results();
             foreach ($fields as $field) {
                 $answer_array[] = [
+                    'field_id' => (int) Output::getClean($field->field_id),
+                    'field_type' => (int) Output::getClean($field->type),
                     'question' => Output::getClean($field->name),
-                    'field_type' => Output::getClean($field->type),
                     'answer' => Output::getPurified(Output::getDecoded($field->value))
                 ];
             }
@@ -191,8 +173,9 @@ class Submission {
             foreach ($answers as $answer) {
                 $question = $this->_db->get('forms_fields', ['id', '=', $answer[0]])->results();
                 $answer_array[] = [
-                    'question' => Output::getClean($question[0]->name),
+                    'field_id' => 1,
                     'field_type' => 1,
+                    'question' => Output::getClean($question[0]->name),
                     'answer' => Output::getPurified(Output::getDecoded($answer[1]))
                 ];
             }
@@ -201,7 +184,16 @@ class Submission {
         return $answer_array;
     }
 
-    /**
+    /*
+     * Get current submission status.
+     *
+     * @return Status Get current submission status.
+     */
+    public function getStatus(): Status {
+        return new Status($this->data()->status_id);
+    }
+
+    /*
      * Add an error to the errors array.
      *
      * @param string $error The error message.
@@ -210,7 +202,7 @@ class Submission {
         $this->_errors[] = $error;
     }
 
-    /**
+    /*
      * Get any errors from the functions given by this integration.
      *
      * @return array Any errors.
@@ -219,7 +211,7 @@ class Submission {
         return $this->_errors;
     }
 
-    /**
+    /*
      * Delete this submission.
      */
     public function delete(): void {

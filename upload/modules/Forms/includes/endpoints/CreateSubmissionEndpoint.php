@@ -2,7 +2,7 @@
 class CreateSubmissionEndpoint extends KeyAuthEndpoint {
 
     public function __construct() {
-        $this->_route = 'forms/{form}/submissions/create';
+        $this->_route = 'forms/form/{form}/submissions/create';
         $this->_module = 'Forms';
         $this->_description = 'Create a new form submission';
         $this->_method = 'POST';

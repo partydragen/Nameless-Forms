@@ -2,7 +2,7 @@
 class FormInfoEndpoint extends KeyAuthEndpoint {
 
     public function __construct() {
-        $this->_route = 'forms/{form}';
+        $this->_route = 'forms/form/{form}';
         $this->_module = 'Forms';
         $this->_description = 'Get form details';
         $this->_method = 'GET';

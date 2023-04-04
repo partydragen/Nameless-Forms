@@ -11,7 +11,7 @@ class ListFormsEndpoint extends KeyAuthEndpoint {
     public function execute(Nameless2API $api): void {
         $forms_list = [];
         $forms_query = $api->getDb()->query('SELECT * FROM nl2_forms')->results();
-        foreach($forms_query as $form) {
+        foreach ($forms_query as $form) {
             $forms_list[] = [
                 'id' => $form->id,
                 'url' => $form->url,

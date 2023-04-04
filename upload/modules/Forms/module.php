@@ -11,9 +11,9 @@
 
 class Forms_Module extends Module {
     private DB $_db;
-    private $_language;
-    private $_forms_language;
-    private $_cache;
+    private Language $_language;
+    private Language $_forms_language;
+    private Cache $_cache;
 
     public function __construct($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints) {
         $this->_db = DB::getInstance();
@@ -110,18 +110,22 @@ class Forms_Module extends Module {
         }
 
         // Hooks
-        EventHandler::registerEvent('newFormSubmission', $forms_language->get('forms', 'new_form_submission'));
+        EventHandler::registerEvent(SubmissionCreatedEvent::class);
         EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
         EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
         EventHandler::registerEvent('renderForm', 'renderForm', [], true, true);
 
-        EventHandler::registerListener('renderForm', 'ContentHook::purify');
-        EventHandler::registerListener('renderForm', 'ContentHook::codeTransform', 15);
-        EventHandler::registerListener('renderForm', 'ContentHook::decode', 20);
-        EventHandler::registerListener('renderForm', 'ContentHook::renderEmojis', 10);
-        EventHandler::registerListener('renderForm', 'ContentHook::replaceAnchors', 15);
-        EventHandler::registerListener('cloneGroup', 'CloneGroupFormsHook::execute');
-        EventHandler::registerListener('deleteUser', 'DeleteUserFormsHook::execute');
+        EventHandler::registerListener('renderForm', [FormHook::class, 'globalLimit']);
+        EventHandler::registerListener('renderForm', [FormHook::class, 'userLimit']);
+        EventHandler::registerListener('renderForm', [FormHook::class, 'requiredIntegrations']);
+
+        EventHandler::registerListener('renderForm', [ContentHook::class, 'purify']);
+        EventHandler::registerListener('renderForm', [ContentHook::class, 'codeTransform'], 15);
+        EventHandler::registerListener('renderForm', [ContentHook::class, 'decode'], 20);
+        EventHandler::registerListener('renderForm', [ContentHook::class, 'renderEmojis'], 10);
+        EventHandler::registerListener('renderForm', [ContentHook::class, 'replaceAnchors'], 5);
+        EventHandler::registerListener(GroupClonedEvent::class, CloneGroupFormsHook::class);
+        EventHandler::registerListener(UserDeletedEvent::class, DeleteUserFormsHook::class);
 
         $endpoints->loadEndpoints(ROOT_PATH . '/modules/Forms/includes/endpoints');
 

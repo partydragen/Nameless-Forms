@@ -1,11 +1,11 @@
 <?php
-/**
+/*
  * Contains namespaced API error messages for the Forms module.
  * These have no versioning, and are not meant to be used by any other modules.
  *
  * @package Modules\Forms
  * @author Partydragen
- * @version 2.0.0-pr13
+ * @version 2.1.0
  * @license MIT
  */
 class FormsApiErrors {
