@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.1
+ *  NamelessMC version 2.1.0
  *
  *  License: MIT
  *
@@ -32,7 +32,7 @@ if (!isset($_GET['action'])) {
             // Deal with input
             if (Input::exists()) {
                 // Check token
-                if (Token::check(Input::get('token'))) {
+                if (Token::check()) {
                     // Valid token
                     // Validate input
                     $validation = Validate::check($_POST, [

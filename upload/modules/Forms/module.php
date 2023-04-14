@@ -111,13 +111,9 @@ class Forms_Module extends Module {
 
         // Hooks
         EventHandler::registerEvent(SubmissionCreatedEvent::class);
-        EventHandler::registerEvent('updatedFormSubmission', $forms_language->get('forms', 'updated_form_submission'));
-        EventHandler::registerEvent('updatedFormSubmissionStaff', $forms_language->get('forms', 'updated_form_submission_staff'));
+        EventHandler::registerEvent(SubmissionUpdatedEvent::class);
+        EventHandler::registerEvent(SubmissionUpdatedStaffEvent::class);
         EventHandler::registerEvent('renderForm', 'renderForm', [], true, true);
-
-        EventHandler::registerListener('renderForm', [FormHook::class, 'globalLimit']);
-        EventHandler::registerListener('renderForm', [FormHook::class, 'userLimit']);
-        EventHandler::registerListener('renderForm', [FormHook::class, 'requiredIntegrations']);
 
         EventHandler::registerListener('renderForm', [ContentHook::class, 'purify']);
         EventHandler::registerListener('renderForm', [ContentHook::class, 'codeTransform'], 15);

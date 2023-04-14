@@ -239,7 +239,6 @@ if (!isset($_GET['view'])) {
         'STATUS_LIST' => $status_array,
         'FORM_SELECTION_VALUE' => (isset($_GET['form']) ? $_GET['form'] : '0'),
         'STATUS_SELECTION_VALUE' => (isset($_GET['status']) ? $_GET['status'] : '0'),
-        'USER' => $forms_language->get('forms', 'user'),
         'ID_OR_USERNAME' => $forms_language->get('forms', 'id_or_username'),
         'USER_VALUE' => (isset($_GET['user']) ? $_GET['user'] : ''),
         'SORT' => $forms_language->get('forms', 'sort'),
@@ -269,7 +268,7 @@ if (!isset($_GET['view'])) {
             $errors = [];
 
             // Check token
-            if (Token::check(Input::get('token'))) {
+            if (Token::check()) {
                 // Valid token
                 $validation = Validate::check($_POST, [
                     'content' => [
@@ -295,7 +294,6 @@ if (!isset($_GET['view'])) {
                     // Check if status have changed
                     $status_id = $submission->data()->status_id;
                     $status_html = $status->data()->html;
-                    $status_color = $status->data()->color;
                     if ($submission->data()->status_id != $_POST['status']) {
                         $new_status = new Status($_POST['status']);
                         if ($new_status->exists()) {
@@ -310,7 +308,6 @@ if (!isset($_GET['view'])) {
 
                             if ($hasperm) {
                                 $status_html = $new_status->data()->html;
-                                $status_color = $new_status->data()->color;
                                 $status_id = $_POST['status'];
                                 $any_changes = true;
                             } else {
@@ -358,22 +355,17 @@ if (!isset($_GET['view'])) {
                             ]);
                         }
 
-                        EventHandler::executeEvent('updatedFormSubmissionStaff', [
-                            'event' => 'updatedFormSubmissionStaff',
-                            'user_id' => $user->data()->id,
-                            'username' => $user->getDisplayname(),
-                            'content' => $forms_language->get('forms', 'updated_submission_text', ['form' => $form->data()->title, 'user' => $user->getDisplayname()]),
-                            'content_full' => $content,
-                            'avatar_url' => $user->getAvatar(128, true),
-                            'title' => '[#' . $submission->data()->id . '] ' . $form->data()->title,
-                            'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
-                            'color' => $status_color
-                        ]);
+                        EventHandler::executeEvent(new SubmissionUpdatedStaffEvent(
+                            $user,
+                            $submission,
+                            $content,
+                            json_decode($form->data()->hooks)
+                        ));
 
                         // Alert user?
                         if ($submission->data()->user_id != null) {
                             $target_user = new User($submission->data()->user_id);
-                            if ($target_user->exists() && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds(false)), $submission->data()->form_id)) {
+                            if ($target_user->exists() && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds()), $submission->data()->form_id)) {
                                 // Send alert to user
                                 Alert::create(
                                     $submission->data()->user_id,
@@ -501,7 +493,7 @@ if (!isset($_GET['view'])) {
         // Form statuses
         $statuses = [];
         $form_statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0');
-        if ($form_statuses->count())) {
+        if ($form_statuses->count()) {
             foreach ($form_statuses->results() as $status_query) {
                 $form_ids = explode(',', $status_query->fids);
 
@@ -528,7 +520,7 @@ if (!isset($_GET['view'])) {
 
         // Can user view own submission?
         $can_view_own = false;
-        if ($submission->data()->user_id != null && $target_user && $forms->canViewOwnSubmission(implode(',', $user->getAllGroupIds()), $submission->data()->form_id)) {
+        if ($submission->data()->user_id != null && $target_user->exists() && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds()), $submission->data()->form_id)) {
             $can_view_own = true;
         }
 
@@ -556,7 +548,7 @@ if (!isset($_GET['view'])) {
             'YES' => $language->get('general', 'yes'),
             'NO' => $language->get('general', 'no'),
             'STATUSES' => $statuses,
-            'CAN_USE_ANONYMOUS' => ($can_view_own && $user->hasPermission('forms.anonymous') ? true : false),
+            'CAN_USE_ANONYMOUS' => $can_view_own && $user->hasPermission('forms.anonymous'),
             'ANONYMOUS' => $forms_language->get('forms', 'anonymous'),
             'SUBMIT_AS_ANONYMOUS' => $forms_language->get('forms', 'submit_as_anonymous'),
             'SEND_NOTIFY_EMAIL' => $forms_language->get('forms', 'send_notify_email'),

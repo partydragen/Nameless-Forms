@@ -26,10 +26,10 @@ require_once(ROOT_PATH . '/modules/Forms/classes/Forms.php');
 if (!isset($_GET['action'])) {
 
     // Get forms from database
-    $forms = DB::getInstance()->orderAll('forms', 'id', 'ASC')->results();
+    $forms = DB::getInstance()->orderAll('forms', 'id', 'ASC');
     $forms_array = [];
-    if (count($forms)) {
-        foreach ($forms as $form) {
+    if ($forms->count()) {
+        foreach ($forms->results() as $form) {
             $forms_array[] = [
                 'name' => Output::getClean($form->title),
                 'edit_link' => URL::build('/panel/form/', 'form=' . Output::getClean($form->id)),
@@ -39,10 +39,10 @@ if (!isset($_GET['action'])) {
     }
 
     // Get statuses from database
-    $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0')->results();
+    $statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0');
     $status_array = [];
-    if (count($statuses)) {
-        foreach ($statuses as $status) {
+    if ($statuses->count()) {
+        foreach ($statuses->results() as $status) {
             $status_array[] = [
                 'id' => $status->id,
                 'html' => Output::getPurified($status->html),

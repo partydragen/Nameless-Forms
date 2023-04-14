@@ -160,22 +160,12 @@ if (!isset($_GET['view'])) {
                         'status_id' => $status_id
                     ]);
 
-                    $status = new Status($status_id);
-                    $status_color = $status->data()->color;
-            
-                    EventHandler::executeEvent('updatedFormSubmission', [
-                        'event' => 'updatedFormSubmission',
-                        'username' => $form->data()->title,
-                        'content' => $forms_language->get('forms', 'updated_submission_text', [
-                            'form' => $form->data()->title,
-                            'user' => $user->getDisplayname()
-                        ]),
-                        'content_full' => Input::get('content'),
-                        'avatar_url' => $user->getAvatar(128, true),
-                        'title' => $form->data()->title,
-                        'url' => rtrim(URL::getSelfURL(), '/') . URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id),
-                        'color' => $status_color
-                    ]);
+                    EventHandler::executeEvent(new SubmissionUpdatedEvent(
+                        $user,
+                        $submission,
+                        Input::get('content'),
+                        json_decode($form->data()->hooks)
+                    ));
 
                     $success = $language->get('moderator', 'comment_created');
 

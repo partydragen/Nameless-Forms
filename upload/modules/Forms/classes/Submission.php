@@ -146,6 +146,10 @@ class Submission {
         if (!$this->_db->update('forms_replies', $this->data()->id, $fields)) {
             throw new Exception('There was a problem updating submission');
         }
+
+        foreach ($fields as $key => $value) {
+            $this->_data->$key = $value;
+        }
     }
 
     /*

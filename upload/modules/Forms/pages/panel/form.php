@@ -775,11 +775,11 @@ if (!isset($_GET['action'])) {
                 ]);
             }
 
-            // Hookd
-            $hooks_query = DB::getInstance()->orderAll('hooks', 'id', 'ASC')->results();
+            // Hooks
+            $hooks_query = DB::getInstance()->orderAll('hooks', 'id', 'ASC');
             $hooks_array = [];
-            if (count($hooks_query)) {
-                foreach ($hooks_query as $hook) {
+            if ($hooks_query->count()) {
+                foreach ($hooks_query->results() as $hook) {
                     $events = json_decode($hook->events);
 
                     if (in_array('newFormSubmission', $events) || in_array('updatedFormSubmission', $events) || in_array('updatedFormSubmissionStaff', $events)) {
