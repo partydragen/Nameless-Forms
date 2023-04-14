@@ -54,6 +54,12 @@ class Submission {
      * @param User|null $user The user who submitted this submission.
      */
     public function create(Form $form, ?User $user, array $fields_values): bool {
+        $fields = $form->getFields();
+        if (!count($fields)) {
+            $this->addError('There are no fields for this form, You need to add fields for this form at StaffCP -> Forms');
+            return false;
+        }
+
         $user_id = ($user != null && $user->exists()) ? $user->data()->id : null;
 
         $this->_db->insert('forms_replies', [
@@ -73,7 +79,7 @@ class Submission {
         try {
             $inserts = [];
             $insert_values = [];
-            foreach ($form->getFields() as $field) {
+            foreach ($fields as $field) {
                 if ($field->type != 10) {
                     // Normal POST value
                     if (isset($fields_values[$field->id])) {
