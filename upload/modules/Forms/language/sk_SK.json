@@ -119,5 +119,9 @@
     "forms/submit_to_submission_forum": "Odoslať príspevok do fóra?",
     "forms/submission_source": "Odoslať príspevok zdroju",
     "forms/advanced": "Pokročilé",
-    "forms/no_permission_to_select_status": "Na výber tohto stavu nemáte povolenie!"
+    "forms/no_permission_to_select_status": "Na výber tohto stavu nemáte povolenie!",
+    "forms/limits_and_requirements": "Limity a požiadavky",
+    "forms/form_global_limit_reached": "Tento formulár nedávno odoslalo príliš veľa používateľov, skúste to prosím neskôr",
+    "forms/form_user_limit_reached": "Dosiahli ste limit, koľkokrát môžete odoslať tento formulár!",
+    "forms/form_requires_integration": "Tento formulár vyžaduje, aby ste prepojili svoj {{integration}} účet, môžete to urobiť na {{linkStart}}prepojeniach účtu{{linkEnd}}"
 }
