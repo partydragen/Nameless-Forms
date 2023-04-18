@@ -29,7 +29,7 @@ class Submission {
         }
     }
 
-    /*
+    /**
      * Does this submission exist?
      *
      * @return bool Whether the submission exists (has data) or not.
@@ -38,7 +38,7 @@ class Submission {
         return (!empty($this->_data));
     }
 
-    /*
+    /**
      * Get the submission data.
      *
      * @return object|null This submission data.
@@ -47,7 +47,7 @@ class Submission {
         return $this->_data;
     }
 
-    /*
+    /**
      * Create a new submission.
      *
      * @param Form $form The form this submission was submitted for.
@@ -69,7 +69,7 @@ class Submission {
             'created' => date('U'),
             'updated' => date('U'),
             'content' =>  '',
-            'status_id' => 1
+            'status_id' => $form->data()->source == 'forms' ? 1 : 0
         ]);
         $submission_id = DB::getInstance()->lastId();
 
@@ -137,16 +137,27 @@ class Submission {
                 json_decode($form->data()->hooks)
             ));
 
+            // Submit submission to another source?
+            if ($form->data()->source != 'forms') {
+                $source = Forms::getInstance()->getSubmissionSource($form->data()->source);
+
+                if (!$source->create($form, $this, $user, $fields_values)) {
+                    $this->delete();
+                    return false;
+                }
+            }
+
             return true;
         }
 
         return false;
     }
 
-    /*
+    /**
      * Update a submission data in the database.
      *
      * @param array $fields Column names and values to update.
+     * @throws Exception
      */
     public function update(array $fields = []): void {
         if (!$this->_db->update('forms_replies', $this->data()->id, $fields)) {
@@ -158,7 +169,7 @@ class Submission {
         }
     }
 
-    /*
+    /**
      * Get the fields answers for this submission
      *
      * @return array The fields answers for this submission
@@ -194,7 +205,7 @@ class Submission {
         return $answer_array;
     }
 
-    /*
+    /**
      * Get current submission status.
      *
      * @return Status Get current submission status.
@@ -203,7 +214,7 @@ class Submission {
         return new Status($this->data()->status_id);
     }
 
-    /*
+    /**
      * Add an error to the errors array.
      *
      * @param string $error The error message.
@@ -212,7 +223,7 @@ class Submission {
         $this->_errors[] = $error;
     }
 
-    /*
+    /**
      * Get any errors from the functions given by this integration.
      *
      * @return array Any errors.

@@ -1,10 +1,14 @@
 <?php
-class ForumSubmissionSource {
+class ForumSubmissionSource extends SubmissionBase {
 
-    public function create(Form $form, Submission $submission, array $fields_values): void {
-        $forum = $this->_db->get('forums', ['id', '=', $form->data()->forum_id]);
+    public function getName(): string {
+        return 'Forum';
+    }
+
+    public function create(Form $form, Submission $submission, User $user, array $fields_values): bool {
+        $forum = DB::getInstance()->get('forums', ['id', '=', $form->data()->forum_id]);
         if (!$forum->count()) {
-            $this->addError('Forum id '.$form->data()->forum_id.' not found, Please contact a administrator');
+            $submission->addError('Forum id '.$form->data()->forum_id.' not found, Please contact a administrator');
             return false;
         }
         $forum = $forum->first();
@@ -20,9 +24,10 @@ class ForumSubmissionSource {
             }
         }
 
+        $title = '[#' . $submission->data()->id . '] ' . $form->data()->title;
         DB::getInstance()->insert('topics', [
             'forum_id' => $form->data()->forum_id,
-            'topic_title' => $form->data()->title,
+            'topic_title' => $title,
             'topic_creator' => $user->data()->id,
             'topic_last_user' => $user->data()->id,
             'topic_date' => date('U'),
@@ -58,7 +63,6 @@ class ForumSubmissionSource {
             'last_topic_posted' => $topic_id
         ]);
 
-        $title = $form->data()->title;
         $available_hooks = json_decode($forum->hooks) ?? [];
         EventHandler::executeEvent(new TopicCreatedEvent(
             $user,
@@ -69,8 +73,17 @@ class ForumSubmissionSource {
             $available_hooks,
         ));
 
+        $submission->update([
+            'source' => 'forum',
+            'source_id' => $topic_id
+        ]);
+
         Session::flash('success_post', Forms::getLanguage()->get('forms', 'form_submitted'));
         Redirect::to(URL::build('/forum/topic/' . $topic_id));
         return true;
+    }
+
+    public function getURL(Submission $submission): string {
+        return URL::build('/forum/topic/' . $submission->data()->source_id);
     }
 }

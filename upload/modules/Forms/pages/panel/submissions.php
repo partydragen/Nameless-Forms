@@ -70,7 +70,7 @@ if (!isset($_GET['view'])) {
     }
 
     $query = 'SELECT * FROM nl2_forms_replies';
-    $where = ' WHERE form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.'))';
+    $where = ' WHERE source IS NULL AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view = 1 AND group_id IN('.$group_ids.'))';
     $order = ' ORDER BY created DESC';
     $limit = '';
     $params = [];
@@ -252,6 +252,15 @@ if (!isset($_GET['view'])) {
         if (!$submission->exists()) {
             Redirect::to(URL::build('/panel/forms/submissions'));
         }
+
+        // Check if submission is submitted to different source
+        if ($submission->data()->source != null) {
+            $source = Forms::getInstance()->getSubmissionSource($submission->data()->source);
+            if ($source != null) {
+                Redirect::to($source->getURL($submission));
+            }
+        }
+
         $form = new Form($submission->data()->form_id);
         $status = new Status($submission->data()->status_id);
 

@@ -30,7 +30,7 @@ $timeago = new TimeAgo(TIMEZONE);
 
 if (!isset($_GET['view'])) {
     $submissions = [];
-    $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$user->data()->id])->results();
+    $submissions_query = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE source IS NULL AND user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$user->data()->id])->results();
 
     if (count($submissions_query)) {
         // Get page
@@ -114,6 +114,14 @@ if (!isset($_GET['view'])) {
         Redirect::to(URL::build('/user/submissions'));
     }
     $submission = new Submission(null, null, $submission->first());
+
+    // Check if submission is submitted to different source
+    if ($submission->data()->source != null) {
+        $source = Forms::getInstance()->getSubmissionSource($submission->data()->source);
+        if ($source != null) {
+            Redirect::to($source->getURL($submission));
+        }
+    }
 
     $form = new Form($submission->data()->form_id);
     $status = new Status($submission->data()->status_id);

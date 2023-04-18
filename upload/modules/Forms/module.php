@@ -15,7 +15,8 @@ class Forms_Module extends Module {
     private Language $_forms_language;
     private Cache $_cache;
 
-    public function __construct($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints) {
+    public function __construct($language, $forms_language, $pages, $user, $navigation, $cache, $endpoints)
+    {
         $this->_db = DB::getInstance();
         $this->_language = $language;
         $this->_forms_language = $forms_language;
@@ -71,7 +72,7 @@ class Forms_Module extends Module {
                     }
 
                     if (!$perm) {
-                        $hasperm = $this->_db->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN('.$group_ids.')', array($form->id));
+                        $hasperm = $this->_db->query('SELECT form_id FROM nl2_forms_permissions WHERE form_id = ? AND post = 1 AND group_id IN(' . $group_ids . ')', array($form->id));
                         if ($hasperm->count()) {
                             $perm = true;
                         }
@@ -92,15 +93,15 @@ class Forms_Module extends Module {
                                     $form_order = $cache->retrieve('form-' . $form->id . '_order');
                                 }
                                 $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form_order, $form->icon);
-                            break;
+                                break;
                             case 2:
                                 // "More" dropdown
                                 $navigation->addItemToDropdown('more_dropdown', 'form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form->icon);
-                            break;
+                                break;
                             case 3:
                                 // Footer
                                 $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'footer', null, 2000, $form->icon);
-                            break;
+                                break;
                         }
                     }
                 }
@@ -452,20 +453,43 @@ class Forms_Module extends Module {
                 echo $e->getMessage() . '<br />';
             }
         }
+
+        if ($old_version < 1110) {
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms ADD `discord_fields` tinyint(1) NOT NULL DEFAULT \'0\'');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
+            }
+
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms_replies ADD `source` varchar(64) DEFAULT NULL');
+                $this->_db->query('ALTER TABLE nl2_forms_replies ADD `source_id` int(11) DEFAULT NULL');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
+            }
+
+            try {
+                $this->_db->query('ALTER TABLE nl2_forms_comments ADD `staff_only` tinyint(1) NOT NULL DEFAULT \'0\'');
+            } catch (Exception $e) {
+                // unable to retrieve from config
+                echo $e->getMessage() . '<br />';
+            }
+        }
     }
 
     private function initialise() {
         // Generate tables
         if (!$this->_db->showTables('forms')) {
             try {
-                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', `source` varchar(32) NOT NULL DEFAULT 'forms', `forum_id` int(11) NOT NULL DEFAULT '0', `global_limit` varchar(128) DEFAULT NULL, `user_limit` varchar(128) DEFAULT NULL, `required_integrations` varchar(128) DEFAULT NULL, `min_player_age` varchar(128) DEFAULT NULL, `min_player_playtime` varchar(128) DEFAULT NULL, `hooks` varchar(512) DEFAULT NULL, PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms", " `id` int(11) NOT NULL AUTO_INCREMENT, `url` varchar(32) NOT NULL, `title` varchar(32) NOT NULL, `guest` tinyint(1) NOT NULL DEFAULT '0', `link_location` tinyint(1) NOT NULL DEFAULT '1', `icon` varchar(64) NULL, `can_view` tinyint(1) NOT NULL DEFAULT '0', `captcha` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NULL DEFAULT NULL, `comment_status` int(11) NOT NULL DEFAULT '0', `source` varchar(32) NOT NULL DEFAULT 'forms', `forum_id` int(11) NOT NULL DEFAULT '0', `global_limit` varchar(128) DEFAULT NULL, `user_limit` varchar(128) DEFAULT NULL, `required_integrations` varchar(128) DEFAULT NULL, `min_player_age` varchar(128) DEFAULT NULL, `min_player_playtime` varchar(128) DEFAULT NULL, `hooks` varchar(512) DEFAULT NULL, `discord_fields` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
 
                 $this->_db->insert('forms', array(
                     'url' => '/apply',
                     'title' => 'Staff Applications',
                     'guest' => 0,
                     'link_location' => 1
-                    
                 ));
             } catch (Exception $e) {
                 // Error
@@ -503,7 +527,7 @@ class Forms_Module extends Module {
 
         if (!$this->_db->showTables('forms_comments')) {
             try {
-                $this->_db->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms_comments", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `created` int(11) NOT NULL, `anonymous` tinyint(1) NOT NULL DEFAULT '0', `content` mediumtext NOT NULL, `staff_only` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)");
             } catch (Exception $e) {
                 // Error
             }
@@ -534,7 +558,7 @@ class Forms_Module extends Module {
 
         if (!$this->_db->showTables('forms_replies')) {
             try {
-                $this->_db->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`id`)");
+                $this->_db->createTable("forms_replies", " `id` int(11) NOT NULL AUTO_INCREMENT, `form_id` int(11) NOT NULL, `user_id` int(11) NULL, `updated_by` int(11) NULL, `created` int(11) NOT NULL, `updated` int(11) NOT NULL, `content` mediumtext NULL DEFAULT NULL, `status_id` int(11) NOT NULL DEFAULT '1', `source` varchar(32) DEFAULT NULL, `source_id` int(11) DEFAULT NULL, PRIMARY KEY (`id`)");
             } catch (Exception $e) {
                 // Error
             }

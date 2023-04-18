@@ -453,7 +453,7 @@ if (!isset($_GET['action'])) {
                     }
                     
                     try {
-                        if ($cat_perm_exists != 0) { // Permission already exists, update
+                        if ($cat_perm_exists != 0) { // Permission already exists, update.
                             // Update the category
                             DB::getInstance()->update('forms_permissions', $update_id, [
                                 'post' => $post,
@@ -751,14 +751,16 @@ if (!isset($_GET['action'])) {
                 'name' => 'Forms (Default)'
             ];
 
+            foreach (Forms::getInstance()->getSubmissionSources() as $source) {
+                $submission_sources[] = [
+                    'value' => strtolower($source->getName()),
+                    'name' => $source->getName()
+                ];
+            }
+
             // Forum enabled?
             $forum_enabled = Util::isModuleEnabled('Forum');
             if ($forum_enabled) {
-                $submission_sources[] = [
-                    'value' => 'forum',
-                    'name' => 'Forum'
-                ];
-
                 $forum_list = [];
                 $forums = DB::getInstance()->orderAll('forums', 'forum_order', 'ASC')->results();
                 foreach ($forums as $forum) {

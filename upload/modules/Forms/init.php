@@ -30,6 +30,14 @@ spl_autoload_register(function ($class) {
 
 // Load classes
 spl_autoload_register(function ($class) {
+    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'classes', 'SubmissionSources', $class . '.php'));
+    if (file_exists($path)) {
+        require_once($path);
+    }
+});
+
+// Load classes
+spl_autoload_register(function ($class) {
     $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'hooks', $class . '.php'));
     if (file_exists($path)) {
         require_once($path);
