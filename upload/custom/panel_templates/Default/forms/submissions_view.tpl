@@ -75,8 +75,8 @@
                           {foreach from=$COMMENTS item=comment}
                             <div class="card">
                               <div class="card-header">
-                                <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}{if $comment.anonymous} ({$ANONYMOUS}){/if}</a>:
-                                <span data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
+                                <a href="{$comment.profile}" style="{$comment.style}" target="_blank"><img src="{$comment.avatar}" class="rounded" style="max-height:25px;max-width:25px;" alt="{$comment.username}" /> {$comment.username}</a>:
+                                <span data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span> {if $comment.anonymous} <span class="badge badge-secondary">{$ANONYMOUS}</span>{/if} {if $comment.staff_only} <span class="badge badge-secondary">{$STAFF_ONLY}</span>{/if}
                                 {if $comment.delete_link}
                                     <button class="btn btn-danger btn-sm float-right" type="button" onclick="showDeleteCommentModal('{$comment.delete_link}')"><i class="fas fa-trash fa-fw"></i></button>
                                 {/if}
@@ -119,6 +119,10 @@
                               <label class="custom-control-label" for="inputNotifyEmail">{$SEND_NOTIFY_EMAIL}</label>
                             </div>
                           {/if}
+                          <div class="form-group custom-control custom-switch">
+                            <input id="inputStaffOnly" name="staff_only" type="checkbox" class="custom-control-input" />
+                            <label class="custom-control-label" for="inputStaffOnly">{$COMMENT_STAFF_ONLY}</label>
+                          </div>
                           <div class="form-group">
                             <input type="hidden" name="token" value="{$TOKEN}">
                             <input type="submit" value="{$SUBMIT}" class="btn btn-primary">

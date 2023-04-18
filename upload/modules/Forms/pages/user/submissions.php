@@ -172,7 +172,9 @@ if (!isset($_GET['view'])) {
                         $user,
                         $submission,
                         Input::get('content'),
-                        json_decode($form->data()->hooks)
+                        false,
+                        false,
+                        json_decode($form->data()->hooks),
                     ));
 
                     $success = $language->get('moderator', 'comment_created');
@@ -191,7 +193,7 @@ if (!isset($_GET['view'])) {
     }
 
     // Get comments
-    $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->data()->id])->results();
+    $comments = DB::getInstance()->get('forms_comments', [['form_id', $submission->data()->id], ['staff_only', 0]])->results();
     $smarty_comments = [];
     foreach ($comments as $comment) {
         // Check if comment user is 

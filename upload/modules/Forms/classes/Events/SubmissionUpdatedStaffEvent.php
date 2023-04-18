@@ -3,12 +3,16 @@ class SubmissionUpdatedStaffEvent extends AbstractEvent implements HasWebhookPar
     public User $user;
     public Submission $submission;
     public string $content;
+    public bool $anonymous;
+    public bool $staff_only;
     public ?array $available_hooks;
 
-    public function __construct(User $user, Submission $submission, string $content, ?array $available_hooks) {
+    public function __construct(User $user, Submission $submission, string $content, bool $anonymous, bool $staff_only, ?array $available_hooks) {
         $this->user = $user;
         $this->submission = $submission;
         $this->content = $content;
+        $this->anonymous = $anonymous;
+        $this->staff_only = $staff_only;
         $this->available_hooks = $available_hooks;
     }
 
@@ -40,7 +44,9 @@ class SubmissionUpdatedStaffEvent extends AbstractEvent implements HasWebhookPar
                 'id' => $this->user->data()->id,
                 'username' => $this->user->getDisplayname(),
                 'avatar' => $this->user->getAvatar(128, true),
-                'content' => $this->content
+                'content' => $this->content,
+                'anonymous' => $this->anonymous,
+                'staff_only' => $this->staff_only,
             ],
             'status' => [
                 'id' => $this->submission->data()->status_id,

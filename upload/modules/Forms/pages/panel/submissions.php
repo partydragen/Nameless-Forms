@@ -300,6 +300,10 @@ if (!isset($_GET['view'])) {
                     if (isset($_POST['notify_email']) && $_POST['notify_email'] == 'on') $sendEmail = 1;
                     else $sendEmail = 0;
 
+                    // Comment for staff only?
+                    if (isset($_POST['staff_only']) && $_POST['staff_only'] == 'on') $staff_only = 1;
+                    else $staff_only = 0;
+
                     // Check if status have changed
                     $status_id = $submission->data()->status_id;
                     $status_html = $status->data()->html;
@@ -346,7 +350,8 @@ if (!isset($_GET['view'])) {
                                 'user_id' => $user->data()->id,
                                 'created' => date('U'),
                                 'anonymous' => $anonymous,
-                                'content' => nl2br(Input::get('content'))
+                                'content' => nl2br(Input::get('content')),
+                                'staff_only' => $staff_only
                             ]);
 
                             $content = Output::getClean(Input::get('content'));
@@ -368,11 +373,13 @@ if (!isset($_GET['view'])) {
                             $user,
                             $submission,
                             $content,
+                            $anonymous,
+                            $staff_only,
                             json_decode($form->data()->hooks)
                         ));
 
                         // Alert user?
-                        if ($submission->data()->user_id != null) {
+                        if (!$staff_only && $submission->data()->user_id != null) {
                             $target_user = new User($submission->data()->user_id);
                             if ($target_user->exists() && $forms->canViewOwnSubmission(implode(',', $target_user->getAllGroupIds()), $submission->data()->form_id)) {
                                 // Send alert to user
@@ -474,6 +481,7 @@ if (!isset($_GET['view'])) {
                 'style' => $comment_user_style,
                 'avatar' => $comment_user_avatar,
                 'anonymous' => $comment->anonymous,
+                'staff_only' => $comment->staff_only,
                 'content' => Output::getPurified(Output::getDecoded($comment->content)),
                 'date' => date(DATE_FORMAT, $comment->created),
                 'date_friendly' => $timeago->inWords($comment->created, $language),
@@ -559,9 +567,11 @@ if (!isset($_GET['view'])) {
             'STATUSES' => $statuses,
             'CAN_USE_ANONYMOUS' => $can_view_own && $user->hasPermission('forms.anonymous'),
             'ANONYMOUS' => $forms_language->get('forms', 'anonymous'),
+            'STAFF_ONLY' => $forms_language->get('forms', 'staff_only'),
             'SUBMIT_AS_ANONYMOUS' => $forms_language->get('forms', 'submit_as_anonymous'),
             'SEND_NOTIFY_EMAIL' => $forms_language->get('forms', 'send_notify_email'),
             'CAN_SEND_EMAIL' => $can_view_own,
+            'COMMENT_STAFF_ONLY' => $forms_language->get('forms', 'comment_staff_only'),
             'TOKEN' => Token::get(),
             'PATH_TO_UPLOADS' => ((defined('CONFIG_PATH')) ? CONFIG_PATH . '/' : '/') . 'uploads/forms_submissions/',
             'COMMENT_VALUE' => (isset($_POST['content']) ? Output::getClean(Input::get('content')) : ''),
