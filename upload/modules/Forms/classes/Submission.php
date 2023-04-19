@@ -69,7 +69,7 @@ class Submission {
             'created' => date('U'),
             'updated' => date('U'),
             'content' =>  '',
-            'status_id' => $form->data()->source == 'forms' ? 1 : 0
+            'status_id' => 1
         ]);
         $submission_id = DB::getInstance()->lastId();
 

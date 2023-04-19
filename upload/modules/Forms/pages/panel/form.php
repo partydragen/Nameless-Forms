@@ -732,10 +732,14 @@ if (!isset($_GET['action'])) {
                         $hooks = null;
                     }
 
+                    if (isset($_POST['discord_fields']) && $_POST['discord_fields'] == 'on') $discord_fields = 1;
+                    else $discord_fields = 0;
+
                     $form->update([
                         'source' => Input::get('submission_source'),
                         'forum_id' => isset($_POST['forum']) ? Input::get('forum') : $form->data()->forum_id,
                         'hooks' => $hooks,
+                        'discord_fields' => $discord_fields
                     ]);
 
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
@@ -805,6 +809,8 @@ if (!isset($_GET['action'])) {
                 'HOOKS_ARRAY' => $hooks_array,
                 'FORM_HOOKS' => json_decode($form_hooks),
                 'NO_ITEM_SELECTED' => $language->get('admin', 'no_item_selected'),
+                'DISCORD_FIELDS' => 'Include preview of the fields in the discord embed for new submissions',
+                'DISCORD_FIELDS_VALUE' => $form->data()->discord_fields
             ]);
 
             $template_file = 'forms/form_advanced.tpl';

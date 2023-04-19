@@ -104,6 +104,13 @@
                                 </select>
                             </div>
 
+                            <div class="form-group custom-control custom-switch">
+                                <input id="inputDiscordFields" name="discord_fields" type="checkbox" class="custom-control-input"{if $DISCORD_FIELDS_VALUE eq 1} checked{/if} />
+                                <label class="custom-control-label" for="inputDiscordFields">
+                                    {$DISCORD_FIELDS}
+                                </label>
+                            </div>
+
                             <div class="form-group">
                                 <input type="hidden" name="token" value="{$TOKEN}">
                                 <span data-toggle="popover" data-title="Early access for patreons" data-content="This feature is currently in early access for patreon supporters" data-placement="right"><a href="#" class="btn btn-primary disabled">{$SUBMIT}</a></span>

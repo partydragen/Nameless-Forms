@@ -59,7 +59,7 @@ class SubmissionCreatedEvent extends AbstractEvent implements HasWebhookParams, 
             ->setUsername($this->form->data()->title)
             ->setAvatarUrl($this->user != null && $this->user->exists() ? $this->user->getAvatar(128, true) : null)
             ->addEmbed(function (DiscordEmbed $embed) use ($language) {
-                return $embed
+                $embed
                     ->setTitle('[#' . $this->submission->data()->id . '] ' . $this->form->data()->title)
                     ->setFooter($language->get('forms', 'new_submission_text', [
                         'form' => $this->form->data()->title,
@@ -67,6 +67,15 @@ class SubmissionCreatedEvent extends AbstractEvent implements HasWebhookParams, 
                     ]))
                     ->setUrl(URL::getSelfURL() . ltrim(URL::build('/panel/forms/submissions/', 'view=' . $this->submission->data()->id), '/'))
                     ->setColor($this->submission->getStatus()->data()->color);
+
+                // Include fields in the discord embed?
+                if ($this->form->data()->discord_fields) {
+                    foreach ($this->submission->getFieldsAnswers() as $field) {
+                        $embed->addField($field['question'], Text::embedSafe(str_replace('<br />', '', $field['answer'])));
+                    }
+                }
+
+                return $embed;
             });
     }
 
