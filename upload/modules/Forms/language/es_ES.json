@@ -123,5 +123,7 @@
     "forms/limits_and_requirements": "Límites y Requisitos",
     "forms/form_global_limit_reached": "Demasiados usuarios han enviado recientemente a este formulario, por favor intenta de nuevo más tarde",
     "forms/form_user_limit_reached": "¡Has alcanzado el límite de veces que puedes enviar a este formulario!",
-    "forms/no_permission_to_select_status": "¡No tienes permiso para seleccionar este estado!"
+    "forms/no_permission_to_select_status": "¡No tienes permiso para seleccionar este estado!",
+    "forms/comment_staff_only": "Haz que este comentario solo sea visible para el personal autorizado",
+    "forms/staff_only": "Solo personal autorizado"
 }
