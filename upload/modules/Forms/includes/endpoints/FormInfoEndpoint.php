@@ -16,6 +16,7 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
             'title' => $form->data()->title,
             'captcha' => (bool) $form->data()->captcha,
             'comment_status' => $form->data()->comment_status,
+            'source' => $form->data()->source,
         ];
 
         $fields = [];

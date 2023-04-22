@@ -55,6 +55,7 @@ class SubmissionUpdatedEvent extends AbstractEvent implements HasWebhookParams, 
             ],
             'created' => $this->submission->data()->created,
             'last_updated' => $this->submission->data()->updated,
+            'source' => $this->submission->data()->source,
             'fields' => $this->submission->getFieldsAnswers(),
             'url' => URL::getSelfURL() . ltrim(URL::build('/panel/forms/submissions/', 'view=' . $this->submission->data()->id), '/')
         ];
@@ -65,7 +66,7 @@ class SubmissionUpdatedEvent extends AbstractEvent implements HasWebhookParams, 
         $form = new form($this->submission->data()->form_id);
 
         return DiscordWebhookBuilder::make()
-            ->setUsername($form->data()->title)
+            ->setUsername($this->user->getDisplayname() . ' | ' . SITE_NAME)
             ->setAvatarUrl($this->user->getAvatar(128, true))
             ->addEmbed(function (DiscordEmbed $embed) use ($language, $form) {
                 return $embed

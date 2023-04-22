@@ -47,6 +47,7 @@ class SubmissionCreatedEvent extends AbstractEvent implements HasWebhookParams, 
             ],
             'created' => $this->submission->data()->created,
             'last_updated' => $this->submission->data()->updated,
+            'source' => $this->submission->data()->source,
             'fields' => $this->submission->getFieldsAnswers(),
             'url' => URL::getSelfURL() . ltrim(URL::build('/panel/forms/submissions/', 'view=' . $this->submission->data()->id), '/')
         ];
@@ -56,7 +57,7 @@ class SubmissionCreatedEvent extends AbstractEvent implements HasWebhookParams, 
         $language = new Language(ROOT_PATH . '/modules/Forms/language', DEFAULT_LANGUAGE);
 
         return DiscordWebhookBuilder::make()
-            ->setUsername($this->form->data()->title)
+            ->setUsername(($this->user != null && $this->user->exists() ? $this->user->getDisplayname() : Forms::getLanguage()->get('forms', 'guest')) . ' | ' . SITE_NAME)
             ->setAvatarUrl($this->user != null && $this->user->exists() ? $this->user->getAvatar(128, true) : null)
             ->addEmbed(function (DiscordEmbed $embed) use ($language) {
                 $embed

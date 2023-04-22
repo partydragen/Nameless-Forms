@@ -19,6 +19,7 @@ class ListFormsEndpoint extends KeyAuthEndpoint {
                 'title' => $form->title,
                 'captcha' => (bool) $form->captcha,
                 'comment_status' => $form->comment_status,
+                'source' => $form->source,
             ];
         }
 

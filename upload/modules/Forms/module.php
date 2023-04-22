@@ -295,6 +295,8 @@ class Forms_Module extends Module {
                 'captcha' => (bool)$form->data()->captcha,
                 'comment_status' => (int)$form->data()->comment_status,
                 'source' => $form->data()->source,
+                'hooks' => $form->data()->hooks,
+                'discord_fields' => (bool)$form->data()->discord_fields,
                 'forum_id' => (int)$form->data()->forum_id,
                 'fields' => $fields,
                 'permissions' => $permissions

@@ -79,7 +79,6 @@ class ForumSubmissionSource extends SubmissionBase {
         ]);
 
         Session::flash('success_post', Forms::getLanguage()->get('forms', 'form_submitted'));
-        Redirect::to(URL::build('/forum/topic/' . $topic_id));
         return true;
     }
 

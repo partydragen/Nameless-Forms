@@ -51,6 +51,7 @@ class SubmissionInfoEndpoint extends KeyAuthEndpoint {
             ],
             'created' => $submission->data()->created,
             'last_updated' => $submission->data()->updated,
+            'source' => $submission->data()->source,
             'fields' => $submission->getFieldsAnswers(),
             'url' => URL::getSelfURL() . ltrim(URL::build('/panel/forms/submissions/', 'view=' . $submission->data()->id), '/')
         ];

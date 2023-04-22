@@ -10,31 +10,44 @@ class ListSubmissionsEndpoint extends KeyAuthEndpoint {
 
     public function execute(Nameless2API $api): void {
         $query = 'SELECT * FROM nl2_forms_replies';
-        $where = ' WHERE id <> 0';
+        $where = '';
         $order = ' ORDER BY `created` DESC';
         $limit = '';
         $params = [];
 
+        // Get submissions submitted to source
+        if (isset($_GET['source']) && is_numeric($_GET['source'])) {
+            $where .= ' AND `source` = ?';
+            $params[] = $_GET['status'];
+        } else {
+            $where .= ' WHERE source IS NULL';
+        }
+
+        // Get submissions from a specific form.
         if (isset($_GET['form']) && is_numeric($_GET['form'])) {
             $where .= ' AND `form_id` = ?';
             $params[] = $_GET['form'];
         }
 
+        // Get submissions submitted from user.
         if (isset($_GET['user']) && is_numeric($_GET['user'])) {
             $where .= ' AND `user_id` = ?';
             $params[] = $_GET['user'];
         }
 
+        // Get submissions updated by certain user.
         if (isset($_GET['updated_by_user']) && is_numeric($_GET['updated_by_user'])) {
             $where .= ' AND `updated_by` = ?';
             $params[] = $_GET['updated_by_user'];
         }
 
+        // Get submissions from certain status
         if (isset($_GET['status']) && is_numeric($_GET['status'])) {
             $where .= ' AND `status_id` = ?';
             $params[] = $_GET['status'];
         }
 
+        // Limit the amount of submissions returned
         if (isset($_GET['limit']) && is_numeric($_GET['limit'])) {
             $limit .= ' LIMIT '. $_GET['limit'];
         }

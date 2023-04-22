@@ -92,6 +92,14 @@ if (Input::exists()) {
                 if ($submission->create($form, $user, $_POST)) {
                     // Redirect to submission view if user have view access, if not redirect back 
                     if ($user->isLoggedIn() && $forms->canViewOwnSubmission($group_ids, $form->data()->id)) {
+                        // Check if submission is submitted to different source
+                        if ($submission->data()->source != null) {
+                            $source = Forms::getInstance()->getSubmissionSource($submission->data()->source);
+                            if ($source != null) {
+                                Redirect::to($source->getURL($submission));
+                            }
+                        }
+
                         Session::flash('submission_success', $forms_language->get('forms', 'form_submitted'));
                         Redirect::to(URL::build('/user/submissions/', 'view=' . Output::getClean($submission->data()->id)));
 
