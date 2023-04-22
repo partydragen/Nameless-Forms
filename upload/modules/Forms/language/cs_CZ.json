@@ -123,5 +123,7 @@
     "forms/limits_and_requirements": "Omezení a požadavky",
     "forms/form_global_limit_reached": "Tento formulář byl v nedávné době odeslán příliš velkým počtem uživatelů, zkuste to prosím znovu za chvíli",
     "forms/form_user_limit_reached": "Dosáhli jste limitu počtu odeslání tohoto formuláře!",
-    "forms/form_requires_integration": "Tento formulář vyžaduje, abyste propojili svůj účet s účtem {{integration}}. Můžete tak provést v {{linkStart}}propojeních účtu{{linkEnd}}"
+    "forms/form_requires_integration": "Tento formulář vyžaduje, abyste propojili svůj účet s účtem {{integration}}. Můžete tak provést v {{linkStart}}propojeních účtu{{linkEnd}}",
+    "forms/staff_only": "Pouze členové týmu",
+    "forms/comment_staff_only": "Označit tento komentář jako viditelný pouze pro členy týmu"
 }
