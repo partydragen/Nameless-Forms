@@ -123,5 +123,7 @@
     "forms/limits_and_requirements": "Limity a požiadavky",
     "forms/form_global_limit_reached": "Tento formulár nedávno odoslalo príliš veľa používateľov, skúste to prosím neskôr",
     "forms/form_user_limit_reached": "Dosiahli ste limit, koľkokrát môžete odoslať tento formulár!",
-    "forms/form_requires_integration": "Tento formulár vyžaduje, aby ste prepojili svoj {{integration}} účet, môžete to urobiť na {{linkStart}}prepojeniach účtu{{linkEnd}}"
+    "forms/form_requires_integration": "Tento formulár vyžaduje, aby ste prepojili svoj {{integration}} účet, môžete to urobiť na {{linkStart}}prepojeniach účtu{{linkEnd}}",
+    "forms/staff_only": "Iba tím",
+    "forms/comment_staff_only": "Urobiť tento komentár viditeľný len pre tím"
 }
