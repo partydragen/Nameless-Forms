@@ -108,5 +108,22 @@
     "forms/your_submission_updated": "Votre soumission a été mise à jour",
     "forms/advanced": "Avancé",
     "forms/submission_source": "Soumettre la soumission à la source",
-    "forms/submit_to_submission_forum": "Soumettre la soumission au forum ?"
+    "forms/submit_to_submission_forum": "Soumettre la soumission au forum ?",
+    "forms/staff_only": "Staff uniquement",
+    "forms/field_name": "Nom du champ",
+    "forms/field_name_minimum": "Le nom du champ doit comporter au moins 2 caractères.",
+    "forms/field_order": "Ordre des champs",
+    "forms/field_updated_successfully": "Champ mis à jour avec succès",
+    "forms/fields": "Champs",
+    "forms/file": "Fichier (Images)",
+    "forms/form": "Formulaire",
+    "forms/form_created_successfully": "Formulaire créé avec succès.",
+    "forms/form_requires_integration": "Ce formulaire requiert de lier votre compte {{integration}}, vous pouvez le faire sur {{linkStart}}connexions de compte{{linkEnd}}",
+    "forms/limits_and_requirements": "Limites et Conditions",
+    "forms/form_global_limit_reached": "Trop d'utilisateurs ont récemment répondu à ce formulaire, veuillez réessayer plus tard",
+    "forms/form_user_limit_reached": "Vous avez atteint la limite de réponse à ce formulaire !",
+    "forms/comment_staff_only": "Rendre ce commentaire visible uniquement pour le staff",
+    "forms/field_deleted_successfully": "Champ supprimé avec succès",
+    "forms/field_name_maximum": "Le nom du champ doit comporter au maximum 255 caractères.",
+    "forms/no_permission_to_select_status": "Vous n'avez pas la permission de sélectionner ce statut !"
 }
