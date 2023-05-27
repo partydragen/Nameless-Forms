@@ -593,7 +593,7 @@ class Forms_Module extends Module {
                     'gids' => '2,3'
                 ));
                 $this->_db->insert('forms_statuses', array(
-                    'html' => '<span class="badge badge-warning">Under Considering</span>',
+                    'html' => '<span class="badge badge-warning" style="color:black;">Pending</span>',
                     'open' => 1,
                     'fids' => '1',
                     'gids' => '2,3'
