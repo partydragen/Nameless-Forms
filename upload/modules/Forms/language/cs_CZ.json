@@ -17,7 +17,7 @@
     "forms/confirm_delete_submisssion": "Opravdu chcete odstranit tuto odpověď?",
     "forms/creating_new_form": "Vytváření nového formuláře",
     "forms/creating_status": "Vytváření nového stavu",
-    "forms/current_status": "Stav",
+    "forms/current_status": "Aktuální stav",
     "forms/current_status_x": "Stav: {{status}}",
     "forms/current_version_x": "Současná verze doplňku: {{version}}",
     "forms/choose_picture": "Vybrat obrázek",
