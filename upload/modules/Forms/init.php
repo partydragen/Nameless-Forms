@@ -2,7 +2,7 @@
 /*
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.0-pr13
+ *  NamelessMC version 2.1.2
  *
  *  License: MIT
  *
@@ -12,37 +12,7 @@
 // Initialise forms language
 $forms_language = new Language(ROOT_PATH . '/modules/Forms/language', LANGUAGE);
 
-// Load classes
-spl_autoload_register(function ($class) {
-    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'classes', $class . '.php'));
-    if (file_exists($path)) {
-        require_once($path);
-    }
-});
-
-// Load classes
-spl_autoload_register(function ($class) {
-    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'classes', 'Events', $class . '.php'));
-    if (file_exists($path)) {
-        require_once($path);
-    }
-});
-
-// Load classes
-spl_autoload_register(function ($class) {
-    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'classes', 'SubmissionSources', $class . '.php'));
-    if (file_exists($path)) {
-        require_once($path);
-    }
-});
-
-// Load classes
-spl_autoload_register(function ($class) {
-    $path = join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Forms', 'hooks', $class . '.php'));
-    if (file_exists($path)) {
-        require_once($path);
-    }
-});
+require_once(ROOT_PATH . '/modules/Forms/autoload.php');
 
 // Initialise module
 require_once(ROOT_PATH . '/modules/Forms/module.php');

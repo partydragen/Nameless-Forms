@@ -2,7 +2,7 @@
 /*
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.0.1
+ *  NamelessMC version 2.1.2
  *
  *  License: MIT
  *
@@ -25,7 +25,7 @@ class Forms_Module extends Module {
         $name = 'Forms';
         $author = '<a href="https://partydragen.com" target="_blank" rel="nofollow noopener">Partydragen</a>';
         $module_version = '1.11.0';
-        $nameless_version = '2.1.0';
+        $nameless_version = '2.1.2';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
