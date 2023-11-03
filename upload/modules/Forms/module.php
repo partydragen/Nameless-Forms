@@ -78,29 +78,30 @@ class Forms_Module extends Module {
                         }
                     }
 
+                    // Check cache first
+                    $cache->setCache('navbar_order');
+                    if (!$cache->isCached('form-' . $form->id . '_order')) {
+                        // Create cache entry now
+                        $form_order = 5;
+                        $cache->store('form-' . $form->id . '_order', 5);
+                    } else {
+                        $form_order = $cache->retrieve('form-' . $form->id . '_order');
+                    }
+
                     // Add link location to navigation if user have permission
                     if ($perm) {
                         switch ($form->link_location) {
                             case 1:
                                 // Navbar
-                                // Check cache first
-                                $cache->setCache('navbar_order');
-                                if (!$cache->isCached('form-' . $form->id . '_order')) {
-                                    // Create cache entry now
-                                    $form_order = 5;
-                                    $cache->store('form-' . $form->id . '_order', 5);
-                                } else {
-                                    $form_order = $cache->retrieve('form-' . $form->id . '_order');
-                                }
                                 $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form_order, $form->icon);
                                 break;
                             case 2:
                                 // "More" dropdown
-                                $navigation->addItemToDropdown('more_dropdown', 'form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form->icon);
+                                $navigation->addItemToDropdown('more_dropdown', 'form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'top', null, $form->icon, $form_order);
                                 break;
                             case 3:
                                 // Footer
-                                $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'footer', null, 2000, $form->icon);
+                                $navigation->add('form-' . $form->id, Output::getClean($form->title), URL::build(Output::getClean($form->url)), 'footer', null, $form_order, $form->icon);
                                 break;
                         }
                     }
