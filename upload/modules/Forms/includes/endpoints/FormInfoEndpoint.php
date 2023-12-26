@@ -19,6 +19,7 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
             'source' => $form->data()->source,
         ];
 
+        // Form fields
         $fields = [];
         foreach ($form->getFields() as $field) {
             $fields[] = [
@@ -36,7 +37,8 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
             ];
         }
         $return['fields'] = $fields;
-        
+
+        // Form permissions
         $permissions = [];
         $permissions_query = $api->getDb()->query('SELECT * FROM nl2_forms_permissions WHERE form_id = ?', [$form->data()->id])->results();
         foreach ($permissions_query as $permission) {
@@ -48,6 +50,32 @@ class FormInfoEndpoint extends KeyAuthEndpoint {
             ];
         }
         $return['permissions'] = $permissions;
+
+        // Form statuses
+        $statuses = [];
+        $form_statuses = DB::getInstance()->query('SELECT * FROM nl2_forms_statuses WHERE deleted = 0');
+        if ($form_statuses->count()) {
+            foreach ($form_statuses->results() as $status_query) {
+                $form_ids = explode(',', $status_query->fids);
+
+                if (in_array($form->data()->id, $form_ids) || $status_query->id == 1) {
+                    $groups_list = [];
+                    $groups = explode(',', $status_query->gids);
+                    foreach ($groups as $group) {
+                        $groups_list[] = [
+                            'group_id' => (int) $group
+                        ];
+                    }
+
+                    $statuses[] = [
+                        'id' => $status_query->id,
+                        'html' => Output::getPurified($status_query->html),
+                        'permissions' => $groups_list
+                    ];
+                }
+            }
+        }
+        $return['statuses'] = $statuses;
 
         $api->returnArray($return);
     }
