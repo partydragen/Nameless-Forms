@@ -72,7 +72,7 @@ class SubmissionUpdatedStaffEvent extends AbstractEvent implements HasWebhookPar
                 return $embed
                     ->setTitle('[#' . $this->submission->data()->id . '] ' . $form->data()->title)
                     ->setDescription(Text::embedSafe($this->content))
-                    ->setFooter($language->get('forms', 'updated_submission_text', [
+                    ->setFooter($language->get('forms', 'new_submission_comment', [
                         'form' => $form->data()->title,
                         'user' => $this->user->getDisplayname()
                     ]))
