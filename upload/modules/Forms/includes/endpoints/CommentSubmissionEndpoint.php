@@ -2,7 +2,7 @@
 class CommentSubmissionEndpoint extends KeyAuthEndpoint {
 
     public function __construct() {
-        $this->_route = 'forms/submissions/{submission}';
+        $this->_route = 'forms/submissions/{submission}/comment';
         $this->_module = 'Suggestions';
         $this->_description = 'Leave a comment on the suggestion';
         $this->_method = 'POST';
