@@ -13,4 +13,5 @@ class FormsApiErrors {
     public const ERROR_SUBMISSION_NOT_FOUND = 'forms:submission_not_found';
     public const ERROR_VALIDATION_ERRORS = 'forms:validation_errors';
     public const ERROR_UNKNOWN_ERROR = 'forms:unknown_error';
+    public const ERROR_CANNOT_CHANGE_STATUS = 'forms:cannot_change_status';
 }
