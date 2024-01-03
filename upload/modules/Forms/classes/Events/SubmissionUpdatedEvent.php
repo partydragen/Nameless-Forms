@@ -21,7 +21,7 @@ class SubmissionUpdatedEvent extends AbstractEvent implements HasWebhookParams, 
     }
 
     public static function description(): string {
-        return (new Language(ROOT_PATH . '/modules/Forms/language'))->get('forms', 'new_form_submission_comment');
+        return (new Language(ROOT_PATH . '/modules/Forms/language'))->get('forms', 'updated_form_submission');
     }
 
     public function webhookParams(): array {
@@ -72,7 +72,7 @@ class SubmissionUpdatedEvent extends AbstractEvent implements HasWebhookParams, 
                 return $embed
                     ->setTitle('[#' . $this->submission->data()->id . '] ' . $form->data()->title)
                     ->setDescription(Text::embedSafe($this->content))
-                    ->setFooter($language->get('forms', 'new_submission_comment', [
+                    ->setFooter($language->get('forms', 'updated_submission_text', [
                         'form' => $form->data()->title,
                         'user' => $this->user->getDisplayname()
                     ]))

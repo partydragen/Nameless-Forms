@@ -62,7 +62,7 @@ class SubmissionCreatedEvent extends AbstractEvent implements HasWebhookParams, 
             ->addEmbed(function (DiscordEmbed $embed) use ($language) {
                 $embed
                     ->setTitle('[#' . $this->submission->data()->id . '] ' . $this->form->data()->title)
-                    ->setFooter($language->get('forms', 'new_submission_in_form', [
+                    ->setFooter($language->get('forms', 'new_submission_text', [
                         'form' => $this->form->data()->title,
                         'user' => ($this->user != null && $this->user->exists() ? $this->user->getDisplayname() : Forms::getLanguage()->get('forms', 'guest'))
                     ]))
