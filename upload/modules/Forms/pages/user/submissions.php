@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.0.1
+ *  NamelessMC version 2.1.2
  *
  *  License: MIT
  *
@@ -138,13 +138,15 @@ if (!isset($_GET['view'])) {
                     'content' => [
                         Validate::REQUIRED => true,
                         Validate::MIN => 3,
-                        Validate::MAX => 10000
+                        Validate::MAX => 10000,
+                        Validate::RATE_LIMIT => [1, 5],
                     ]
                 ])->messages([
                     'content' => [
                         Validate::REQUIRED => $forms_language->get('forms', 'comment_minimum'),
                         Validate::MIN => $forms_language->get('forms', 'comment_minimum'),
-                        Validate::MAX => $forms_language->get('forms', 'comment_maximum')
+                        Validate::MAX => $forms_language->get('forms', 'comment_maximum'),
+                        Validate::RATE_LIMIT => $forms_language->get('forms', 'post_rate_limit')
                     ]
                 ]);
 

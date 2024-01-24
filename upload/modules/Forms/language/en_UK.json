@@ -125,5 +125,6 @@
     "forms/limits_and_requirements": "Limits & Requirements",
     "forms/form_global_limit_reached": "To many users have recently submitted to this form, Please try again later",
     "forms/form_user_limit_reached": "You have reached the limit of times you can submit to this form!",
-    "forms/form_requires_integration": "This form requires you to link your {{integration}} account, You can do this at {{linkStart}}account connections{{linkEnd}}"
+    "forms/form_requires_integration": "This form requires you to link your {{integration}} account, You can do this at {{linkStart}}account connections{{linkEnd}}",
+    "forms/post_rate_limit": "Please slow down, You have already submitted within the last seconds!"
 }

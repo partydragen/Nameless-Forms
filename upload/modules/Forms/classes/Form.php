@@ -85,6 +85,9 @@ class Form {
         $to_validate = [];
         $to_validate_messages = [];
 
+        $to_validate['token'] = [Validate::RATE_LIMIT => [1, 5]];
+        $to_validate_messages['token'] = [Validate::RATE_LIMIT => $forms_language->get('forms', 'post_rate_limit')];
+
         foreach ($this->getFields() as $field) {
             $field_validation = [];
             $field_validation_message = [];
