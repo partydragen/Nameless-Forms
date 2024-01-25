@@ -125,5 +125,6 @@
     "forms/form_global_limit_reached": "Es haben zu viele Benutzer dieses Formular ausgefüllt. Bitte versuch es später noch einmal.",
     "forms/form_requires_integration": "Für dieses Formular musst du dein {{integration}}-Konto verknüpfen. Du kannst dies unter {{linkStart}}Kontoverbindungen{{linkEnd}} tun.",
     "forms/staff_only": "Nur Teammitglieder",
-    "forms/comment_staff_only": "Diesen Kommentar nur für Teammitglieder sichtbar machen"
+    "forms/comment_staff_only": "Diesen Kommentar nur für Teammitglieder sichtbar machen",
+    "forms/post_rate_limit": "Bitte mach langsam, du hast bereits in den letzten Sekunden eingereicht!"
 }
