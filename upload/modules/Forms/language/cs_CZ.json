@@ -125,5 +125,6 @@
     "forms/form_user_limit_reached": "Dosáhli jste limitu počtu odeslání tohoto formuláře!",
     "forms/form_requires_integration": "Tento formulář vyžaduje, abyste propojili svůj účet s účtem {{integration}}. Můžete tak provést v {{linkStart}}propojeních účtu{{linkEnd}}",
     "forms/staff_only": "Pouze členové týmu",
-    "forms/comment_staff_only": "Označit tento komentář jako viditelný pouze pro členy týmu"
+    "forms/comment_staff_only": "Označit tento komentář jako viditelný pouze pro členy týmu",
+    "forms/post_rate_limit": "Zpomalte, jeden formulář jste již nedávno odeslali!"
 }
