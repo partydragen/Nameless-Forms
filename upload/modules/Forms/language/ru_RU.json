@@ -123,5 +123,7 @@
     "forms/limits_and_requirements": "Лимиты и Требования",
     "forms/form_global_limit_reached": "Очень много пользователей уже отправили данную форму. Пожалуйста, попробуйте позже",
     "forms/form_user_limit_reached": "Вы достигли лимита отправки данной формы!",
-    "forms/no_permission_to_select_status": "У вас нет прав для выбора данного статуса!"
+    "forms/no_permission_to_select_status": "У вас нет прав для выбора данного статуса!",
+    "forms/post_rate_limit": "Пожалуйста, помедленнее, вы уже отправляли сообщение несколько секунд назад!",
+    "forms/comment_staff_only": "Сделать этот комментарий видимым только для администрации"
 }
