@@ -16,7 +16,7 @@
     
       <div class="ui segment">
           <h2 class="ui header">{$TITLE}</h2>
-          <hr>
+          <div class="ui divider"></div>
                 
           {if isset($SUCCESS)}
             <div class="ui success icon message">

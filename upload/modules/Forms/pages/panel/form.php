@@ -138,7 +138,7 @@ if (!isset($_GET['action'])) {
         ];
     }
 
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'FORM_NAME' => $forms_language->get('forms', 'form_name'),
         'FORM_NAME_VALUE' => Output::getClean(htmlspecialchars_decode($form->data()->title)),
         'FORM_ICON' => $forms_language->get('forms', 'form_icon'),
@@ -171,7 +171,7 @@ if (!isset($_GET['action'])) {
 
     $template->addJSScript(Input::createTinyEditor($language, 'inputContent', null, false, true));
     
-    $template_file = 'forms/form.tpl';
+    $template_file = 'forms/form';
 } else {
     switch($_GET['action']) {
         case 'new':
@@ -239,7 +239,7 @@ if (!isset($_GET['action'])) {
                 }
             }
         
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'FIELD_TITLE_FOR_X' => $forms_language->get('forms', 'new_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
@@ -344,7 +344,7 @@ if (!isset($_GET['action'])) {
                 $options = str_replace(',', "\n", htmlspecialchars($field->options));
             }
         
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'FIELD_TITLE_FOR_X' => $forms_language->get('forms', 'editing_field_for_x', ['form' => Output::getClean($form->data()->title)]),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/form/', 'form=' . Output::getClean($form->data()->id)),
@@ -399,7 +399,7 @@ if (!isset($_GET['action'])) {
                 ];
             }
             
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'FIELD_NAME' => $language->get('admin', 'field_name'),
                 'ORDER' => $forms_language->get('forms', 'field_order'),
                 'TYPE' => $language->get('admin', 'type'),
@@ -532,7 +532,7 @@ if (!isset($_GET['action'])) {
             $guest_query = DB::getInstance()->query('SELECT 0 AS id, post AS can_post, view_own AS can_view_own FROM nl2_forms_permissions WHERE group_id = 0 AND form_id = ?', [$form->data()->id])->results();
             $group_query = DB::getInstance()->query('SELECT id, name, can_post, can_view_own, can_view, can_delete FROM nl2_groups A LEFT JOIN (SELECT group_id, post AS can_post, `view_own` AS can_view_own, `view` AS can_view, can_delete FROM nl2_forms_permissions WHERE form_id = ?) B ON A.id = B.group_id ORDER BY `order` ASC', [$form->data()->id])->results();
         
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'USER' => $language->get('admin', 'user'),
                 'STAFFCP' => $language->get('moderator', 'staff_cp'),
                 'GROUP' => $language->get('admin', 'group'),
@@ -615,7 +615,7 @@ if (!isset($_GET['action'])) {
                 }
             }
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'SELECT_STATUSES' => $forms_language->get('forms', 'select_statuses_to_form'),
                 'ALL_STATUSES' => $status_array,
                 'CHANGE_STATUS_ON_COMMENT' => $forms_language->get('forms', 'change_status_on_comment'),
@@ -709,7 +709,7 @@ if (!isset($_GET['action'])) {
                 'period' => $player_playtime_json['period'] ?? 'all_time'
             ];
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'GLOBAL_LIMIT_VALUE' => $global_limit,
                 'USER_LIMIT_VALUE' => $user_limit,
                 'INTEGRATIONS_LIST' => $integrations_list,
@@ -774,7 +774,7 @@ if (!isset($_GET['action'])) {
                     ];
                 }
 
-                $smarty->assign([
+                $template->getEngine()->addVariables([
                     'SUBMIT_TO_FORUM' => 'Submit submission to forum?',
                     'SUBMIT_TO_FORUM_VALUE' => Output::getClean($form->data()->forum_id),
                     'SUBMIT_TO_FORUM_LIST' => $forum_list,
@@ -799,7 +799,7 @@ if (!isset($_GET['action'])) {
 
             $form_hooks = $form->data()->hooks ?: '[]';
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'SUBMISSION_SOURCE' => 'Submit submission to source',
                 'SUBMISSION_SOURCE_LIST' => $submission_sources,
                 'SUBMISSION_SOURCE_VALUE' => Output::getClean($form->data()->source),
@@ -828,18 +828,18 @@ if (Session::exists('staff_forms'))
     $success = Session::flash('staff_forms');
 
 if (isset($success))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
     ]);
 
 if (isset($errors) && count($errors))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
 
-$smarty->assign([
+$template->getEngine()->addVariables([
     'PARENT_PAGE' => PARENT_PAGE,
     'PAGE' => PANEL_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
@@ -870,4 +870,4 @@ $template->onPageLoad();
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 
 // Display template
-$template->displayTemplate($template_file, $smarty);
+$template->displayTemplate($template_file);

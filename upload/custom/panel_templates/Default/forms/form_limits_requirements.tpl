@@ -125,10 +125,10 @@
                             </div>
 
                             </br>
-                            <h5>MCStatistics (<a href="https://mcstatistics.org/" target="_blank">View</a>)</h5>
+                            <h5>MCStatistics (<a href="https://mcstatistics.org/" target="_blank">View</a>) {if !$MCSTATISTICS_ENABLED}<span class="badge badge-warning">Module Not Installed!</span>{/if}</h5>
                             <hr>
                             <div class="form-group">
-                                <label for="inputPlayerAge">Minimum player age since first join (0 to disable) {if !$MCSTATISTICS_ENABLED}(MCStatistics Module not installed)){/if}</label>
+                                <label for="inputPlayerAge">Minimum player age since first join (0 to disable)</label>
                                 <div class="input-group">
                                     <input type="number" name="player_age_interval" class="form-control" id="inputPlayerAge" value="{$PLAYER_AGE_VALUE.interval}" {if !$MCSTATISTICS_ENABLED}disabled{/if}>
                                     <select name="player_age_period" class="form-control" {if !$MCSTATISTICS_ENABLED}disabled{/if}>
@@ -142,7 +142,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="inputUserLimit">Minimum playtime (0 to disable) {if !$MCSTATISTICS_ENABLED}(MCStatistics Module not installed)){/if}</label>
+                                <label for="inputUserLimit">Minimum playtime (0 to disable)</label>
                                 <div class="input-group">
                                     <input type="number" name="player_playtime" class="form-control" id="inputPlayerPlaytime" value="{$PLAYER_PLAYTIME_VALUE.playtime}" {if !$MCSTATISTICS_ENABLED}disabled{/if}>
                                     <div class="input-group-prepend">

@@ -189,7 +189,7 @@ if (!isset($_GET['view'])) {
             ];
         }
 
-        $smarty->assign('PAGINATION', $pagination);
+        $template->getEngine()->addVariable('PAGINATION', $pagination);
     }
 
     // Get forms from database
@@ -226,7 +226,7 @@ if (!isset($_GET['view'])) {
         }
     }
 
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUBMISSIONS_LIST' => $submissions,
         'VIEW' => $language->get('general', 'view'),
         'NO_SUBMISSIONS' => $forms_language->get('forms', 'no_open_submissions'),
@@ -244,7 +244,7 @@ if (!isset($_GET['view'])) {
         'SORT' => $forms_language->get('forms', 'sort'),
     ]);
 
-    $template_file = 'forms/submissions.tpl';
+    $template_file = 'forms/submissions';
 } else {
     if (!isset($_GET['action'])) {
         // Get submission by id
@@ -460,7 +460,7 @@ if (!isset($_GET['view'])) {
 
         // Get comments
         $comments = DB::getInstance()->get('forms_comments', ['form_id', '=', $submission->data()->id])->results();
-        $smarty_comments = [];
+        $comments_list = [];
         foreach ($comments as $comment) {
             $comment_user = new User($comment->user_id);
             if ($comment_user->exists()) {
@@ -475,7 +475,7 @@ if (!isset($_GET['view'])) {
                 $comment_user_avatar = 'https://avatars.dicebear.com/api/initials/'.$language->get('general', 'deleted_user').'.png?size=64';
             }
 
-            $smarty_comments[] = [
+            $comments_list[] = [
                 'username' => $comment_user_name,
                 'profile' => $comment_user_profile,
                 'style' => $comment_user_style,
@@ -541,7 +541,7 @@ if (!isset($_GET['view'])) {
             $can_view_own = true;
         }
 
-        $smarty->assign([
+        $template->getEngine()->addVariables([
             'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => Output::getClean($form->data()->title)]),
             'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => Output::getPurified($status->data()->html)]),
             'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
@@ -553,7 +553,7 @@ if (!isset($_GET['view'])) {
             'USER_AVATAR' => $user_avatar,
             'CREATED_DATE' => date(DATE_FORMAT, $submission->data()->created),
             'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->data()->created, $language),
-            'COMMENTS' => $smarty_comments,
+            'COMMENTS' => $comments_list,
             'COMMENTS_TEXT' => $language->get('moderator', 'comments'),
             'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
             'NO_COMMENTS' => $language->get('moderator', 'no_comments'),
@@ -578,7 +578,7 @@ if (!isset($_GET['view'])) {
             'NO_PERMISSION_TO_SELECT_STATUS' => $forms_language->get('forms', 'no_permission_to_select_status')
         ]);
 
-        $template_file = 'forms/submissions_view.tpl';
+        $template_file = 'forms/submissions_view';
     } else {
         switch($_GET['action']) {
             case 'delete_submission':
@@ -626,18 +626,18 @@ if (Session::exists('submission_success'))
     $success = Session::flash('submission_success');
 
 if (isset($success))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
     ]);
 
 if (isset($errors) && count($errors))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
 
-$smarty->assign([
+$template->getEngine()->addVariables([
     'PARENT_PAGE' => PARENT_PAGE,
     'PAGE' => PANEL_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
@@ -652,4 +652,4 @@ $template->onPageLoad();
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 
 // Display template
-$template->displayTemplate($template_file, $smarty);
+$template->displayTemplate($template_file);

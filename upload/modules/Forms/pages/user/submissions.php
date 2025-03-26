@@ -93,10 +93,10 @@ if (!isset($_GET['view'])) {
             ];
         }
 
-        $smarty->assign('PAGINATION', $pagination);
+        $template->getEngine()->addVariable('PAGINATION', $pagination);
     }
 
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUBMISSIONS_LIST' => $submissions,
         'VIEW' => $language->get('general', 'view'),
         'NO_SUBMISSIONS' => $forms_language->get('forms', 'no_open_submissions'),
@@ -106,7 +106,7 @@ if (!isset($_GET['view'])) {
         'STATUS' => $forms_language->get('forms', 'status')
     ]);
 
-    $template_file = 'forms/submissions.tpl';
+    $template_file = 'forms/submissions';
 } else {
     // Get submission by id
     $submission = DB::getInstance()->query('SELECT * FROM nl2_forms_replies WHERE id = ? AND user_id = ? AND form_id IN (SELECT form_id FROM nl2_forms_permissions WHERE view_own = 1 AND group_id IN('.$group_ids.')) ORDER BY created DESC', [$_GET['view'], $user->data()->id]);
@@ -196,7 +196,7 @@ if (!isset($_GET['view'])) {
 
     // Get comments
     $comments = DB::getInstance()->get('forms_comments', [['form_id', $submission->data()->id], ['staff_only', 0]])->results();
-    $smarty_comments = [];
+    $comments_list = [];
     foreach ($comments as $comment) {
         // Check if comment user is 
         $user_profile = null;
@@ -216,7 +216,7 @@ if (!isset($_GET['view'])) {
             $user_name = $forms_language->get('forms', 'anonymous');
         }
 
-        $smarty_comments[] = [
+        $comments_list[] = [
             'username' => $user_name,
             'profile' => $user_profile,
             'style' => $user_style,
@@ -228,7 +228,7 @@ if (!isset($_GET['view'])) {
     }
 
     $target_user = new User($submission->data()->user_id);
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'FORM_X' => $forms_language->get('forms', 'form_x', ['form' => $form->data()->title]),
         'CURRENT_STATUS_X' => $forms_language->get('forms', 'current_status_x', ['status' => Output::getPurified($status->data()->html)]),
         'LAST_UPDATED' => $forms_language->get('forms', 'last_updated'),
@@ -240,7 +240,7 @@ if (!isset($_GET['view'])) {
         'USER_AVATAR' => $target_user->getAvatar(),
         'CREATED_DATE' => date(DATE_FORMAT, $submission->data()->created),
         'CREATED_DATE_FRIENDLY' => $timeago->inWords($submission->data()->created, $language),
-        'COMMENTS' => $smarty_comments,
+        'COMMENTS' => $comments_list,
         'COMMENTS_TEXT' => $language->get('moderator', 'comments'),
         'CAN_COMMENT' => Output::getClean($status->data()->open),
         'NEW_COMMENT' => $language->get('moderator', 'new_comment'),
@@ -251,11 +251,11 @@ if (!isset($_GET['view'])) {
         'PATH_TO_UPLOADS' => ((defined('CONFIG_PATH')) ? CONFIG_PATH . '/' : '/') . 'uploads/forms_submissions/'
     ]);
 
-    $template_file = 'forms/submissions_view.tpl';
+    $template_file = 'forms/submissions_view';
 }
 
 // Language values
-$smarty->assign([
+$template->getEngine()->addVariables([
     'USER_CP' => $language->get('user', 'user_cp'),
     'SUBMISSIONS' => $forms_language->get('forms', 'submissions'),
 ]);
@@ -268,13 +268,13 @@ if (Session::exists('submission_success'))
     $success = Session::flash('submission_success');
 
 if (isset($success))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
     ]);
 
 if (isset($errors) && count($errors))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
@@ -287,4 +287,4 @@ require(ROOT_PATH . '/core/templates/navbar.php');
 require(ROOT_PATH . '/core/templates/footer.php');
 
 // Display template
-$template->displayTemplate($template_file, $smarty);
+$template->displayTemplate($template_file);

@@ -126,7 +126,7 @@ if (!isset($_GET['action'])) {
                 }
             }
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'CREATING_STATUS' => $forms_language->get('forms', 'creating_status'),
                 'CANCEL' => $language->get('general', 'cancel'),
                 'CANCEL_LINK' => URL::build('/panel/forms'),
@@ -144,7 +144,7 @@ if (!isset($_GET['action'])) {
                 'MARKED_AS_OPEN' => $forms_language->get('forms', 'marked_as_open'),
             ]);
         
-            $template_file = 'forms/status_new.tpl';
+            $template_file = 'forms/status_new';
         break;
         case 'edit':
             // Editing a status
@@ -264,7 +264,7 @@ if (!isset($_GET['action'])) {
                 }
             }
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'EDITING_STATUS' => $forms_language->get('forms', 'editing_status'),
                 'CANCEL' => $language->get('general', 'cancel'),
                 'CANCEL_LINK' => URL::build('/panel/forms'),
@@ -284,7 +284,7 @@ if (!isset($_GET['action'])) {
                 'MARKED_AS_OPEN_VALUE' => Output::getClean($status->data()->open),
             ]);
 
-            $template_file = 'forms/status_edit.tpl';
+            $template_file = 'forms/status_edit';
         break;
         case 'delete':
             // status deletion
@@ -318,18 +318,18 @@ if (Session::exists('forms_statuses'))
     $success = Session::flash('forms_statuses');
 
 if (isset($success))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
     ]);
 
 if (isset($errors) && count($errors))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
 
-$smarty->assign([
+$template->getEngine()->addVariables([
     'PARENT_PAGE' => PARENT_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
     'FORMS' => $forms_language->get('forms', 'forms'),
@@ -344,4 +344,4 @@ $template->onPageLoad();
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 
 // Display template
-$template->displayTemplate($template_file, $smarty);
+$template->displayTemplate($template_file);

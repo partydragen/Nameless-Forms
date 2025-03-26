@@ -53,7 +53,7 @@ if (!isset($_GET['action'])) {
         }
     }
 
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'FORM' => $forms_language->get('forms', 'form'),
         'NEW_FORM' => $forms_language->get('forms', 'new_form'),
         'NEW_FORM_LINK' => URL::build('/panel/forms/', 'action=new'),
@@ -74,7 +74,7 @@ if (!isset($_GET['action'])) {
         
     ]);
 
-    $template_file = 'forms/forms.tpl';
+    $template_file = 'forms/forms';
 } else {
     switch ($_GET['action']) {
         case 'new':
@@ -163,7 +163,7 @@ if (!isset($_GET['action'])) {
                 }
             }
 
-            $smarty->assign([
+            $template->getEngine()->addVariables([
                 'CREATING_NEW_FORM' => $forms_language->get('forms', 'creating_new_form'),
                 'BACK' => $language->get('general', 'back'),
                 'BACK_LINK' => URL::build('/panel/forms'),
@@ -191,7 +191,7 @@ if (!isset($_GET['action'])) {
 
             $template->addJSScript(Input::createTinyEditor($language, 'inputContent', null, false, true));
 
-            $template_file = 'forms/forms_new.tpl';
+            $template_file = 'forms/forms_new';
         break;
         case 'delete':
             // Delete Form
@@ -220,18 +220,18 @@ if (Session::exists('staff_forms'))
     $success = Session::flash('staff_forms');
 
 if (isset($success))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'SUCCESS' => $success,
         'SUCCESS_TITLE' => $language->get('general', 'success')
     ]);
 
 if (isset($errors) && count($errors))
-    $smarty->assign([
+    $template->getEngine()->addVariables([
         'ERRORS' => $errors,
         'ERRORS_TITLE' => $language->get('general', 'error')
     ]);
 
-$smarty->assign([
+$template->getEngine()->addVariables([
     'PARENT_PAGE' => PARENT_PAGE,
     'PAGE' => PANEL_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
@@ -246,4 +246,4 @@ $template->onPageLoad();
 require(ROOT_PATH . '/core/templates/panel_navbar.php');
 
 // Display template
-$template->displayTemplate($template_file, $smarty);
+$template->displayTemplate($template_file);

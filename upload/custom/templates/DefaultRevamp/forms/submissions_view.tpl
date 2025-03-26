@@ -46,8 +46,8 @@
           <div class="ui segment">
             <a href="{$USER_PROFILE}" style="{$USER_STYLE}" target="_blank"><img src="{$USER_AVATAR}" class="ui mini avatar image" style="max-width:25px;max-height:25px;" alt="{$USER}" /> {$USER}</a>:
             <span class="pull-right" data-toggle="tooltip" data-original-title="{$CREATED_DATE}">{$CREATED_DATE_FRIENDLY}</span>
-            
-            <hr>
+
+            <div class="ui divider"></div>
             
             {foreach from=$ANSWERS item=answer}
               <strong>{$answer.question}</strong>
@@ -70,7 +70,7 @@
                   <i class="fa fa-user"></i> {$comment.username}:
                 {/if}
                 <span class="pull-right" data-toggle="tooltip" data-original-title="{$comment.date}">{$comment.date_friendly}</span>
-                <hr>
+                <div class="ui divider"></div>
                 {$comment.content}
               </div>
             {/foreach}
