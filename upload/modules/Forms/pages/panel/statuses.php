@@ -136,7 +136,7 @@ if (!isset($_GET['action'])) {
                 'NO' => $language->get('general', 'no'),
                 'STATUS_HTML' => $forms_language->get('forms', 'status_html'),
                 'STATUS_FORMS' => $forms_language->get('forms', 'status_forms'),
-                'STATUS_COLOUR' => $forms_language->get('forms', 'status_colour'),
+                'STATUS_COLOUR' => $forms_language->get('forms', 'status_color'),
                 'STATUS_COLOUR_VALUE' => '',
                 'ALL_FORMS' => $template_forms,
                 'STATUS_GROUPS' => $forms_language->get('forms', 'status_groups'),
