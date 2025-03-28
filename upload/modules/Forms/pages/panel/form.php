@@ -261,7 +261,7 @@ if (!isset($_GET['action'])) {
                 'REQUIRED' => $language->get('admin', 'required'),
             ]);
         
-            $template_file = 'forms/field.tpl';
+            $template_file = 'forms/field';
         break;
         case 'edit':
             if (!is_numeric($_GET['id'])) {
@@ -371,7 +371,7 @@ if (!isset($_GET['action'])) {
                 'REQUIRED_VALUE' => $field->required,
             ]);
         
-            $template_file = 'forms/field.tpl';
+            $template_file = 'forms/field';
         break;
         case 'delete':
             // Delete Field
@@ -415,7 +415,7 @@ if (!isset($_GET['action'])) {
                 'NO' => $language->get('general', 'no')
             ]);
             
-            $template_file = 'forms/form_fields.tpl';
+            $template_file = 'forms/form_fields';
         break;
         case 'permissions':
             // Form permissions
@@ -546,7 +546,7 @@ if (!isset($_GET['action'])) {
                 'SHOW_NAVIGATION_LINK_FOR_GUEST' => $forms_language->get('forms', 'show_navigation_link_for_guest'),
             ]);
             
-            $template_file = 'forms/form_permissions.tpl';
+            $template_file = 'forms/form_permissions';
         break;
         case 'statuses':
             // Form statuses
@@ -623,7 +623,7 @@ if (!isset($_GET['action'])) {
                 'DISABLED' => $language->get('user', 'disabled'),
             ]);
             
-            $template_file = 'forms/form_statuses.tpl';
+            $template_file = 'forms/form_statuses';
         break;
         case 'limits_requirements':
             // Limits and requirements
@@ -718,7 +718,7 @@ if (!isset($_GET['action'])) {
                 'PLAYER_PLAYTIME_VALUE' => $player_playtime,
             ]);
 
-            $template_file = 'forms/form_limits_requirements.tpl';
+            $template_file = 'forms/form_limits_requirements';
         break;
         case 'advanced':
             // Form advanced
