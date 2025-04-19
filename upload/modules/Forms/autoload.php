@@ -2,7 +2,7 @@
 /*
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
- *  NamelessMC version 2.1.2
+ *  NamelessMC version 2.2.0
  *
  *  License: MIT
  *
