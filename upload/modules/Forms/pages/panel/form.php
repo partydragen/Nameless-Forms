@@ -3,7 +3,7 @@
  *  Made by Partydragen
  *  https://github.com/partydragen/Nameless-Forms
  *  https://partydragen.com/
- *  NamelessMC version 2.1.0
+ *  NamelessMC version 2.2.1
  *
  *  License: MIT
  *
@@ -213,11 +213,11 @@ if (!isset($_GET['action'])) {
                             // Save to database
                             DB::getInstance()->insert('forms_fields', [
                                 'form_id' => $_GET['form'],
-                                'name' => Output::getClean(Input::get('field_name')),
+                                'name' => Input::get('field_name'),
                                 'type' => $type,
                                 'required' => $required,
-                                'options' => htmlspecialchars($options),
-                                'info' => Output::getClean(nl2br(Input::get('info'))),
+                                'options' => $options,
+                                'info' => nl2br(Input::get('info')),
                                 'order' => Input::get('order'),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
@@ -314,7 +314,7 @@ if (!isset($_GET['action'])) {
                                 'name' => Input::get('field_name'),
                                 'type' => $type,
                                 'required' => $required,
-                                'options' => htmlspecialchars($options),
+                                'options' => $options,
                                 'info' => nl2br(Input::get('info')),
                                 'min' => Input::get('minimum'),
                                 'max' => Input::get('maximum'),
@@ -591,7 +591,7 @@ if (!isset($_GET['action'])) {
                     
                     // Save to database
                     $form->update([
-                        'comment_status' => Output::getClean($_POST['comment_status'])
+                        'comment_status' => $_POST['comment_status']
                     ]);
                     
                     Session::flash('staff_forms', $forms_language->get('forms', 'form_updated_successfully'));
@@ -791,7 +791,7 @@ if (!isset($_GET['action'])) {
                     if (in_array('newFormSubmission', $events) || in_array('updatedFormSubmission', $events) || in_array('updatedFormSubmissionStaff', $events)) {
                         $hooks_array[] = [
                             'id' => $hook->id,
-                            'name' => Output::getClean($hook->name),
+                            'name' => $hook->name,
                         ];
                     }
                 }
