@@ -1,1 +1,5 @@
-{}
+{
+    "forms/action": "操作",
+    "forms/comment": "评论",
+    "forms/anonymous": "匿名"
+}
